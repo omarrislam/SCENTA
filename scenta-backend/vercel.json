@@ -4,12 +4,7 @@
   "builds": [
     {
       "src": "api/index.cjs",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": [
-          "dist-cjs/**"
-        ]
-      }
+      "use": "@vercel/node"
     }
   ],
   "routes": [

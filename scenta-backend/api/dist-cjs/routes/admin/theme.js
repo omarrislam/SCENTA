@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const auth_1 = require("../../middleware/auth");
+const auditLog_1 = require("../../middleware/auditLog");
+const themeController_1 = require("../../controllers/admin/themeController");
+const router = (0, express_1.Router)();
+router.use(auth_1.requireAuth, (0, auth_1.requireRole)("admin"), auditLog_1.auditLog);
+router.get("/", themeController_1.getTheme);
+router.patch("/", themeController_1.updateTheme);
+exports.default = router;

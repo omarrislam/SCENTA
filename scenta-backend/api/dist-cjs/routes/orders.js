@@ -1,0 +1,16 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const orderController_1 = require("../controllers/orderController");
+const auth_1 = require("../middleware/auth");
+const validate_1 = require("../middleware/validate");
+const checkout_1 = require("../validators/checkout");
+const rateLimit_1 = require("../middleware/rateLimit");
+const router = (0, express_1.Router)();
+router.post("/checkout/validate", rateLimit_1.checkoutLimiter, auth_1.requireAuth, (0, validate_1.validate)(checkout_1.checkoutSchema), orderController_1.validateCheckoutHandler);
+router.post("/orders", rateLimit_1.checkoutLimiter, auth_1.requireAuth, (0, validate_1.validate)(checkout_1.checkoutSchema), orderController_1.createCodOrder);
+router.post("/payments/stripe/create-intent", rateLimit_1.checkoutLimiter, auth_1.requireAuth, (0, validate_1.validate)(checkout_1.checkoutSchema), orderController_1.createStripeIntent);
+router.post("/payments/stripe/webhook", orderController_1.stripeWebhook);
+router.get("/orders/me", auth_1.requireAuth, orderController_1.listMyOrders);
+router.get("/orders/me/:orderId", auth_1.requireAuth, orderController_1.getMyOrder);
+exports.default = router;

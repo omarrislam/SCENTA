@@ -1,5 +1,5 @@
-const { createApp } = require("../dist-cjs/app.js");
-const { connectDatabase } = require("../dist-cjs/config/db.js");
+const { createApp } = require("./dist-cjs/app.js");
+const { connectDatabase } = require("./dist-cjs/config/db.js");
 
 let ready = null;
 
