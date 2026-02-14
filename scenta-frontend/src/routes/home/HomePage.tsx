@@ -15,7 +15,7 @@ import { pickLocalized, resolveLocale } from "../../utils/localize";
 const HomePage = () => {
   const { t, i18n } = useTranslation();
   const locale = resolveLocale(i18n.language);
-  useMeta("SCENTA | Siwa-Inspired Fragrance");
+  useMeta("SCENTA | Signature Fragrance");
   const { addItem } = useCart();
   const { pushToast } = useToast();
   const { theme, isLoading: isThemeLoading } = useTheme();
