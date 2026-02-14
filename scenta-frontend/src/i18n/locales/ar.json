@@ -1,0 +1,230 @@
+﻿{
+  "brand": "سنتا",
+  "nav": {
+    "shop": "تسوق",
+    "collections": "المجموعات",
+    "quiz": "اعثر على عطرك",
+    "blog": "المجلة",
+    "account": "الحساب",
+    "admin": "لوحة التحكم",
+    "cart": "السلة",
+    "signIn": "تسجيل الدخول",
+    "signOut": "تسجيل الخروج",
+    "register": "إنشاء حساب"
+  },
+  "promo": {
+    "shipping": "شحن مجاني داخل مصر للطلبات فوق ١٥٠٠ جنيه",
+    "cod": "الدفع عند الاستلام متاح",
+    "crafted": "مصنوع في القاهرة ومحبوب في كل مكان"
+  },
+  "hero": {
+    "label": "مجموعات التوقيع",
+    "title": "عطرٌ مصقول.",
+    "subtitle": "عطور فاخرة منتقاة لطقوسك اليومية. اكتشف عطرك القادم.",
+    "primary": "تسوق المجموعة",
+    "secondary": "ابدأ اختبار العطر",
+    "notesTitle": "نغمات مختارة",
+    "notesSubtitle": "خلطات منتقاة بعمق.",
+    "bestSellers": "الأكثر مبيعًا",
+    "slideTwoTitle": "منعش وخفيف ولا يُنسى.",
+    "slideTwoSubtitle": "أزهار شفافة ومسكات نظيفة لطقوس النهار.",
+    "slideTwoPrimary": "تسوق النغمات المنعشة",
+    "slideThreeTitle": "دفء يبقى طويلًا.",
+    "slideThreeSubtitle": "عنبر وأخشاب وملمس مخملي للمساء.",
+    "slideThreePrimary": "تسوق النغمات الدافئة",
+    "slideLabel": "شريحة البطل {{index}}"
+  },
+  "blog": {
+    "empty": "لا توجد مقالات بعد."
+  },
+  "labels": {
+    "new": "جديد",
+    "best": "الأفضل"
+  },
+  "cta": {
+    "explore": "استكشف",
+    "addToCart": "أضف للسلة",
+    "wishlist": "المفضلة",
+    "view": "عرض",
+    "add": "إضافة",
+    "addedCart": "تمت الإضافة للسلة",
+    "savedWishlist": "تم الحفظ في المفضلة",
+    "save": "حفظ"
+  },
+  "shop": {
+    "title": "المتجر",
+    "searchLabel": "بحث",
+    "searchPlaceholder": "ابحث عن العطور",
+    "sortLabel": "ترتيب",
+    "sortFeatured": "الأبرز",
+    "sortPriceAsc": "السعر من الأقل للأعلى",
+    "sortPriceDesc": "السعر من الأعلى للأقل",
+    "tagsLabel": "الوسوم",
+    "prev": "السابق",
+    "next": "التالي",
+    "pageOf": "صفحة {{current}} من {{total}}"
+  },
+  "cart": {
+    "title": "السلة",
+    "empty": "سلتك فارغة.",
+    "onlyLeft": "تبقى {{count}} فقط بالمخزون.",
+    "total": "الإجمالي",
+    "checkout": "إتمام الشراء",
+    "remove": "إزالة"
+  },
+  "checkout": {
+    "title": "الدفع",
+    "empty": "سلتك فارغة. أضف منتجات قبل الدفع.",
+    "stepLabel": "خطوة {{current}} من {{total}}: {{label}}",
+    "steps": {
+      "address": "العنوان",
+      "shipping": "الشحن",
+      "payment": "الدفع",
+      "review": "المراجعة"
+    },
+    "fullName": "الاسم الكامل",
+    "phone": "رقم الهاتف",
+    "address": "العنوان",
+    "city": "المدينة",
+    "area": "المنطقة",
+    "street": "الشارع",
+    "building": "المبنى",
+    "notes": "ملاحظات التوصيل",
+    "shippingStandard": "قياسي (2-4 أيام)",
+    "shippingExpress": "سريع (اليوم التالي)",
+    "paymentCod": "الدفع عند الاستلام",
+    "paymentCard": "بطاقة (Stripe)",
+    "reviewTotal": "الإجمالي",
+    "back": "رجوع",
+    "continue": "متابعة",
+    "placeOrder": "تأكيد الطلب",
+    "placing": "جارٍ تأكيد الطلب...",
+    "couponLabel": "كوبون",
+    "couponPlaceholder": "أدخل الكود",
+    "applyCoupon": "تطبيق",
+    "couponApplied": "تم تطبيق الكوبون",
+    "couponInvalid": "كوبون غير صالح",
+    "discount": "الخصم",
+    "finalTotal": "الإجمالي بعد الخصم",
+    "addressMissing": "يرجى استكمال عنوان التوصيل.",
+    "intentCreated": "تم بدء عملية الدفع عبر Stripe.",
+    "orderFailed": "تعذر إتمام الطلب."
+  },
+  "auth": {
+    "loginTitle": "تسجيل الدخول",
+    "registerTitle": "إنشاء حساب",
+    "forgotTitle": "إعادة تعيين كلمة المرور",
+    "resetTitle": "تعيين كلمة مرور جديدة",
+    "fullName": "الاسم الكامل",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "continue": "متابعة",
+    "sendReset": "إرسال رابط الاستعادة",
+    "savePassword": "حفظ كلمة المرور",
+    "noAccount": "ليس لديك حساب؟ سجّل الآن",
+    "haveAccount": "لديك حساب؟ سجّل الدخول",
+    "errors": {
+      "required": "يرجى تعبئة جميع الحقول المطلوبة.",
+      "invalid": "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
+      "exists": "البريد الإلكتروني مسجل بالفعل.",
+      "generic": "تعذر تسجيل الدخول. حاول مرة أخرى."
+    }
+  },
+  "product": {
+    "loading": "جارٍ التحميل...",
+    "tabs": {
+      "description": "الوصف",
+      "notes": "النغمات",
+      "specs": "المواصفات",
+      "reviews": "التقييمات"
+    },
+    "specs": {
+      "longevity": "الثبات: 6-8 ساعات",
+      "sillage": "الفوحان: متوسط",
+      "season": "الموسم: طوال العام"
+    }
+  },
+  "account": {
+    "title": "الحساب",
+    "overviewTitle": "نظرة عامة",
+    "welcome": "مرحبًا بعودتك",
+    "overview": "ستجد هنا نظرة عامة على الحساب والطلبات والمفضلة.",
+    "profile": "بيانات الحساب",
+    "name": "الاسم",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "unknown": "غير معروف",
+    "changePassword": "تغيير كلمة المرور",
+    "currentPassword": "كلمة المرور الحالية",
+    "newPassword": "كلمة المرور الجديدة",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "updatePassword": "تحديث كلمة المرور",
+    "passwordMissing": "يرجى تعبئة جميع حقول كلمة المرور.",
+    "passwordMismatch": "كلمتا المرور غير متطابقتين.",
+    "passwordUpdated": "تم تحديث كلمة المرور.",
+    "passwordError": "تعذر تحديث كلمة المرور.",
+    "orders": "الطلبات",
+    "wishlist": "المفضلة",
+    "wishlistEmpty": "قائمة المفضلة فارغة.",
+    "orderLabel": "طلب {{number}}",
+    "orderMissing": "الطلب غير موجود.",
+    "status": "الحالة",
+    "total": "الإجمالي"
+  },
+  "quiz": {
+    "title": "اعثر على عطرك",
+    "subtitle": "أجب عن بضعة أسئلة وسنطابق لك العطر الأنسب.",
+    "recommendation": "نوصي بـ {{name}}",
+    "reason": "السبب: نغمات متوازنة تناسب مزاجك ومناسباتك.",
+    "progress": "السؤال {{current}} من {{total}}",
+    "retake": "إعادة الاختبار"
+  },
+  "home": {
+    "tabs": {
+      "best": "الأكثر مبيعًا",
+      "new": "وصل حديثًا",
+      "featured": "مختارة"
+    },
+    "collectionsTitle": "تسوق حسب المجموعة",
+    "collectionsCta": "عرض الكل",
+    "shippingFastTitle": "توصيل سريع",
+    "shippingFastBody": "٢-٤ أيام داخل مصر مع تتبع.",
+    "shippingCodTitle": "الدفع عند الاستلام",
+    "shippingCodBody": "ادفع بأمان عند باب منزلك.",
+    "shippingGiftTitle": "جاهزة للهدايا",
+    "shippingGiftBody": "تغليف فاخر مع بطاقات العطر.",
+    "editorialEyebrow": "تحرير العطر",
+    "editorialTitle": "اختيارات طقوس العطر",
+    "editorialBody": "مختارات من النغمات الدافئة والزهور الخفيفة لطقوس عصرية.",
+    "editorialCta": "اكتشف المختارات",
+    "quizTitle": "اعثر على توقيعك",
+    "quizBody": "أجب على بعض الأسئلة وسنطابق لك العطر المثالي.",
+    "quizCta": "ابدأ الاختبار",
+    "newsletterTitle": "إصدارات خاصة",
+    "newsletterBody": "احصل على وصول مبكر للإصدارات المحدودة وطقوس العطر.",
+    "newsletterCta": "انضم للقائمة"
+  },
+  "order": {
+    "confirmedTitle": "تم تأكيد الطلب",
+    "confirmedBody": "تم تقديم طلبك. سنرسل لك تفاصيل التتبع عبر البريد الإلكتروني."
+  },
+  "stock": {
+    "low": "مخزون منخفض (تبقى {{count}})",
+    "ok": "متوفر ({{count}})",
+    "out": "غير متوفر"
+  },
+  "footer": {
+    "blurb": "عطور راقية مستوحاة من الطقوس العصرية.",
+    "about": "عن سنتا",
+    "aboutLink": "عن سنتا",
+    "policies": "السياسات",
+    "returns": "الاسترجاع",
+    "shipping": "الشحن",
+    "privacy": "الخصوصية",
+    "terms": "الشروط",
+    "copyright": "© 2026 سنتا. جميع الحقوق محفوظة."
+  },
+  "page": {
+    "loading": "جارٍ التحميل..."
+  }
+}

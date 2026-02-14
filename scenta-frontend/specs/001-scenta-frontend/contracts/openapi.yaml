@@ -1,0 +1,328 @@
+﻿openapi: 3.0.3
+info:
+  title: SCENTA Frontend API Contracts
+  version: 1.0.0
+  description: Frontend-facing REST endpoints consumed by the SCENTA UI.
+servers:
+  - url: /api
+paths:
+  /auth/login:
+    post:
+      summary: Log in
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LoginRequest' }
+      responses:
+        '200': { description: OK }
+  /auth/register:
+    post:
+      summary: Register account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RegisterRequest' }
+      responses:
+        '201': { description: Created }
+  /products:
+    get:
+      summary: List products
+      parameters:
+        - in: query
+          name: q
+          schema: { type: string }
+        - in: query
+          name: filters
+          schema: { type: object }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProductListResponse' }
+  /products/{slug}:
+    get:
+      summary: Product detail
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProductResponse' }
+  /collections:
+    get:
+      summary: List collections
+      responses:
+        '200': { description: OK }
+  /collections/{slug}:
+    get:
+      summary: Collection detail
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: OK }
+  /products/{productId}/reviews:
+    get:
+      summary: List reviews for product
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: OK }
+  /cart:
+    get:
+      summary: Get cart
+      responses:
+        '200': { description: OK }
+  /cart/items:
+    post:
+      summary: Add item to cart
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CartItemRequest' }
+      responses:
+        '200': { description: OK }
+  /cart/items/{itemId}:
+    patch:
+      summary: Update cart item
+      parameters:
+        - in: path
+          name: itemId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CartItemUpdate' }
+      responses:
+        '200': { description: OK }
+    delete:
+      summary: Remove cart item
+      parameters:
+        - in: path
+          name: itemId
+          required: true
+          schema: { type: string }
+      responses:
+        '204': { description: No Content }
+  /checkout/validate:
+    post:
+      summary: Validate checkout
+      responses:
+        '200': { description: OK }
+  /orders:
+    post:
+      summary: Create order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/OrderRequest' }
+      responses:
+        '201': { description: Created }
+  /orders/me:
+    get:
+      summary: List my orders
+      responses:
+        '200': { description: OK }
+  /orders/{orderId}:
+    get:
+      summary: Order detail
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: OK }
+  /payments/stripe/create-intent:
+    post:
+      summary: Create Stripe payment intent
+      responses:
+        '200': { description: OK }
+  /wishlist:
+    get:
+      summary: List wishlist
+      responses:
+        '200': { description: OK }
+    post:
+      summary: Add wishlist item
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/WishlistRequest' }
+      responses:
+        '200': { description: OK }
+  /wishlist/{itemId}:
+    delete:
+      summary: Remove wishlist item
+      parameters:
+        - in: path
+          name: itemId
+          required: true
+          schema: { type: string }
+      responses:
+        '204': { description: No Content }
+  /back-in-stock:
+    post:
+      summary: Subscribe to back-in-stock
+      responses:
+        '200': { description: OK }
+  /admin/products:
+    get:
+      summary: Admin list products
+      responses:
+        '200': { description: OK }
+    post:
+      summary: Admin create product
+      responses:
+        '201': { description: Created }
+  /admin/products/{id}:
+    patch:
+      summary: Admin update product
+      responses:
+        '200': { description: OK }
+  /admin/inventory:
+    post:
+      summary: Admin update inventory
+      responses:
+        '200': { description: OK }
+  /admin/orders:
+    get:
+      summary: Admin list orders
+      responses:
+        '200': { description: OK }
+  /admin/orders/{id}:
+    patch:
+      summary: Admin update order status
+      responses:
+        '200': { description: OK }
+  /admin/customers:
+    get:
+      summary: Admin list customers
+      responses:
+        '200': { description: OK }
+  /admin/coupons:
+    get:
+      summary: Admin list coupons
+      responses:
+        '200': { description: OK }
+    post:
+      summary: Admin create coupon
+      responses:
+        '201': { description: Created }
+  /admin/collections:
+    get:
+      summary: Admin list collections
+      responses:
+        '200': { description: OK }
+  /admin/theme:
+    patch:
+      summary: Admin update theme sections
+      responses:
+        '200': { description: OK }
+  /admin/blog:
+    get:
+      summary: Admin list blog posts
+      responses:
+        '200': { description: OK }
+    post:
+      summary: Admin create blog post
+      responses:
+        '201': { description: Created }
+  /admin/pages:
+    get:
+      summary: Admin list pages
+      responses:
+        '200': { description: OK }
+    post:
+      summary: Admin create page
+      responses:
+        '201': { description: Created }
+  /admin/reports:
+    get:
+      summary: Admin sales reports
+      responses:
+        '200': { description: OK }
+components:
+  schemas:
+    LoginRequest:
+      type: object
+      properties:
+        email: { type: string }
+        password: { type: string }
+      required: [email, password]
+    RegisterRequest:
+      type: object
+      properties:
+        name: { type: string }
+        email: { type: string }
+        password: { type: string }
+      required: [name, email, password]
+    ProductListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/Product' }
+        total: { type: integer }
+    ProductResponse:
+      type: object
+      properties:
+        item: { $ref: '#/components/schemas/Product' }
+    Product:
+      type: object
+      properties:
+        id: { type: string }
+        slug: { type: string }
+        name: { type: string }
+        price: { type: number }
+        variants:
+          type: array
+          items: { $ref: '#/components/schemas/Variant' }
+    Variant:
+      type: object
+      properties:
+        id: { type: string }
+        size: { type: string }
+        price: { type: number }
+        stock: { type: integer }
+    CartItemRequest:
+      type: object
+      properties:
+        productId: { type: string }
+        variantId: { type: string }
+        quantity: { type: integer }
+      required: [productId, variantId, quantity]
+    CartItemUpdate:
+      type: object
+      properties:
+        quantity: { type: integer }
+    OrderRequest:
+      type: object
+      properties:
+        cartId: { type: string }
+        addressId: { type: string }
+        paymentMethod: { type: string }
+      required: [cartId, addressId, paymentMethod]
+    WishlistRequest:
+      type: object
+      properties:
+        productId: { type: string }
+      required: [productId]

@@ -1,0 +1,230 @@
+﻿{
+  "brand": "SCENTA",
+  "nav": {
+    "shop": "Shop",
+    "collections": "Collections",
+    "quiz": "Find Your Scent",
+    "blog": "Journal",
+    "account": "Account",
+    "admin": "Admin",
+    "cart": "Cart",
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "register": "Register"
+  },
+  "promo": {
+    "shipping": "Free shipping in Egypt over EGP 1500",
+    "cod": "Cash on delivery available",
+    "crafted": "Crafted in Cairo, loved everywhere"
+  },
+  "hero": {
+    "label": "Signature Collections",
+    "title": "Scent, refined.",
+    "subtitle": "Luxury fragrances curated for modern rituals. Discover your next signature.",
+    "primary": "Shop the collection",
+    "secondary": "Take the scent quiz",
+    "notesTitle": "Featured Notes",
+    "notesSubtitle": "Curated blends with depth.",
+    "bestSellers": "Best Sellers",
+    "slideTwoTitle": "Bright, airy, unforgettable.",
+    "slideTwoSubtitle": "Sheer florals and clean musks made for daylight rituals.",
+    "slideTwoPrimary": "Shop fresh notes",
+    "slideThreeTitle": "Warmth that lingers.",
+    "slideThreeSubtitle": "Amber, woods, and velvet textures for the night.",
+    "slideThreePrimary": "Shop warm notes",
+    "slideLabel": "Hero slide {{index}}"
+  },
+  "blog": {
+    "empty": "No posts yet."
+  },
+  "labels": {
+    "new": "New",
+    "best": "Best"
+  },
+  "cta": {
+    "explore": "Explore",
+    "addToCart": "Add to cart",
+    "wishlist": "Wishlist",
+    "view": "View",
+    "add": "Add",
+    "addedCart": "Added to cart",
+    "savedWishlist": "Saved to wishlist",
+    "save": "Save"
+  },
+  "shop": {
+    "title": "Shop",
+    "searchLabel": "Search",
+    "searchPlaceholder": "Search fragrances",
+    "sortLabel": "Sort",
+    "sortFeatured": "Featured",
+    "sortPriceAsc": "Price low to high",
+    "sortPriceDesc": "Price high to low",
+    "tagsLabel": "Tags",
+    "prev": "Prev",
+    "next": "Next",
+    "pageOf": "Page {{current}} of {{total}}"
+  },
+  "cart": {
+    "title": "Cart",
+    "empty": "Your cart is empty.",
+    "onlyLeft": "Only {{count}} left in stock.",
+    "total": "Total",
+    "checkout": "Checkout",
+    "remove": "Remove"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "empty": "Your cart is empty. Add items before checking out.",
+    "stepLabel": "Step {{current}} of {{total}}: {{label}}",
+    "steps": {
+      "address": "Address",
+      "shipping": "Shipping",
+      "payment": "Payment",
+      "review": "Review"
+    },
+    "fullName": "Full name",
+    "phone": "Phone",
+    "address": "Address",
+    "city": "City",
+    "area": "Area",
+    "street": "Street",
+    "building": "Building",
+    "notes": "Delivery notes",
+    "shippingStandard": "Standard (2-4 days)",
+    "shippingExpress": "Express (next day)",
+    "paymentCod": "Cash on delivery",
+    "paymentCard": "Card (Stripe)",
+    "reviewTotal": "Total",
+    "back": "Back",
+    "continue": "Continue",
+    "placeOrder": "Place order",
+    "placing": "Placing order...",
+    "couponLabel": "Coupon",
+    "couponPlaceholder": "Enter code",
+    "applyCoupon": "Apply",
+    "couponApplied": "Coupon applied",
+    "couponInvalid": "Invalid coupon",
+    "discount": "Discount",
+    "finalTotal": "Final total",
+    "addressMissing": "Please complete your delivery address.",
+    "intentCreated": "Stripe payment initiated.",
+    "orderFailed": "Unable to place order."
+  },
+  "auth": {
+    "loginTitle": "Login",
+    "registerTitle": "Register",
+    "forgotTitle": "Reset password",
+    "resetTitle": "Set new password",
+    "fullName": "Full name",
+    "email": "Email",
+    "password": "Password",
+    "continue": "Continue",
+    "sendReset": "Send reset link",
+    "savePassword": "Save password",
+    "noAccount": "No account? Register",
+    "haveAccount": "Already have an account? Login",
+    "errors": {
+      "required": "Please fill in all required fields.",
+      "invalid": "Invalid email or password.",
+      "exists": "Email already registered.",
+      "generic": "Unable to sign in. Please try again."
+    }
+  },
+  "product": {
+    "loading": "Loading...",
+    "tabs": {
+      "description": "Description",
+      "notes": "Notes",
+      "specs": "Specs",
+      "reviews": "Reviews"
+    },
+    "specs": {
+      "longevity": "Longevity: 6-8 hours",
+      "sillage": "Sillage: Moderate",
+      "season": "Season: All year"
+    }
+  },
+  "account": {
+    "title": "Account",
+    "overviewTitle": "Overview",
+    "welcome": "Welcome back",
+    "overview": "Account overview, orders, and wishlist will live here.",
+    "profile": "Profile details",
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "unknown": "Unknown",
+    "changePassword": "Change password",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm new password",
+    "updatePassword": "Update password",
+    "passwordMissing": "Please fill in all password fields.",
+    "passwordMismatch": "Passwords do not match.",
+    "passwordUpdated": "Password updated.",
+    "passwordError": "Unable to update password.",
+    "orders": "Orders",
+    "wishlist": "Wishlist",
+    "wishlistEmpty": "Your wishlist is empty.",
+    "orderLabel": "Order {{number}}",
+    "orderMissing": "Order not found.",
+    "status": "Status",
+    "total": "Total"
+  },
+  "quiz": {
+    "title": "Find Your Scent",
+    "subtitle": "Answer a few questions and we will pair you with your ideal fragrance.",
+    "recommendation": "We recommend {{name}}",
+    "reason": "Why: Balanced notes tailored to your mood and occasion.",
+    "progress": "Question {{current}} of {{total}}",
+    "retake": "Retake quiz"
+  },
+  "home": {
+    "tabs": {
+      "best": "Best sellers",
+      "new": "New arrivals",
+      "featured": "Featured"
+    },
+    "collectionsTitle": "Shop by collection",
+    "collectionsCta": "View all",
+    "shippingFastTitle": "Fast delivery",
+    "shippingFastBody": "2-4 days across Egypt with tracking.",
+    "shippingCodTitle": "Cash on delivery",
+    "shippingCodBody": "Pay safely at your doorstep.",
+    "shippingGiftTitle": "Gift-ready",
+    "shippingGiftBody": "Premium boxing and scent cards included.",
+    "editorialEyebrow": "Editorial",
+    "editorialTitle": "The scent ritual edit",
+    "editorialBody": "A curated selection of warm signatures and airy florals for modern rituals.",
+    "editorialCta": "Explore the edit",
+    "quizTitle": "Find your signature",
+    "quizBody": "Answer a few questions and we will match you to the perfect scent.",
+    "quizCta": "Start the quiz",
+    "newsletterTitle": "Private drops",
+    "newsletterBody": "Get early access to limited releases and scent rituals.",
+    "newsletterCta": "Join the list"
+  },
+  "order": {
+    "confirmedTitle": "Order Confirmed",
+    "confirmedBody": "Your order has been placed. We will email you the tracking details."
+  },
+  "stock": {
+    "low": "Low stock ({{count}} left)",
+    "ok": "{{count}} in stock",
+    "out": "Out of stock"
+  },
+  "footer": {
+    "blurb": "Refined scents inspired by modern rituals.",
+    "about": "About",
+    "aboutLink": "About SCENTA",
+    "policies": "Policies",
+    "returns": "Returns",
+    "shipping": "Shipping",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "copyright": "© 2026 SCENTA. All rights reserved."
+  },
+  "page": {
+    "loading": "Loading..."
+  }
+}

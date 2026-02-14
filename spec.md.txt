@@ -1,0 +1,801 @@
+# SCENTA — Perfume E-Commerce Web App (Shopify-like)  
+**Spec for Codex + Speckit Toolkit**  
+Version: 1.0 • Market: Egypt (EGP) • Languages: Arabic (RTL) + English (LTR) • Brand: SCENTA (own brand only)
+
+---
+
+## 0) One-sentence pitch
+SCENTA is a luxury/minimal, Shopify-style perfume store selling **Extrait** perfumes in **50ml / 100ml** plus **decants**, with fast browsing, powerful filtering, wishlist, reviews, and a full admin dashboard for catalog, inventory, orders, customers, coupons, collections, CMS, and reports.
+
+---
+
+## 1) Goals & Non-Goals
+
+### Goals
+- Premium **luxury/minimal** storefront with smooth animations and excellent performance (Shopify-like feel).
+- Bi-lingual experience: **Arabic (RTL)** and **English (LTR)**.
+- Core commerce: browse → filter/search → product → cart → checkout → pay (COD/Stripe) → order tracking.
+- Admin dashboard to manage the entire business.
+- Clean architecture with **separate repos**: `frontend` (React) and `backend` (Node/Express + MongoDB).
+- Prepare for future deployment (env config, storage abstraction, logging, CI-ready structure).
+
+### Non-Goals (out of scope)
+- Marketplace sellers / multi-vendor
+- Subscriptions
+
+---
+
+## 2) Key Requirements Snapshot
+
+### Storefront
+- Products: **Perfumes + Decants**
+- Brand: **SCENTA only**
+- Variants:
+  - Size: **50ml**, **100ml**
+  - Concentration: **Extrait only**
+  - Gender: **Men / Women / Unisex**
+  - Bottle type: **Spray only**
+- Media: multiple images + zoom
+- Filters (must-have):
+  - Price range
+  - Notes (top/middle/base)
+  - Season
+  - Occasion
+  - Longevity/sillage
+  - New / Best seller
+  - Gender
+  - Size
+  - In stock / Out of stock
+- Reviews: star rating + text + optional images (optional)  
+- Auth: **Email + password**
+- Checkout: **Login required**
+- Payments: **Cash on Delivery + Stripe**
+- Shipping: **Flat rate**, Standard only
+- Tax: **Included in price**
+- Email: **Abandoned cart + Order confirmation**
+
+### Admin
+- Admin only
+- Modules:
+  - Products + variants
+  - Inventory
+  - Orders + status updates
+  - Customers
+  - Coupons/discounts (% off, Buy X Get Y)
+  - Collections
+  - Homepage sections editor (Shopify-like theme sections)
+  - Blog/pages CMS
+  - Reports (sales, top products)
+
+### Performance & UX
+- “Fast like Shopify”: optimize LCP, CLS, TTFB, route-level code splitting, image optimization, caching.
+- Tasteful animations (micro-interactions; no heavy effects that hurt performance).
+
+---
+
+## 3) Target Users & Roles
+
+### Roles
+- **Guest**: can browse, search, filter, view products, but cannot checkout.
+- **Customer (logged in)**: can add to cart, checkout, track orders, wishlist, review, get back-in-stock notifications.
+- **Admin**: full dashboard permissions.
+
+---
+
+## 4) Information Architecture (Sitemap)
+
+### Storefront (Public)
+- `/` Home
+- `/shop` All products (with filters + search)
+- `/collections/:slug` Collection page
+- `/product/:slug` Product details
+- `/quiz` Find Your Scent quiz
+- `/blog` Blog listing
+- `/blog/:slug` Blog post
+- `/pages/:slug` Static pages (Terms, Privacy, Returns, Shipping, About, Contact)
+- `/auth/login`
+- `/auth/register`
+- `/auth/forgot-password`
+- `/auth/reset-password`
+
+### Storefront (Customer)
+- `/account`
+- `/account/orders`
+- `/account/orders/:orderId`
+- `/account/wishlist`
+- `/checkout` (requires login)
+- `/cart`
+
+### Admin
+- `/admin`
+- `/admin/products`
+- `/admin/products/new`
+- `/admin/products/:id/edit`
+- `/admin/inventory`
+- `/admin/orders`
+- `/admin/orders/:id`
+- `/admin/customers`
+- `/admin/coupons`
+- `/admin/collections`
+- `/admin/theme` (homepage sections editor)
+- `/admin/blog`
+- `/admin/pages`
+- `/admin/reports`
+
+---
+
+## 5) UI/UX Direction (Luxury / Minimal)
+
+### Visual language
+- Minimal layout, generous whitespace, premium typography.
+- Neutral palette (light base) with dark accents; allow optional “dark mode” later.
+- Product photography is hero: large images, crisp zoom, subtle shadows.
+
+### Animations (required)
+- Page transitions (light fade/slide; must not block rendering).
+- Hover states on product cards (image zoom-in + quick actions).
+- Sticky add-to-cart on product page (when scrolled past main CTA).
+- Skeleton loaders for product grid.
+- Micro-interactions: button press, input focus, toast notifications.
+
+### Accessibility & i18n
+- Full RTL support for Arabic:
+  - Direction changes per locale
+  - Mirrored icons where needed
+  - Correct Arabic typography and spacing
+- Keyboard navigation, ARIA labels, contrast compliance.
+
+---
+
+## 6) Storefront Pages — Detailed Requirements
+
+### 6.1 Home (`/`)
+**Goal:** Provide an immediate luxury feel + conversion funnels.
+
+Sections (order is recommended; admin can reorder via Theme Editor):
+1) **Hero Banner + CTA**
+   - Large image/video (optional) with headline
+   - Primary CTA: “Shop Now”
+   - Secondary CTA: “Find Your Scent”
+2) **Best Sellers**
+   - 8–12 products
+   - “Quick Add” / “Quick View”
+3) **Shop by Notes**
+   - Note categories cards (e.g., Vanilla, Woody, Citrus, Musk, Amber, Floral)
+   - Clicking takes user to `/shop?notes=...`
+4) **New Arrivals**
+   - Most recent products
+5) **Find Your Scent Quiz Teaser**
+   - Short section with CTA to `/quiz`
+6) **Email Signup**
+   - Collect email for promotions + back-in-stock alerts
+7) Optional: Testimonials strip, brand story, Instagram grid (future)
+
+**Acceptance criteria**
+- Home loads fast; hero image optimized; best sellers show within 1–2 seconds on typical connection.
+- Sections editable via admin theme editor (text, images, ordering, visibility).
+
+---
+
+### 6.2 Shop / Product Listing (`/shop`)
+Features:
+- Filter sidebar (desktop) + bottom sheet (mobile)
+- Search input with debounce
+- Sort options:
+  - Featured
+  - Best sellers
+  - New arrivals
+  - Price low→high, high→low
+- Pagination or infinite scroll (choose one; default: pagination)
+- Product cards:
+  - Image (hover swap to second image)
+  - Name, price, rating, “New”/“Best seller”
+  - Stock label (In stock / Out of stock)
+  - Quick Add (select size 50/100 if needed)
+
+Filters (must-have):
+- Price range slider
+- Gender (Men/Women/Unisex)
+- Size (50/100)
+- Notes (multi-select)
+- Season (multi-select)
+- Occasion (multi-select)
+- Longevity (e.g., 4–6h, 6–8h, 8h+)
+- Sillage (soft/moderate/strong)
+- New / Best seller toggle
+- In stock only toggle
+
+**Acceptance criteria**
+- Filters update results without full page reload (client-side state + server query).
+- URL reflects filters (shareable links).
+- Mobile filter UI is clean and fast.
+
+---
+
+### 6.3 Product Details (`/product/:slug`)
+Layout:
+- Left: image gallery (thumbnails) + zoom
+- Right: product title, rating, price, stock, variant selector
+- Variant selector:
+  - Size: 50ml / 100ml
+  - Gender is informational attribute (not selectable unless product differs by gender)
+- Add to cart
+- Wishlist toggle
+- Back-in-stock button (if out of stock) → subscribes user
+- Tabs:
+  - Description
+  - Notes pyramid (top/middle/base)
+  - Specs (Extrait, spray, size options)
+  - Reviews
+
+Reviews:
+- Star rating + title + text
+- Only customers who purchased can submit (recommended)
+- Admin can moderate/hide review
+
+**Acceptance criteria**
+- Sticky “Add to cart” on scroll (mobile and desktop).
+- Zoom is smooth and does not lag.
+- Back-in-stock subscription works and is tracked.
+
+---
+
+### 6.4 Cart (`/cart`)
+- Line items with:
+  - product, variant (size), quantity
+  - stock validation
+- Upsell section:
+  - “You may also like” (same notes or best sellers)
+- Cart saved for logged-in user (and optionally guest localStorage).
+
+---
+
+### 6.5 Checkout (`/checkout`) — login required
+Steps:
+1) Shipping address
+2) Shipping method (Standard flat rate)
+3) Payment method (COD or Stripe)
+4) Review + place order
+
+Rules:
+- Taxes included in item prices; show “Tax included”.
+- Flat shipping fee added once.
+- Validate stock at final submit.
+
+Emails:
+- Order confirmation email after successful order creation.
+- If Stripe: confirm payment intent success then create final order.
+
+**Acceptance criteria**
+- Cannot access checkout unless authenticated.
+- Stock is revalidated at order placement.
+- COD orders get “Pending confirmation” or “Placed” status.
+
+---
+
+### 6.6 Account
+- Profile basics (name, email)
+- Orders list + order detail
+- Wishlist
+- Notifications: back-in-stock subscriptions list (optional)
+
+---
+
+### 6.7 Find Your Scent Quiz (`/quiz`)
+**Goal:** A short questionnaire that recommends products/collections.
+
+Quiz idea (editable later):
+- Preferred vibe: Fresh / Warm / Sweet / Woody / Floral
+- Occasion: Daily / Office / Date / Events
+- Season: Summer / Winter / All-year
+- Intensity: Soft / Moderate / Strong
+- Favorite notes (multi-select)
+
+Output:
+- Top 5 recommended products + matching collections
+- Option to “save results” to account
+
+**Acceptance criteria**
+- Results are deterministic and explainable: show “Why recommended”.
+- URL share optional (e.g., encoded result).
+
+---
+
+### 6.8 Blog & Pages CMS
+- Blog list + blog post page
+- Static pages by slug: Terms, Privacy, Returns, Shipping, About, Contact
+
+---
+
+## 7) Admin Dashboard — Detailed Requirements
+
+### 7.1 Admin Authentication
+- Admin login (same auth system but role-based)
+- Optional: **2FA** (TOTP) for admin accounts (recommended, can be Phase 2)
+
+### 7.2 Products + Variants
+Admin can:
+- Create/edit product
+- Manage variants (size 50/100)
+- Set price per variant
+- Upload multiple images; choose cover image
+- Assign notes (top/middle/base), season, occasion, longevity, sillage, gender
+- Flags: New, Best seller, Featured
+- SEO fields: meta title, meta description, slug
+- Visibility: Draft/Published
+
+### 7.3 Inventory
+- Track stock per variant
+- Adjust stock with reason (restock, correction, order)
+- Low stock threshold alerts (optional)
+
+### 7.4 Orders
+- View orders with filters: status, date range, payment method
+- Order details: items, address, totals
+- Status updates:
+  - Placed → Confirmed → Packed → Shipped → Delivered
+  - Cancelled / Refunded
+- For Stripe: store payment intent + status
+- For COD: store COD status
+
+### 7.5 Customers
+- List customers
+- View profile: orders, total spend, wishlist count
+- Block/unblock (optional)
+
+### 7.6 Coupons/Discounts
+Types:
+- Percentage discount (e.g., 10%)
+- Buy X Get Y (e.g., buy 2 decants get 1 free)
+
+Rules:
+- Active date range
+- Usage limits: total and per user
+- Minimum order subtotal
+- Applicable products/collections
+
+### 7.7 Collections
+- Manual collections: admin selects products
+- Smart collections (optional):
+  - rule-based (e.g., notes include “vanilla”)
+
+### 7.8 Theme Editor (Homepage Sections)
+- Reorder sections via drag & drop
+- Toggle section visibility
+- Edit section content:
+  - Hero image, headline, CTAs
+  - Select products for Best Sellers/New Arrivals (or auto)
+  - Note categories cards config
+  - Email signup text
+
+### 7.9 Blog & Pages CMS
+- Create/edit posts with rich text
+- Draft/publish
+- Slug management
+- Featured image
+- SEO fields
+
+### 7.10 Reports
+- Sales over time (daily/weekly/monthly)
+- Top products
+- Conversion proxy metrics (optional)
+- Inventory insights (low stock, out of stock)
+
+---
+
+## 8) Data Model (MongoDB)
+
+> Use Mongoose schemas. Keep models normalized enough for admin/reporting, but embed snapshots in orders.
+
+### 8.1 User
+- `_id`
+- `email` (unique)
+- `passwordHash`
+- `name`
+- `role`: `customer | admin`
+- `wishlist`: `[productId + variantKey]` (or separate collection)
+- `createdAt`, `updatedAt`
+- Optional:
+  - `twoFAEnabled`, `twoFASecret` (admin)
+  - `resetPasswordToken`, `resetPasswordExpires`
+
+### 8.2 Product
+- `_id`
+- `slug` (unique)
+- `title`
+- `description` (rich text or markdown)
+- `gender`: `men | women | unisex`
+- `concentration`: `"extrait"` (constant)
+- `bottleType`: `"spray"` (constant)
+- `notes`:
+  - `top`: [string]
+  - `middle`: [string]
+  - `base`: [string]
+- `season`: [string] (summer/winter/all-year)
+- `occasion`: [string] (daily/office/date/events)
+- `longevity`: string/category
+- `sillage`: string/category
+- `flags`: `{ isNew, isBestSeller, isFeatured }`
+- `images`: [{ url, alt, sortOrder }]
+- `variants`: [
+  {
+    `key`: "50ml" | "100ml",
+    `sizeMl`: 50|100,
+    `price`: number,
+    `compareAtPrice`?: number,
+    `sku`: string,
+    `stock`: number,
+    `isActive`: boolean
+  }
+]
+- `seo`: { metaTitle, metaDescription }
+- `status`: `draft | published`
+- timestamps
+
+### 8.3 Collection
+- `_id`
+- `slug`
+- `title`
+- `description`
+- `type`: `manual | smart`
+- `rules` (if smart)
+- `productIds` (if manual)
+- `image`
+- timestamps
+
+### 8.4 Cart (optional server-side)
+If server-side carts are used:
+- `_id`
+- `userId`
+- `items`: [{ productId, variantKey, qty }]
+- timestamps
+
+### 8.5 Order
+Store snapshot data to preserve historical truth:
+- `_id`
+- `orderNumber` (human friendly)
+- `userId`
+- `status` (Placed/Confirmed/Packed/Shipped/Delivered/Cancelled/Refunded)
+- `items`: [
+  {
+    productId,
+    productTitleSnapshot,
+    productSlugSnapshot,
+    variantKey,
+    sizeMl,
+    unitPrice,
+    qty,
+    imageSnapshot
+  }
+]
+- `shippingAddress` { fullName, phone, city, area, street, building, notes }
+- `shipping` { method: "standard", fee: number }
+- `payment`:
+  - `method`: `cod | stripe`
+  - `stripePaymentIntentId`?
+  - `stripeStatus`?
+- `totals`: { subtotal, discountTotal, shippingFee, grandTotal }
+- `coupon`?: { code, type, value }
+- timestamps
+
+### 8.6 Review
+- `_id`
+- `productId`
+- `userId`
+- `rating` (1–5)
+- `title`
+- `body`
+- `status`: `published | hidden | pending`
+- `isVerifiedPurchase`: boolean
+- timestamps
+
+### 8.7 BackInStockSubscription
+- `_id`
+- `userId`
+- `productId`
+- `variantKey`
+- `email`
+- `status`: `active | notified | cancelled`
+- timestamps
+
+### 8.8 BlogPost / Page
+- `slug`, `title`, `content`, `status`, `seo`, `featuredImage`, timestamps
+
+### 8.9 ThemeConfig
+- `locale`: `ar | en`
+- `homeSections`: array of section configs
+- timestamps
+
+---
+
+## 9) Backend API (Node.js + Express)
+
+### API Principles
+- REST JSON
+- JWT auth for sessions
+- Role-based middleware for admin routes
+- Validation (zod/joi) for request bodies
+- Rate limiting (at least on auth + checkout endpoints)
+- Central error handler with structured error responses
+
+### Auth
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `POST /api/auth/logout` (optional if token-based)
+- `POST /api/auth/forgot-password`
+- `POST /api/auth/reset-password`
+- `GET /api/auth/me`
+
+### Products & Collections (public)
+- `GET /api/products`
+  - query params: `q, sort, page, limit, priceMin, priceMax, gender, size, notes, season, occasion, longevity, sillage, isNew, isBestSeller, inStock`
+- `GET /api/products/:slug`
+- `GET /api/collections`
+- `GET /api/collections/:slug`
+
+### Reviews (public read, customer write)
+- `GET /api/products/:productId/reviews`
+- `POST /api/products/:productId/reviews` (verified purchase check)
+- `PATCH /api/admin/reviews/:id` (admin moderation)
+
+### Cart
+(If server-side)
+- `GET /api/cart`
+- `POST /api/cart/items`
+- `PATCH /api/cart/items/:itemId`
+- `DELETE /api/cart/items/:itemId`
+
+### Checkout & Orders
+- `POST /api/checkout/validate` (stock + totals)
+- `POST /api/orders` (COD order creation)
+- `POST /api/payments/stripe/create-intent`
+- `POST /api/payments/stripe/webhook` (server endpoint)
+- `GET /api/orders/me`
+- `GET /api/orders/me/:orderId`
+
+### Wishlist
+- `GET /api/wishlist`
+- `POST /api/wishlist/toggle` (productId + variantKey)
+
+### Back in Stock
+- `POST /api/back-in-stock/subscribe` (requires login)
+- `GET /api/back-in-stock/me`
+- `POST /api/admin/back-in-stock/notify` (trigger batch email on restock)
+
+### Admin
+- `GET /api/admin/products`
+- `POST /api/admin/products`
+- `PATCH /api/admin/products/:id`
+- `DELETE /api/admin/products/:id` (soft delete recommended)
+- `PATCH /api/admin/inventory/adjust`
+- `GET /api/admin/orders`
+- `PATCH /api/admin/orders/:id/status`
+- `GET /api/admin/customers`
+- `POST /api/admin/coupons`
+- `GET /api/admin/coupons`
+- `PATCH /api/admin/coupons/:id`
+- `POST /api/admin/collections`
+- `PATCH /api/admin/collections/:id`
+- `GET /api/admin/theme`
+- `PATCH /api/admin/theme`
+- `POST /api/admin/blog`
+- `PATCH /api/admin/blog/:id`
+- `POST /api/admin/pages`
+- `PATCH /api/admin/pages/:id`
+- `GET /api/admin/reports/sales`
+- `GET /api/admin/reports/top-products`
+
+---
+
+## 10) Stripe + COD Flow (High-Level)
+
+### COD
+1) Customer confirms checkout
+2) Backend validates stock + totals
+3) Backend creates order with status `Placed`
+4) Send order confirmation email
+
+### Stripe
+1) Customer chooses Stripe
+2) Backend creates PaymentIntent with amount
+3) Frontend confirms payment (Stripe Elements)
+4) Webhook verifies payment success
+5) Backend finalizes order + reduce inventory
+6) Send confirmation email
+
+**Important rules**
+- Inventory reduction should happen at order finalization (Stripe success or COD order creation).
+- Handle race conditions: re-check stock at final step and fail gracefully.
+
+---
+
+## 11) Email System Requirements
+
+### Required emails
+- Abandoned cart email (if user has items and leaves)
+- Order confirmation email
+- Back-in-stock email (when variant restocked)
+
+### Provider
+- Prepare abstraction for provider (SendGrid/Mailgun/AWS SES later).
+- Local dev can log emails to console or store in DB.
+
+---
+
+## 12) SEO Requirements
+- Clean slugs for products/collections/blog/pages
+- Meta title/description editable in admin
+- OpenGraph tags (image/title/description)
+- Sitemap generation endpoint (backend) or frontend build-time
+- Robots.txt (frontend)
+
+---
+
+## 13) Security Requirements (Recommended)
+- Password hashing (bcrypt/argon2)
+- JWT with refresh strategy or short-lived access tokens
+- Rate limiting:
+  - `/auth/*` strict
+  - `/checkout/*` strict
+- Input validation for all endpoints
+- Admin-only routes protected + audit logging for sensitive actions
+- Optional Phase 2:
+  - Admin 2FA (TOTP)
+  - Device/session management
+
+---
+
+## 14) Performance Requirements (“Fast like Shopify”)
+Frontend:
+- Code splitting by route
+- Lazy-load non-critical sections (below the fold)
+- Image optimization + responsive sizes + placeholders
+- Caching product lists (stale-while-revalidate pattern)
+- Avoid heavy animation libraries; keep animations minimal and GPU-friendly
+
+Backend:
+- Indexed fields for product filtering (slug, flags, price, notes, etc.)
+- Pagination on lists
+- Response compression
+- Proper caching headers for public catalog endpoints
+
+---
+
+## 15) Frontend Tech Requirements (React)
+- i18n: `react-i18next` (or similar)
+- RTL support: set `dir="rtl"` for Arabic + mirrored layout
+- State: React Query / SWR for data fetching + caching
+- UI:
+  - Component system (custom + minimal library if desired)
+  - Accessible components (dialog, dropdown, toasts)
+- Animations:
+  - Framer Motion (recommended) or CSS transitions
+
+---
+
+## 16) Backend Tech Requirements (Node/Express + MongoDB)
+- Express + Mongoose
+- Validation layer (zod/joi)
+- Auth middleware (JWT)
+- Logging (pino/winston)
+- Config via `.env`
+- Stripe SDK
+- Email abstraction
+
+---
+
+## 17) Repository Structure (Separate Repos)
+
+### Repo 1: `scenta-frontend`
+- `src/`
+  - `pages/` or `routes/`
+  - `components/`
+  - `features/` (shop, product, cart, checkout, account, admin)
+  - `i18n/`
+  - `styles/`
+  - `api/` (client wrappers)
+- `.env.example`
+- `README.md`
+
+### Repo 2: `scenta-backend`
+- `src/`
+  - `app.ts/js`
+  - `routes/`
+  - `controllers/`
+  - `services/` (stripe, email, inventory, reports)
+  - `models/`
+  - `middlewares/`
+  - `utils/`
+- `.env.example`
+- `README.md`
+
+---
+
+## 18) Environment Variables
+
+### Backend `.env.example`
+- `PORT=4000`
+- `MONGO_URI=...`
+- `JWT_SECRET=...`
+- `JWT_EXPIRES_IN=15m`
+- `JWT_REFRESH_SECRET=...` (optional)
+- `STRIPE_SECRET_KEY=...`
+- `STRIPE_WEBHOOK_SECRET=...`
+- `EMAIL_PROVIDER=console` (dev)
+- `FRONTEND_URL=http://localhost:3000`
+
+### Frontend `.env.example`
+- `VITE_API_BASE_URL=http://localhost:4000/api` (or CRA equivalent)
+- `VITE_STRIPE_PUBLISHABLE_KEY=...`
+- `VITE_DEFAULT_LOCALE=ar`
+- `VITE_SUPPORTED_LOCALES=ar,en`
+
+---
+
+## 19) Edge Cases & Error Handling
+- Out-of-stock during checkout → show message + adjust cart.
+- Stripe payment succeeds but webhook delayed → show “Processing” and poll order status.
+- Abandoned cart email should not spam: max 1 email per X hours.
+- Coupon rules: expired, usage limit reached, minimum subtotal not met.
+- Arabic/English content mismatch: fallback language if missing translation.
+- Reviews moderation: hidden reviews should not affect rating average.
+
+---
+
+## 20) Acceptance Criteria (Definition of Done)
+
+### Storefront
+- Home page with required sections and theme config support.
+- Shop listing with all filters + shareable URL filters.
+- Product page with gallery zoom, variants, reviews, wishlist, back-in-stock.
+- Login required for checkout.
+- COD and Stripe both create valid orders.
+- Emails: abandoned cart + order confirmation.
+
+### Admin
+- Full CRUD for products/variants.
+- Inventory adjustment & tracking.
+- Orders listing + status updates.
+- Customers list.
+- Coupons (% + Buy X Get Y).
+- Collections.
+- Theme editor for homepage sections.
+- Blog/pages CMS.
+- Reports: sales + top products.
+
+### Quality
+- RTL/LTR correct for all pages.
+- Strong performance on storefront (fast product listing and product page).
+- Basic security (hashing, auth, role checks, rate limiting).
+
+---
+
+## 21) Milestones (Suggested)
+1) **M1 — Foundation**
+   - Repo setup, auth, product model, basic catalog APIs, i18n, RTL/LTR shell
+2) **M2 — Storefront Core**
+   - Home + shop filters + product page + cart
+3) **M3 — Checkout**
+   - Checkout flow, COD, Stripe PaymentIntent, orders
+4) **M4 — Customer Features**
+   - Wishlist, reviews, back-in-stock, account pages
+5) **M5 — Admin Dashboard**
+   - Products/inventory/orders/customers/coupons/collections/theme/CMS/reports
+6) **M6 — Polish**
+   - Performance, SEO, email flows, monitoring/logging
+
+---
+
+## 22) Open Choices (Decide during implementation)
+- Cart storage: client-only vs server-side
+- Reviews: allow images or text-only
+- Pagination vs infinite scroll (default recommended: pagination for SEO/perf)
+- Admin 2FA: implement now or Phase 2 (recommended Phase 2)
+
+---
+
+## 23) Final Notes for Codex/Speckit
+- Prioritize storefront performance and luxury minimal visuals.
+- Every UI component must support RTL/LTR.
+- Implement robust filtering on backend with indexes.
+- Keep the codebase clean and scalable for future deployment.

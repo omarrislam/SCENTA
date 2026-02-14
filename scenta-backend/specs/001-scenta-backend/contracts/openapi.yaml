@@ -1,0 +1,211 @@
+﻿openapi: 3.0.3
+info:
+  title: SCENTA Backend API
+  version: 1.0.0
+servers:
+  - url: /api
+paths:
+  /auth/register:
+    post:
+      summary: Register user
+      responses:
+        '201': { description: Created }
+  /auth/login:
+    post:
+      summary: Login user
+      responses:
+        '200': { description: OK }
+  /auth/forgot-password:
+    post:
+      summary: Send reset link
+      responses:
+        '200': { description: OK }
+  /auth/reset-password:
+    post:
+      summary: Reset password
+      responses:
+        '200': { description: OK }
+  /auth/me:
+    get:
+      summary: Current user
+      responses:
+        '200': { description: OK }
+  /products:
+    get:
+      summary: List products
+      responses:
+        '200': { description: OK }
+  /products/{slug}:
+    get:
+      summary: Product detail
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: OK }
+  /collections:
+    get:
+      summary: List collections
+      responses:
+        '200': { description: OK }
+  /collections/{slug}:
+    get:
+      summary: Collection detail
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: OK }
+  /products/{productId}/reviews:
+    get:
+      summary: List reviews
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: OK }
+    post:
+      summary: Create review
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          schema: { type: string }
+      responses:
+        '201': { description: Created }
+  /wishlist:
+    get:
+      summary: List wishlist
+      responses:
+        '200': { description: OK }
+  /wishlist/toggle:
+    post:
+      summary: Toggle wishlist item
+      responses:
+        '200': { description: OK }
+  /checkout/validate:
+    post:
+      summary: Validate checkout
+      responses:
+        '200': { description: OK }
+  /orders:
+    post:
+      summary: Create order (COD)
+      responses:
+        '201': { description: Created }
+  /orders/me:
+    get:
+      summary: List my orders
+      responses:
+        '200': { description: OK }
+  /orders/me/{orderId}:
+    get:
+      summary: Order detail
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: OK }
+  /payments/stripe/create-intent:
+    post:
+      summary: Create Stripe intent
+      responses:
+        '200': { description: OK }
+  /payments/stripe/webhook:
+    post:
+      summary: Stripe webhook
+      responses:
+        '200': { description: OK }
+  /back-in-stock/subscribe:
+    post:
+      summary: Subscribe to back-in-stock
+      responses:
+        '200': { description: OK }
+  /admin/products:
+    get:
+      summary: Admin list products
+      responses:
+        '200': { description: OK }
+    post:
+      summary: Admin create product
+      responses:
+        '201': { description: Created }
+  /admin/products/{id}:
+    patch:
+      summary: Admin update product
+      responses:
+        '200': { description: OK }
+    delete:
+      summary: Admin delete product
+      responses:
+        '204': { description: No Content }
+  /admin/orders:
+    get:
+      summary: Admin list orders
+      responses:
+        '200': { description: OK }
+  /admin/orders/{id}/status:
+    patch:
+      summary: Admin update order status
+      responses:
+        '200': { description: OK }
+  /admin/customers:
+    get:
+      summary: Admin list customers
+      responses:
+        '200': { description: OK }
+  /admin/coupons:
+    get:
+      summary: Admin list coupons
+      responses:
+        '200': { description: OK }
+    post:
+      summary: Admin create coupon
+      responses:
+        '201': { description: Created }
+  /admin/collections:
+    post:
+      summary: Admin create collection
+      responses:
+        '201': { description: Created }
+    patch:
+      summary: Admin update collection
+      responses:
+        '200': { description: OK }
+  /admin/theme:
+    get:
+      summary: Admin get theme
+      responses:
+        '200': { description: OK }
+    patch:
+      summary: Admin update theme
+      responses:
+        '200': { description: OK }
+  /admin/blog:
+    post:
+      summary: Admin create blog post
+      responses:
+        '201': { description: Created }
+  /admin/pages:
+    post:
+      summary: Admin create page
+      responses:
+        '201': { description: Created }
+  /admin/reports/sales:
+    get:
+      summary: Admin sales report
+      responses:
+        '200': { description: OK }
+  /admin/reports/top-products:
+    get:
+      summary: Admin top products report
+      responses:
+        '200': { description: OK }
