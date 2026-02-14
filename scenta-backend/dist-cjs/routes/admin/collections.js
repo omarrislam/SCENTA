@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const auth_1 = require("../../middleware/auth");
+const auditLog_1 = require("../../middleware/auditLog");
+const collectionController_1 = require("../../controllers/admin/collectionController");
+const router = (0, express_1.Router)();
+router.use(auth_1.requireAuth, (0, auth_1.requireRole)("admin"), auditLog_1.auditLog);
+router.get("/", collectionController_1.listCollections);
+router.post("/", collectionController_1.createCollection);
+router.patch("/:id", collectionController_1.updateCollection);
+exports.default = router;

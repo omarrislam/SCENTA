@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const wishlistController_1 = require("../controllers/wishlistController");
+const auth_1 = require("../middleware/auth");
+const validate_1 = require("../middleware/validate");
+const wishlist_1 = require("../validators/wishlist");
+const router = (0, express_1.Router)();
+router.get("/wishlist", auth_1.requireAuth, wishlistController_1.getWishlist);
+router.post("/wishlist/toggle", auth_1.requireAuth, (0, validate_1.validate)(wishlist_1.wishlistSchema), wishlistController_1.toggleWishlist);
+exports.default = router;

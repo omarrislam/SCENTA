@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const catalogController_1 = require("../controllers/catalogController");
+const validate_1 = require("../middleware/validate");
+const catalog_1 = require("../validators/catalog");
+const router = (0, express_1.Router)();
+router.get("/products", (0, validate_1.validate)(catalog_1.productFilterSchema), catalogController_1.listCatalog);
+router.get("/products/ids", catalogController_1.getProductsByIds);
+router.get("/products/:slug", catalogController_1.getProduct);
+router.get("/collections", catalogController_1.listCollections);
+router.get("/collections/:slug", catalogController_1.getCollection);
+exports.default = router;

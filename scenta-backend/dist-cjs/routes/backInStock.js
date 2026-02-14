@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const backInStockController_1 = require("../controllers/backInStockController");
+const auth_1 = require("../middleware/auth");
+const router = (0, express_1.Router)();
+router.post("/back-in-stock/subscribe", auth_1.requireAuth, backInStockController_1.subscribeBackInStock);
+router.get("/back-in-stock/me", auth_1.requireAuth, backInStockController_1.listBackInStock);
+router.post("/admin/back-in-stock/notify", auth_1.requireAuth, (0, auth_1.requireRole)("admin"), backInStockController_1.notifyBackInStock);
+exports.default = router;

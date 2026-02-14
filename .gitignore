@@ -6,7 +6,6 @@
 
 # Build output
 **/dist/
-**/dist-cjs/
 **/build/
 
 # Env / secrets

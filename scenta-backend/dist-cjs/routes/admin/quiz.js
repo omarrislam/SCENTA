@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const auth_1 = require("../../middleware/auth");
+const auditLog_1 = require("../../middleware/auditLog");
+const validate_1 = require("../../middleware/validate");
+const quiz_1 = require("../../validators/quiz");
+const quizController_1 = require("../../controllers/admin/quizController");
+const router = (0, express_1.Router)();
+router.use(auth_1.requireAuth, (0, auth_1.requireRole)("admin"), auditLog_1.auditLog);
+router.get("/", quizController_1.listAdminQuiz);
+router.put("/", (0, validate_1.validate)(quiz_1.quizUpdateSchema), quizController_1.replaceQuiz);
+exports.default = router;
