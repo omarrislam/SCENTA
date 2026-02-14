@@ -15,6 +15,17 @@ const ensureReady = async () => {
 const app = createApp();
 
 export default async function handler(req: unknown, res: unknown) {
-  await ensureReady();
+  const method = typeof req === "object" && req !== null && "method" in req
+    ? String((req as { method?: string }).method ?? "")
+    : "";
+  const url = typeof req === "object" && req !== null && "url" in req
+    ? String((req as { url?: string }).url ?? "")
+    : "";
+
+  // Let CORS preflight and health checks run without waiting for DB init.
+  if (method !== "OPTIONS" && !url.startsWith("/api/health")) {
+    await ensureReady();
+  }
+
   return app(req as never, res as never);
 }
