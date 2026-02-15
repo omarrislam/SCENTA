@@ -10,24 +10,26 @@ const router = Router();
 const isVercelRuntime = Boolean(process.env.VERCEL);
 const uploadDir = isVercelRuntime ? path.join("/tmp", "uploads") : path.join(process.cwd(), "uploads");
 
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => {
-    try {
-      if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir, { recursive: true });
+const storage = isVercelRuntime
+  ? multer.memoryStorage()
+  : multer.diskStorage({
+      destination: (_req, _file, cb) => {
+        try {
+          if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
+          }
+          cb(null, uploadDir);
+        } catch (error) {
+          cb(error as Error, uploadDir);
+        }
+      },
+      filename: (_req, file, cb) => {
+        const ext = path.extname(file.originalname);
+        const safeExt = ext && ext.length <= 10 ? ext : "";
+        const name = `${Date.now()}-${Math.round(Math.random() * 1e9)}${safeExt}`;
+        cb(null, name);
       }
-      cb(null, uploadDir);
-    } catch (error) {
-      cb(error as Error, uploadDir);
-    }
-  },
-  filename: (_req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    const safeExt = ext && ext.length <= 10 ? ext : "";
-    const name = `${Date.now()}-${Math.round(Math.random() * 1e9)}${safeExt}`;
-    cb(null, name);
-  }
-});
+    });
 
 const upload = multer({
   storage,

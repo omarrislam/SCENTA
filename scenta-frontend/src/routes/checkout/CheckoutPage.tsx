@@ -100,6 +100,7 @@ const CheckoutPage = () => {
   const [stripeOrderId, setStripeOrderId] = useState<string | null>(null);
 
   const hasApi = Boolean(import.meta.env.VITE_API_BASE_URL);
+  const canUseStripe = hasApi && Boolean(stripePromise);
   const { data: coupons = [] } = useQuery({ queryKey: ["coupons"], queryFn: listPublicCoupons });
 
   const stepLabels = [
@@ -207,8 +208,8 @@ const CheckoutPage = () => {
     try {
       const resolvedItems = await resolvePayloadItems();
       if (payment === "stripe") {
-        if (!stripePromise) {
-          pushToast("Stripe is not configured. Missing VITE_STRIPE_PUBLISHABLE_KEY.", "error");
+        if (!canUseStripe) {
+          pushToast("Card payment is unavailable. Use cash on delivery or configure Stripe + API.", "error");
           return;
         }
         const intent = await createStripeIntent(resolvedItems, shippingAddress, appliedCoupon?.code);
@@ -332,6 +333,7 @@ const CheckoutPage = () => {
                     name="payment"
                     value="stripe"
                     checked={payment === "stripe"}
+                    disabled={!canUseStripe}
                     onChange={(event) => {
                       setPayment(event.target.value);
                       setStripeClientSecret(null);
@@ -340,6 +342,9 @@ const CheckoutPage = () => {
                   />
                   {t("checkout.paymentCard")}
                 </label>
+                {!canUseStripe ? (
+                  <p>Card payment unavailable in this deployment configuration.</p>
+                ) : null}
                 <PaymentOptions />
               </div>
             )}

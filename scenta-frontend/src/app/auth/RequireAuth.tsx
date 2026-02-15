@@ -5,8 +5,10 @@ import { useAuth } from "./AuthContext";
 const RequireAuth = ({ children }: PropsWithChildren) => {
   const { user } = useAuth();
   const location = useLocation();
+  const hasApi = Boolean(import.meta.env.VITE_API_BASE_URL);
+  const token = localStorage.getItem("scenta-token");
 
-  if (!user) {
+  if (!user || (hasApi && !token)) {
     return <Navigate to="/auth/login" state={{ from: location.pathname }} replace />;
   }
 

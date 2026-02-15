@@ -74,24 +74,42 @@ export const createCodOrder = async (
   items: CheckoutItemPayload[],
   shippingAddress: ShippingAddressPayload,
   couponCode?: string
-): Promise<BackendOrder> =>
-  fetchApi<BackendOrder>("/orders", {
+): Promise<BackendOrder> => {
+  if (!hasApi) {
+    const subtotal = items.reduce((sum, item) => sum + item.qty * 100, 0);
+    const shippingFee = 60;
+    const grandTotal = subtotal + shippingFee;
+    return {
+      _id: `local-${Date.now()}`,
+      orderNumber: `SCN-LOCAL-${Date.now().toString().slice(-6)}`,
+      status: "placed",
+      totals: { grandTotal },
+      createdAt: new Date().toISOString(),
+      shippingAddress
+    };
+  }
+  return fetchApi<BackendOrder>("/orders", {
     method: "POST",
     body: JSON.stringify({ items, shippingAddress, couponCode })
   });
+};
 
 export const createStripeIntent = async (
   items: CheckoutItemPayload[],
   shippingAddress: ShippingAddressPayload,
   couponCode?: string
-) =>
-  fetchApi<{ clientSecret: string | null; orderId: string }>(
+) => {
+  if (!hasApi) {
+    throw new Error("Card payment requires API configuration.");
+  }
+  return fetchApi<{ clientSecret: string | null; orderId: string }>(
     "/payments/stripe/create-intent",
     {
       method: "POST",
       body: JSON.stringify({ items, shippingAddress, couponCode })
     }
   );
+};
 
 export const listMyOrders = async (): Promise<Order[]> => {
   if (!hasApi) {

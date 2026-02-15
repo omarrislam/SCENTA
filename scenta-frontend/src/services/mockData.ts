@@ -49,7 +49,7 @@ export const products: Product[] = [
       { id: "var-amber-50", size: "50ml", price: 1890, stock: 12 },
       { id: "var-amber-100", size: "100ml", price: 2690, stock: 6 }
     ],
-    images: ["/images/silk-amber.png", "/images/amber-2.svg"]
+    images: ["/images/amber-1.svg", "/images/amber-2.svg"]
   },
   {
     id: "prod-rose",
@@ -67,7 +67,7 @@ export const products: Product[] = [
       { id: "var-rose-50", size: "50ml", price: 1650, stock: 24 },
       { id: "var-rose-100", size: "100ml", price: 2390, stock: 10 }
     ],
-    images: ["/images/rose-veil.png", "/images/rose-2.svg"]
+    images: ["/images/rose-1.svg", "/images/rose-2.svg"]
   },
   {
     id: "prod-oud",
@@ -139,7 +139,7 @@ export const products: Product[] = [
       { id: "var-iris-50", size: "50ml", price: 1980, stock: 14 },
       { id: "var-iris-100", size: "100ml", price: 2750, stock: 6 }
     ],
-    images: ["/images/velvet-iris.png", "/images/iris-2.svg"]
+    images: ["/images/iris-1.svg", "/images/iris-2.svg"]
   }
 ];
 

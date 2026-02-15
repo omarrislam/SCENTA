@@ -11,14 +11,16 @@ const getAuthToken = () => localStorage.getItem("scenta-token");
 
 export const fetchJson = async <T>(path: string, init?: RequestInit): Promise<T> => {
   const token = getAuthToken();
-  const response = await fetch(`${baseUrl}${path}`, {
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(init?.headers || {})
-    },
-    ...init
-  });
+  const headers = new Headers(init?.headers || {});
+  const isFormData = typeof FormData !== "undefined" && init?.body instanceof FormData;
+  if (!isFormData && !headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json");
+  }
+  if (token && !headers.has("Authorization")) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
+
+  const response = await fetch(`${baseUrl}${path}`, { ...init, headers });
 
   const payload = await response.json().catch(() => null);
 
@@ -47,15 +49,25 @@ export const resolveApiAssetUrl = (value?: string) => {
   if (!value) return value;
   if (!publicBase) return value;
 
+  if (value.startsWith("data:")) {
+    return value;
+  }
+
   if (value.startsWith("/")) {
-    return `${publicBase}${value}`;
+    if (value.startsWith("/uploads/")) {
+      return `${publicBase}${value}`;
+    }
+    return value;
   }
 
   try {
     const parsed = new URL(value);
     const isLocalOrigin = parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1";
     if (isLocalOrigin) {
-      return `${publicBase}${parsed.pathname}${parsed.search}`;
+      if (parsed.pathname.startsWith("/uploads/")) {
+        return `${publicBase}${parsed.pathname}${parsed.search}`;
+      }
+      return `${parsed.pathname}${parsed.search}`;
     }
   } catch {
     return value;

@@ -43,7 +43,7 @@ const buildDefaultHome = (t: (key: string) => string) => ({
     {
       title: t("hero.title"),
       subtitle: t("hero.subtitle"),
-      image: "/images/silk-amber.png",
+      image: "/images/amber-1.svg",
       primaryLabel: t("hero.primary"),
       primaryLink: "/collections/amber-signature",
       secondaryLabel: t("hero.secondary"),
@@ -52,7 +52,7 @@ const buildDefaultHome = (t: (key: string) => string) => ({
     {
       title: t("hero.slideTwoTitle"),
       subtitle: t("hero.slideTwoSubtitle"),
-      image: "/images/rose-veil.png",
+      image: "/images/rose-1.svg",
       primaryLabel: t("hero.slideTwoPrimary"),
       primaryLink: "/shop?tag=fresh",
       secondaryLabel: t("hero.secondary"),
@@ -61,7 +61,7 @@ const buildDefaultHome = (t: (key: string) => string) => ({
     {
       title: t("hero.slideThreeTitle"),
       subtitle: t("hero.slideThreeSubtitle"),
-      image: "/images/velvet-iris.png",
+      image: "/images/iris-1.svg",
       primaryLabel: t("hero.slideThreePrimary"),
       primaryLink: "/shop?tag=warm",
       secondaryLabel: t("hero.secondary"),
@@ -657,7 +657,7 @@ const AdminTheme = () => {
                   {
                     title: "New slide title",
                     subtitle: "New slide subtitle",
-                    image: "/images/silk-amber.png",
+                    image: "/images/amber-1.svg",
                     primaryLabel: "Primary CTA",
                     primaryLink: "/shop",
                     secondaryLabel: "Secondary CTA",

@@ -2,6 +2,7 @@ import { createContext, PropsWithChildren, useContext, useEffect, useMemo } from
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { getPublicTheme, ThemeConfig } from "../services/backendApi";
+import { resolveApiAssetUrl } from "../services/api";
 import { resolveLocale } from "../utils/localize";
 import { defaultThemeConfig } from "./themeDefaults";
 
@@ -29,6 +30,39 @@ const fallbackRadius = { sm: 10, md: 18, lg: 28 };
 type ResolvedColors = typeof fallbackColors;
 type ResolvedRadius = typeof fallbackRadius;
 
+const normalizeThemeAssets = (config: ThemeConfig): ThemeConfig => {
+  const sectionSettings = config.home?.sectionSettings;
+  const normalizedSectionSettings = sectionSettings
+    ? Object.fromEntries(
+        Object.entries(sectionSettings).map(([key, value]) => [
+          key,
+          {
+            ...value,
+            backgroundImage: resolveApiAssetUrl(value?.backgroundImage)
+          }
+        ])
+      )
+    : undefined;
+
+  return {
+    ...config,
+    home: config.home
+      ? {
+          ...config.home,
+          heroSlides: config.home.heroSlides?.map((slide) => ({
+            ...slide,
+            image: resolveApiAssetUrl(slide.image) ?? slide.image
+          })),
+          collectionItems: config.home.collectionItems?.map((item) => ({
+            ...item,
+            image: resolveApiAssetUrl(item.image)
+          })),
+          sectionSettings: normalizedSectionSettings
+        }
+      : config.home
+  };
+};
+
 export const ThemeProvider = ({ children }: PropsWithChildren) => {
   const { i18n } = useTranslation();
   const locale = resolveLocale(i18n.language);
@@ -47,7 +81,7 @@ export const ThemeProvider = ({ children }: PropsWithChildren) => {
     if (!base) {
       return { ...defaultThemeConfig, locale };
     }
-    return {
+    return normalizeThemeAssets({
       ...defaultThemeConfig,
       ...base,
       locale,
@@ -55,7 +89,7 @@ export const ThemeProvider = ({ children }: PropsWithChildren) => {
       home: { ...defaultThemeConfig.home, ...base.home },
       colors: { ...(defaultThemeConfig.colors ?? fallbackColors), ...(base.colors ?? {}) },
       radius: { ...(defaultThemeConfig.radius ?? fallbackRadius), ...(base.radius ?? {}) }
-    };
+    });
   }, [data, fallbackData, locale]);
 
   useEffect(() => {

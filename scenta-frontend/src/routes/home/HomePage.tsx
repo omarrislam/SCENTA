@@ -22,7 +22,7 @@ const HomePage = () => {
   const { data, isLoading } = useQuery({
     queryKey: ["products", "home"],
     queryFn: () => listProducts({ limit: 12 }),
-    refetchInterval: 8000
+    staleTime: 1000 * 60
   });
   const { data: collections = [] } = useQuery({
     queryKey: ["collections"],
@@ -42,21 +42,21 @@ const HomePage = () => {
       {
         title: "Where scent meets soul",
         subtitle: "Contemporary fragrance rituals crafted with luminous oils and soft woods.",
-        image: "/images/silk-amber.png",
+        image: "/images/amber-1.svg",
         primary: { label: "Shop now", to: "/collections/amber-signature" },
         secondary: { label: "View collection", to: "/shop" }
       },
       {
         title: "New in: airy florals",
         subtitle: "Fresh petals and clean musk for day-to-night layering.",
-        image: "/images/rose-veil.png",
+        image: "/images/rose-1.svg",
         primary: { label: "Shop now", to: "/shop?tag=fresh" },
         secondary: { label: "View collection", to: "/shop" }
       },
       {
         title: "Signature warm woods",
         subtitle: "Silky amber, velvety iris, and a glowing night trail.",
-        image: "/images/velvet-iris.png",
+        image: "/images/iris-1.svg",
         primary: { label: "Shop now", to: "/shop?tag=warm" },
         secondary: { label: "View collection", to: "/shop" }
       }
