@@ -62,6 +62,9 @@ export const resolveApiAssetUrl = (value?: string) => {
 
   try {
     const parsed = new URL(value);
+    if (parsed.pathname.startsWith("/images/")) {
+      return `${parsed.pathname}${parsed.search}`;
+    }
     const isLocalOrigin = parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1";
     if (isLocalOrigin) {
       if (parsed.pathname.startsWith("/uploads/")) {

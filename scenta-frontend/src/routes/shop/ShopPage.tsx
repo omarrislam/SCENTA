@@ -38,7 +38,7 @@ const ShopPage = () => {
   const { data: productsData, isLoading } = useQuery({
     queryKey: ["products", search, sort, tag, page],
     queryFn: () => listProducts({ search, page, limit: perPage }),
-    refetchInterval: 8000,
+    staleTime: 1000 * 60,
     placeholderData: keepPreviousData
   });
 

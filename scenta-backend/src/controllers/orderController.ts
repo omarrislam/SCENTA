@@ -64,8 +64,22 @@ export const createCodOrder = async (req: AuthRequest, res: Response, next: Next
         qty: item.qty,
         imageSnapshot: product.images[0]?.url ?? undefined
       });
-      variant.stock = Math.max(0, (variant.stock ?? 0) - item.qty);
-      await product.save();
+      const updateResult = await Product.updateOne(
+        {
+          _id: product.id,
+          "variants.key": item.variantKey,
+          "variants.stock": { $gte: item.qty }
+        },
+        {
+          $inc: { "variants.$.stock": -item.qty }
+        }
+      );
+      if (!updateResult.modifiedCount) {
+        throw new ApiError(409, "OUT_OF_STOCK", "Insufficient stock", {
+          productId: product.id,
+          variantKey: item.variantKey
+        });
+      }
     }
 
     const order = await createOrder({

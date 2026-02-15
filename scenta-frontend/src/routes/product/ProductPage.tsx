@@ -34,7 +34,7 @@ const ProductPage = () => {
   const { data, isLoading } = useQuery({
     queryKey: ["product", slug],
     queryFn: () => getProduct(slug ?? ""),
-    refetchInterval: 8000
+    staleTime: 1000 * 60
   });
   const [variantId, setVariantId] = useState<string | null>(null);
   const [tab, setTab] = useState<(typeof tabs)[number]>("description");
