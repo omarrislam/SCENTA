@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { listCollections, listProducts } from "../../services/catalogService";
+import { resolveApiAssetUrl } from "../../services/api";
 import { themeSections } from "../../services/mockData";
 import ProductCard from "../../components/product/ProductCard";
 import { useCart } from "../../storefront/cart/CartContext";
@@ -123,6 +124,7 @@ const HomePage = () => {
   }, [activeNewTab, genderTabs, newArrivals, products]);
 
   const slide = heroSlides[activeSlide] ?? heroSlides[0];
+  const slideImage = resolveApiAssetUrl(slide.image) ?? slide.image;
   const shippingItems =
     theme?.home?.shippingItems?.length
       ? theme.home.shippingItems
@@ -213,9 +215,9 @@ const HomePage = () => {
                   </div>
                   <div className="hero__media" aria-hidden="true">
                     <img
-                      key={slide.image}
+                      key={slideImage}
                       className="hero__media-image"
-                      src={slide.image}
+                      src={slideImage}
                       alt=""
                       loading="lazy"
                     />
@@ -279,7 +281,9 @@ const HomePage = () => {
                               className="collection-card__media"
                               style={
                                 item.image || collection.image
-                                  ? { backgroundImage: `url(${item.image ?? collection.image})` }
+                                  ? {
+                                      backgroundImage: `url(${resolveApiAssetUrl(item.image ?? collection.image) ?? (item.image ?? collection.image)})`
+                                    }
                                   : undefined
                               }
                             />

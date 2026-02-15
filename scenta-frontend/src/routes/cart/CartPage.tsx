@@ -2,6 +2,7 @@
 import { useTranslation } from "react-i18next";
 import { useCart } from "../../storefront/cart/CartContext";
 import Button from "../../components/ui/Button";
+import { resolveApiAssetUrl } from "../../services/api";
 import { pickLocalized, resolveLocale } from "../../utils/localize";
 import StockIndicator from "../../components/product/StockIndicator";
 
@@ -23,7 +24,7 @@ const CartPage = () => {
             <div key={item.id} className="card cart-item">
               <div className="cart-item__media">
                 {item.product.images?.[0] ? (
-                  <img src={item.product.images[0]} alt={item.product.name} />
+                  <img src={resolveApiAssetUrl(item.product.images[0]) ?? item.product.images[0]} alt={item.product.name} />
                 ) : (
                   <div className="cart-item__placeholder" />
                 )}

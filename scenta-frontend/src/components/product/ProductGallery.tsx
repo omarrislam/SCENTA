@@ -1,8 +1,10 @@
-﻿import { useState } from "react";
+import { useState } from "react";
+import { resolveApiAssetUrl } from "../../services/api";
 
 const ProductGallery = ({ images }: { images: string[] }) => {
   const [active, setActive] = useState(0);
-  const mainImage = images[active] ?? images[0];
+  const normalizedImages = images.map((image) => resolveApiAssetUrl(image) ?? image);
+  const mainImage = normalizedImages[active] ?? normalizedImages[0];
 
   return (
     <div className="product-gallery">
@@ -10,7 +12,7 @@ const ProductGallery = ({ images }: { images: string[] }) => {
         {mainImage && <img src={mainImage} alt="Product" className="product-gallery__image" />}
       </div>
       <div className="product-gallery__thumbs">
-        {images.map((image, index) => (
+        {normalizedImages.map((image, index) => (
           <button
             key={image}
             className={`product-gallery__thumb ${active === index ? "is-active" : ""}`}

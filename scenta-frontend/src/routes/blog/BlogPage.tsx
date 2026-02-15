@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getBlogPost, listBlogPosts } from "../../services/contentService";
+import { resolveApiAssetUrl } from "../../services/api";
 import useMeta from "../../app/seo/useMeta";
 import { pickLocalized, resolveLocale } from "../../utils/localize";
 import Spinner from "../../components/feedback/Spinner";
@@ -47,7 +48,7 @@ const BlogPage = () => {
             <Link key={item.id} to={`/blog/${item.slug}`} className="card blog-card">
               {item.cover && (
                 <div className="blog-card__media">
-                  <img src={item.cover} alt={item.title} />
+                  <img src={resolveApiAssetUrl(item.cover) ?? item.cover} alt={item.title} />
                 </div>
               )}
               <strong>{pickLocalized(item.title, item.titleAr, locale)}</strong>
