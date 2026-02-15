@@ -14,6 +14,7 @@ interface CartState {
   addItem: (product: Product, variant: ProductVariant) => void;
   updateQuantity: (itemId: string, quantity: number) => void;
   removeItem: (itemId: string) => void;
+  clearCart: () => void;
   total: number;
 }
 
@@ -116,13 +117,17 @@ export const CartProvider = ({ children }: PropsWithChildren) => {
     setItems((prev) => prev.filter((item) => item.id !== itemId));
   };
 
+  const clearCart = () => {
+    setItems([]);
+  };
+
   const total = useMemo(
     () => items.reduce((sum, item) => sum + item.variant.price * item.quantity, 0),
     [items]
   );
 
   return (
-    <CartContext.Provider value={{ items, addItem, updateQuantity, removeItem, total }}>
+    <CartContext.Provider value={{ items, addItem, updateQuantity, removeItem, clearCart, total }}>
       {children}
     </CartContext.Provider>
   );

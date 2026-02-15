@@ -27,9 +27,11 @@ const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : 
 
 const StripePaymentForm = ({
   orderId,
+  onPaid,
   onSuccess
 }: {
   orderId: string;
+  onPaid: () => void;
   onSuccess: () => void;
 }) => {
   const { t } = useTranslation();
@@ -56,6 +58,7 @@ const StripePaymentForm = ({
       }
 
       pushToast("Payment successful", "success");
+      onPaid();
       onSuccess();
     } catch (error) {
       pushToast(error instanceof Error ? error.message : t("checkout.orderFailed"), "error");
@@ -78,7 +81,7 @@ const StripePaymentForm = ({
 const CheckoutPage = () => {
   const { t, i18n } = useTranslation();
   const locale = resolveLocale(i18n.language);
-  const { items, total } = useCart();
+  const { items, total, clearCart } = useCart();
   const { pushToast } = useToast();
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
@@ -223,6 +226,7 @@ const CheckoutPage = () => {
         return;
       }
       await createCodOrder(resolvedItems, shippingAddress, appliedCoupon?.code);
+      clearCart();
       pushToast(t("checkout.placeOrder"), "success");
       navigate("/order-confirmation");
     } catch (error) {
@@ -405,7 +409,11 @@ const CheckoutPage = () => {
                 </div>
                 {payment === "stripe" && stripePromise && stripeClientSecret && stripeOrderId ? (
                   <Elements stripe={stripePromise} options={stripeOptions}>
-                    <StripePaymentForm orderId={stripeOrderId} onSuccess={() => navigate("/order-confirmation")} />
+                    <StripePaymentForm
+                      orderId={stripeOrderId}
+                      onPaid={clearCart}
+                      onSuccess={() => navigate("/order-confirmation")}
+                    />
                   </Elements>
                 ) : null}
               </div>
