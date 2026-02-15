@@ -1,4 +1,4 @@
-﻿import { nanoid } from "nanoid";
+import { randomUUID } from "crypto";
 import { Order } from "../models/Order";
 import { Product } from "../models/Product";
 import { ApiError } from "../utils/ApiError";
@@ -43,9 +43,10 @@ interface OrderInput {
 }
 
 export const createOrder = async (input: OrderInput, statusOverride?: string) => {
+  const orderSuffix = randomUUID().replace(/-/g, "").slice(0, 6).toUpperCase();
   return Order.create({
     ...input,
-    orderNumber: `SCN-${nanoid(6).toUpperCase()}`,
+    orderNumber: `SCN-${orderSuffix}`,
     status: statusOverride ?? (input.payment.method === "cod" ? "placed" : "pending")
   });
 };
