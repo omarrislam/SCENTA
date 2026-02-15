@@ -1,4 +1,4 @@
-import { fetchApi } from "./api";
+import { fetchApi, resolveApiAssetUrl } from "./api";
 import { listOrders as listMockOrders, listCustomers as listMockCustomers } from "./mockApi";
 import { blogPosts, collections, products, staticPages } from "./mockData";
 import { BackendProduct } from "./productAdapter";
@@ -51,7 +51,7 @@ const mapCollection = (collection: BackendCollection): Collection => ({
   title: collection.title,
   description: collection.description ?? "",
   productIds: collection.productIds?.map((id) => String(id)) ?? [],
-  image: collection.image
+  image: resolveApiAssetUrl(collection.image)
 });
 
 const mapBlogPost = (post: BackendContentItem): BlogPost => ({
@@ -60,7 +60,7 @@ const mapBlogPost = (post: BackendContentItem): BlogPost => ({
   title: post.title,
   excerpt: post.excerpt ?? "",
   body: post.body ?? "",
-  cover: post.cover ?? ""
+  cover: resolveApiAssetUrl(post.cover ?? "") ?? ""
 });
 
 const mapPage = (page: BackendContentItem): StaticPage => ({
@@ -305,3 +305,4 @@ export const adjustInventory = async (payload: {
     body: JSON.stringify(payload)
   });
 };
+

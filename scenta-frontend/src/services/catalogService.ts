@@ -1,4 +1,4 @@
-import { fetchApi } from "./api";
+import { fetchApi, resolveApiAssetUrl } from "./api";
 import { listProducts as listMockProducts, getProduct as getMockProduct, listCollections as listMockCollections } from "./mockApi";
 import { Collection, Product } from "./types";
 import { BackendProduct, mapProduct } from "./productAdapter";
@@ -6,12 +6,7 @@ import { BackendProduct, mapProduct } from "./productAdapter";
 const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
 const hasApi = Boolean(baseUrl);
 
-const resolveImageUrl = (value?: string) => {
-  if (!value) return value;
-  if (!baseUrl || !value.startsWith("/")) return value;
-  const publicBase = baseUrl.replace(/\/api\/?$/, "");
-  return `${publicBase}${value}`;
-};
+const resolveImageUrl = (value?: string) => resolveApiAssetUrl(value);
 
 interface BackendCollection {
   _id: string;
@@ -101,3 +96,4 @@ export const listProductsByIds = async (ids: string[]): Promise<Product[]> => {
   const data = await fetchApi<BackendProduct[]>(`/products/ids?${query.toString()}`);
   return data.map(mapProduct);
 };
+

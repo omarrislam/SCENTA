@@ -1,4 +1,5 @@
-﻿const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
+const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
+const publicBase = baseUrl.replace(/\/api\/?$/, "");
 
 export interface ApiResponse<T> {
   success: boolean;
@@ -40,4 +41,25 @@ export const fetchApi = async <T>(path: string, init?: RequestInit): Promise<T> 
     throw new Error(payload?.error?.message ?? "Request failed");
   }
   return payload.data;
+};
+
+export const resolveApiAssetUrl = (value?: string) => {
+  if (!value) return value;
+  if (!publicBase) return value;
+
+  if (value.startsWith("/")) {
+    return `${publicBase}${value}`;
+  }
+
+  try {
+    const parsed = new URL(value);
+    const isLocalOrigin = parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1";
+    if (isLocalOrigin) {
+      return `${publicBase}${parsed.pathname}${parsed.search}`;
+    }
+  } catch {
+    return value;
+  }
+
+  return value;
 };

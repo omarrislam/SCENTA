@@ -1,4 +1,4 @@
-import { fetchApi } from "./api";
+import { fetchApi, resolveApiAssetUrl } from "./api";
 import {
   getBlogPost as getMockBlogPost,
   getStaticPage as getMockStaticPage,
@@ -41,7 +41,7 @@ const mapBlogPost = (post: BackendBlogPost): BlogPost => ({
   excerptAr: post.excerptAr,
   body: post.body ?? post.content ?? "",
   bodyAr: post.bodyAr,
-  cover: post.cover ?? post.featuredImage ?? ""
+  cover: resolveApiAssetUrl(post.cover ?? post.featuredImage ?? "") ?? ""
 });
 
 const mapPage = (page: BackendPage): StaticPage => ({
@@ -91,3 +91,4 @@ export const getStaticPage = async (slug: string): Promise<StaticPage> => {
     return getMockStaticPage(slug);
   }
 };
+

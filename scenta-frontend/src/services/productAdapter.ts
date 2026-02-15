@@ -1,4 +1,5 @@
 import { Product, ProductVariant } from "./types";
+import { resolveApiAssetUrl } from "./api";
 
 export interface BackendVariant {
   key: string;
@@ -53,6 +54,6 @@ export const mapProduct = (product: BackendProduct): Product => {
     rating: 4.7,
     tags: buildTags(notes),
     variants: buildVariants(product.variants ?? []),
-    images: (product.images ?? []).map((image) => image.url)
+    images: (product.images ?? []).map((image) => resolveApiAssetUrl(image.url) ?? image.url)
   };
 };
