@@ -7,14 +7,20 @@ import { requireAuth, requireRole } from "../../middleware/auth";
 import { auditLog } from "../../middleware/auditLog";
 
 const router = Router();
-const uploadDir = path.join(process.cwd(), "uploads");
-
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
+const isVercelRuntime = Boolean(process.env.VERCEL);
+const uploadDir = isVercelRuntime ? path.join("/tmp", "uploads") : path.join(process.cwd(), "uploads");
 
 const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, uploadDir),
+  destination: (_req, _file, cb) => {
+    try {
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+      cb(null, uploadDir);
+    } catch (error) {
+      cb(error as Error, uploadDir);
+    }
+  },
   filename: (_req, file, cb) => {
     const ext = path.extname(file.originalname);
     const safeExt = ext && ext.length <= 10 ? ext : "";

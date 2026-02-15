@@ -38,6 +38,9 @@ const uploads_1 = __importDefault(require("./routes/admin/uploads"));
 const health_1 = __importDefault(require("./routes/health"));
 const createApp = () => {
     const app = (0, express_1.default)();
+    const uploadStaticDir = env_1.env.NODE_ENV === "production" && process.env.VERCEL
+        ? path_1.default.join("/tmp", "uploads")
+        : path_1.default.join(process.cwd(), "uploads");
     const allowedOrigins = env_1.env.FRONTEND_URL.split(",")
         .map((origin) => origin.trim())
         .filter(Boolean);
@@ -87,7 +90,7 @@ const createApp = () => {
     app.use("/api/admin/quiz", quiz_2.default);
     app.use("/api/admin/reports", reports_1.default);
     app.use("/api/admin/uploads", uploads_1.default);
-    app.use("/uploads", express_1.default.static(path_1.default.join(process.cwd(), "uploads")));
+    app.use("/uploads", express_1.default.static(uploadStaticDir));
     app.use(errorHandler_1.errorHandler);
     return app;
 };

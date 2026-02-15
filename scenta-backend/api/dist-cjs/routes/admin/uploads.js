@@ -11,12 +11,20 @@ const uploadController_1 = require("../../controllers/admin/uploadController");
 const auth_1 = require("../../middleware/auth");
 const auditLog_1 = require("../../middleware/auditLog");
 const router = (0, express_1.Router)();
-const uploadDir = path_1.default.join(process.cwd(), "uploads");
-if (!fs_1.default.existsSync(uploadDir)) {
-    fs_1.default.mkdirSync(uploadDir, { recursive: true });
-}
+const isVercelRuntime = Boolean(process.env.VERCEL);
+const uploadDir = isVercelRuntime ? path_1.default.join("/tmp", "uploads") : path_1.default.join(process.cwd(), "uploads");
 const storage = multer_1.default.diskStorage({
-    destination: (_req, _file, cb) => cb(null, uploadDir),
+    destination: (_req, _file, cb) => {
+        try {
+            if (!fs_1.default.existsSync(uploadDir)) {
+                fs_1.default.mkdirSync(uploadDir, { recursive: true });
+            }
+            cb(null, uploadDir);
+        }
+        catch (error) {
+            cb(error, uploadDir);
+        }
+    },
     filename: (_req, file, cb) => {
         const ext = path_1.default.extname(file.originalname);
         const safeExt = ext && ext.length <= 10 ? ext : "";

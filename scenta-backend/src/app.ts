@@ -33,6 +33,9 @@ import healthRoutes from "./routes/health";
 
 export const createApp = () => {
   const app = express();
+  const uploadStaticDir = env.NODE_ENV === "production" && process.env.VERCEL
+    ? path.join("/tmp", "uploads")
+    : path.join(process.cwd(), "uploads");
   const allowedOrigins = env.FRONTEND_URL.split(",")
     .map((origin) => origin.trim())
     .filter(Boolean);
@@ -87,7 +90,7 @@ export const createApp = () => {
   app.use("/api/admin/reports", adminReportsRoutes);
   app.use("/api/admin/uploads", adminUploadRoutes);
 
-  app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+  app.use("/uploads", express.static(uploadStaticDir));
 
   app.use(errorHandler);
 
