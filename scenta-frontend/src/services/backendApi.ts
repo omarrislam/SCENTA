@@ -112,6 +112,73 @@ export interface ThemeConfig {
 const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
 const hasApi = Boolean(baseUrl);
 const THEME_STORAGE_KEY = "scenta-theme";
+const MAX_IMAGE_EDGE = 1400;
+const TARGET_UPLOAD_BYTES = 350 * 1024;
+
+const loadImageBitmap = async (file: File): Promise<ImageBitmap | null> => {
+  if (typeof createImageBitmap !== "function") return null;
+  try {
+    return await createImageBitmap(file);
+  } catch {
+    return null;
+  }
+};
+
+const optimizeImageForUpload = async (file: File): Promise<File> => {
+  if (!file.type.startsWith("image/") || file.type === "image/svg+xml") {
+    return file;
+  }
+  if (file.size <= TARGET_UPLOAD_BYTES) {
+    return file;
+  }
+
+  const bitmap = await loadImageBitmap(file);
+  if (!bitmap) {
+    return file;
+  }
+
+  const largestEdge = Math.max(bitmap.width, bitmap.height);
+  const scale = largestEdge > MAX_IMAGE_EDGE ? MAX_IMAGE_EDGE / largestEdge : 1;
+  const width = Math.max(1, Math.round(bitmap.width * scale));
+  const height = Math.max(1, Math.round(bitmap.height * scale));
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+
+  const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    bitmap.close();
+    return file;
+  }
+  ctx.drawImage(bitmap, 0, 0, width, height);
+  bitmap.close();
+
+  const outputType = "image/webp";
+  let quality = 0.86;
+  let candidate: Blob | null = null;
+
+  for (let i = 0; i < 6; i += 1) {
+    // eslint-disable-next-line no-await-in-loop
+    const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, outputType, quality)
+    );
+    if (!blob) continue;
+    candidate = blob;
+    if (blob.size <= TARGET_UPLOAD_BYTES) break;
+    quality -= 0.12;
+    if (quality < 0.3) break;
+  }
+
+  if (!candidate) {
+    return file;
+  }
+
+  const nextName = file.name.replace(/\.[^.]+$/, "") || "upload";
+  return new File([candidate], `${nextName}.webp`, {
+    type: outputType,
+    lastModified: Date.now()
+  });
+};
 
 const getStoredTheme = (locale: Locale): ThemeConfig | null => {
   const stored = localStorage.getItem(THEME_STORAGE_KEY);
@@ -184,16 +251,17 @@ export const getPublicTheme = async (locale: Locale) => {
 };
 
 export const uploadImage = async (file: File): Promise<string> => {
+  const optimizedFile = await optimizeImageForUpload(file);
   if (!hasApi) {
     return new Promise((resolve) => {
       const reader = new FileReader();
       reader.onload = () => resolve(typeof reader.result === "string" ? reader.result : "");
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(optimizedFile);
     });
   }
   const token = localStorage.getItem("scenta-token");
   const formData = new FormData();
-  formData.append("file", file);
+  formData.append("file", optimizedFile);
   const response = await fetch(`${baseUrl}/admin/uploads`, {
     method: "POST",
     headers: token ? { Authorization: `Bearer ${token}` } : undefined,
