@@ -97,3 +97,42 @@ export const resolveApiAssetUrl = (value?: string) => {
 
   return value;
 };
+
+interface ResponsiveImageSource {
+  src: string;
+  srcSet?: string;
+}
+
+const normalizeUploadBasePath = (pathname: string) => {
+  if (!pathname.startsWith("/uploads/")) return null;
+  if (/-((sm)|(md)|(lg))\.webp$/i.test(pathname)) {
+    return pathname.replace(/-((sm)|(md)|(lg))\.webp$/i, "");
+  }
+  const extMatch = pathname.match(/\.[^/.]+$/);
+  if (!extMatch) return pathname;
+  return pathname.slice(0, -extMatch[0].length);
+};
+
+export const resolveResponsiveImageSource = (value?: string): ResponsiveImageSource | null => {
+  const resolved = resolveApiAssetUrl(value);
+  if (!resolved) return null;
+  try {
+    const parsed = new URL(resolved, window.location.origin);
+    const basePath = normalizeUploadBasePath(parsed.pathname);
+    if (!basePath) {
+      return { src: resolved };
+    }
+
+    const suffix = parsed.search ?? "";
+    const sm = `${parsed.origin}${basePath}-sm.webp${suffix}`;
+    const md = `${parsed.origin}${basePath}-md.webp${suffix}`;
+    const lg = `${parsed.origin}${basePath}-lg.webp${suffix}`;
+
+    return {
+      src: lg,
+      srcSet: `${sm} 480w, ${md} 960w, ${lg} 1440w`
+    };
+  } catch {
+    return { src: resolved };
+  }
+};

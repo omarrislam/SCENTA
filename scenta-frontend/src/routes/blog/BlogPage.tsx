@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getBlogPost, listBlogPosts } from "../../services/contentService";
-import { resolveApiAssetUrl } from "../../services/api";
+import { resolveResponsiveImageSource } from "../../services/api";
 import useMeta from "../../app/seo/useMeta";
 import { pickLocalized, resolveLocale } from "../../utils/localize";
 import Spinner from "../../components/feedback/Spinner";
@@ -46,17 +46,23 @@ const BlogPage = () => {
         <div className="grid grid--2">
           {posts.map((item) => (
             <Link key={item.id} to={`/blog/${item.slug}`} className="card blog-card">
-              {item.cover && (
+              {(() => {
+                const imageSource = resolveResponsiveImageSource(item.cover);
+                if (!imageSource?.src) return null;
+                return (
                 <div className="blog-card__media">
                   <img
-                    src={resolveApiAssetUrl(item.cover) ?? item.cover}
+                    src={imageSource.src}
+                    srcSet={imageSource.srcSet}
                     alt={item.title}
                     loading="lazy"
                     decoding="async"
                     fetchPriority="low"
+                    sizes="(max-width: 900px) 100vw, 50vw"
                   />
                 </div>
-              )}
+                );
+              })()}
               <strong>{pickLocalized(item.title, item.titleAr, locale)}</strong>
               <p>{pickLocalized(item.excerpt, item.excerptAr, locale)}</p>
             </Link>

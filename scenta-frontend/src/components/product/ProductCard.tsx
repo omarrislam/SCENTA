@@ -1,7 +1,7 @@
 ﻿import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Product } from "../../services/types";
-import { resolveApiAssetUrl } from "../../services/api";
+import { resolveResponsiveImageSource } from "../../services/api";
 import { pickLocalized, pickLocalizedArray, resolveLocale } from "../../utils/localize";
 import Button from "../ui/Button";
 import Badge from "../ui/Badge";
@@ -20,7 +20,7 @@ const ProductCard = ({ product, onQuickAdd }: ProductCardProps) => {
   const { theme } = useTheme();
   const price = product.variants[0]?.price ?? 0;
   const stock = product.variants[0]?.stock ?? 0;
-  const imageUrl = resolveApiAssetUrl(product.images?.[0]) ?? product.images?.[0];
+  const imageSource = resolveResponsiveImageSource(product.images?.[0]);
   const name = pickLocalized(product.name, product.nameAr, locale);
   const notes = pickLocalizedArray(product.notes, product.notesAr, locale);
   const badgeSettings = theme.home?.badges;
@@ -34,14 +34,16 @@ const ProductCard = ({ product, onQuickAdd }: ProductCardProps) => {
   return (
     <div className="product-card">
       <div className="product-card__media">
-        {imageUrl ? (
+        {imageSource?.src ? (
           <img
             className="product-card__image"
-            src={imageUrl}
+            src={imageSource.src}
+            srcSet={imageSource.srcSet}
             alt={name}
             loading="lazy"
             decoding="async"
             fetchPriority="low"
+            sizes="(max-width: 600px) 50vw, (max-width: 1200px) 33vw, 25vw"
           />
         ) : (
           <div className="product-card__image product-card__image--placeholder" />

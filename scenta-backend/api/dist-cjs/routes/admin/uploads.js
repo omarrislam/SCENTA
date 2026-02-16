@@ -12,32 +12,29 @@ const auth_1 = require("../../middleware/auth");
 const auditLog_1 = require("../../middleware/auditLog");
 const router = (0, express_1.Router)();
 const isVercelRuntime = Boolean(process.env.VERCEL);
-const shouldUseMemoryStorage = isVercelRuntime || process.env.NODE_ENV === "production";
 const uploadDir = isVercelRuntime ? path_1.default.join("/tmp", "uploads") : path_1.default.join(process.cwd(), "uploads");
-const storage = shouldUseMemoryStorage
-    ? multer_1.default.memoryStorage()
-    : multer_1.default.diskStorage({
-        destination: (_req, _file, cb) => {
-            try {
-                if (!fs_1.default.existsSync(uploadDir)) {
-                    fs_1.default.mkdirSync(uploadDir, { recursive: true });
-                }
-                cb(null, uploadDir);
+const storage = multer_1.default.diskStorage({
+    destination: (_req, _file, cb) => {
+        try {
+            if (!fs_1.default.existsSync(uploadDir)) {
+                fs_1.default.mkdirSync(uploadDir, { recursive: true });
             }
-            catch (error) {
-                cb(error, uploadDir);
-            }
-        },
-        filename: (_req, file, cb) => {
-            const ext = path_1.default.extname(file.originalname);
-            const safeExt = ext && ext.length <= 10 ? ext : "";
-            const name = `${Date.now()}-${Math.round(Math.random() * 1e9)}${safeExt}`;
-            cb(null, name);
+            cb(null, uploadDir);
         }
-    });
+        catch (error) {
+            cb(error, uploadDir);
+        }
+    },
+    filename: (_req, file, cb) => {
+        const ext = path_1.default.extname(file.originalname);
+        const safeExt = ext && ext.length <= 10 ? ext : "";
+        const name = `${Date.now()}-${Math.round(Math.random() * 1e9)}${safeExt}`;
+        cb(null, name);
+    }
+});
 const upload = (0, multer_1.default)({
     storage,
-    limits: { fileSize: 5 * 1024 * 1024 },
+    limits: { fileSize: 10 * 1024 * 1024 },
     fileFilter: (_req, file, cb) => {
         cb(null, file.mimetype.startsWith("image/"));
     }

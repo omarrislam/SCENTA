@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { resolveApiAssetUrl } from "../../services/api";
+import { resolveResponsiveImageSource } from "../../services/api";
 
 const ProductGallery = ({ images }: { images: string[] }) => {
   const [active, setActive] = useState(0);
-  const normalizedImages = images.map((image) => resolveApiAssetUrl(image) ?? image);
+  const normalizedImages = images
+    .map((image) => resolveResponsiveImageSource(image))
+    .filter((image): image is NonNullable<typeof image> => Boolean(image?.src));
   const mainImage = normalizedImages[active] ?? normalizedImages[0];
 
   return (
@@ -11,18 +13,20 @@ const ProductGallery = ({ images }: { images: string[] }) => {
       <div className="product-gallery__main">
         {mainImage && (
           <img
-            src={mainImage}
+            src={mainImage.src}
+            srcSet={mainImage.srcSet}
             alt="Product"
             className="product-gallery__image"
             decoding="async"
             fetchPriority="high"
+            sizes="(max-width: 900px) 100vw, 70vw"
           />
         )}
       </div>
       <div className="product-gallery__thumbs">
         {normalizedImages.map((image, index) => (
           <button
-            key={image}
+            key={image.src}
             className={`product-gallery__thumb ${active === index ? "is-active" : ""}`}
             onClick={() => setActive(index)}
             type="button"
@@ -30,11 +34,13 @@ const ProductGallery = ({ images }: { images: string[] }) => {
           >
             {image && (
               <img
-                src={image}
+                src={image.src}
+                srcSet={image.srcSet}
                 alt={`Thumbnail ${index + 1}`}
                 loading="lazy"
                 decoding="async"
                 fetchPriority="low"
+                sizes="96px"
               />
             )}
           </button>

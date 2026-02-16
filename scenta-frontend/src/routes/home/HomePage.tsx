@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { listCollections, listProducts } from "../../services/catalogService";
-import { resolveApiAssetUrl } from "../../services/api";
+import { resolveApiAssetUrl, resolveResponsiveImageSource } from "../../services/api";
 import { themeSections } from "../../services/mockData";
 import ProductCard from "../../components/product/ProductCard";
 import { useCart } from "../../storefront/cart/CartContext";
@@ -138,7 +138,8 @@ const HomePage = () => {
   }, [activeNewTab, genderTabs, newArrivals, products]);
 
   const slide = heroSlides[activeSlide] ?? heroSlides[0];
-  const slideImage = resolveApiAssetUrl(slide.image) ?? slide.image;
+  const slideImageSource = resolveResponsiveImageSource(slide.image);
+  const slideImage = slideImageSource?.src ?? (resolveApiAssetUrl(slide.image) ?? slide.image);
   const shippingItems =
     theme?.home?.shippingItems?.length
       ? theme.home.shippingItems
@@ -158,9 +159,11 @@ const HomePage = () => {
   const collectionsCtaLink = collectionsSetting.ctaLink ?? "/shop";
   const heroLabel = getSectionSetting("hero").title ?? "Welcome to our store";
   const offerImage = resolveApiAssetUrl("/images/iris-1.svg") ?? "/images/iris-1.svg";
+  const offerImageSource = resolveResponsiveImageSource(offerImage);
   const editorialImage = resolveApiAssetUrl(editorialSetting.backgroundImage ?? "/images/amber-1.svg")
     ?? editorialSetting.backgroundImage
     ?? "/images/amber-1.svg";
+  const editorialImageSource = resolveResponsiveImageSource(editorialImage);
   const signatureFeatures = [
     {
       title: "Original creations",
@@ -251,6 +254,7 @@ const HomePage = () => {
                       key={slideImage}
                       className="hero__media-image"
                       src={slideImage}
+                      srcSet={slideImageSource?.srcSet}
                       alt=""
                       loading="eager"
                       fetchPriority="high"
@@ -314,12 +318,14 @@ const HomePage = () => {
                           const title = pickLocalized(collection.title, collection.titleAr, locale);
                           const resolvedTitle = item.title ?? title;
                           const cardImage = resolveCollectionCardImage(collection.slug, item.image ?? collection.image);
+                          const cardImageSource = resolveResponsiveImageSource(cardImage);
                           return (
                           <Link key={collection.id} className="collection-card" to={`/collections/${collection.slug}`}>
                             <div className="collection-card__media">
                               <img
                                 className="collection-card__image"
-                                src={cardImage}
+                                src={cardImageSource?.src ?? cardImage}
+                                srcSet={cardImageSource?.srcSet}
                                 alt={resolvedTitle}
                                 loading="lazy"
                                 decoding="async"
@@ -388,7 +394,8 @@ const HomePage = () => {
                 <section className="editorial-banner" data-reveal>
                   <img
                     className="editorial-banner__image"
-                    src={editorialImage}
+                    src={editorialImageSource?.src ?? editorialImage}
+                    srcSet={editorialImageSource?.srcSet}
                     alt=""
                     loading="lazy"
                     decoding="async"
@@ -513,7 +520,8 @@ const HomePage = () => {
                   >
                     <img
                       className="siwa-offer__image"
-                      src={offerImage}
+                      src={offerImageSource?.src ?? offerImage}
+                      srcSet={offerImageSource?.srcSet}
                       alt=""
                       loading="lazy"
                       decoding="async"

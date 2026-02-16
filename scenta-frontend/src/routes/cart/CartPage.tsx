@@ -2,7 +2,7 @@
 import { useTranslation } from "react-i18next";
 import { useCart } from "../../storefront/cart/CartContext";
 import Button from "../../components/ui/Button";
-import { resolveApiAssetUrl } from "../../services/api";
+import { resolveResponsiveImageSource } from "../../services/api";
 import { pickLocalized, resolveLocale } from "../../utils/localize";
 import StockIndicator from "../../components/product/StockIndicator";
 
@@ -20,16 +20,20 @@ const CartPage = () => {
         </div>
       ) : (
         <div className="grid">
-          {items.map((item) => (
+          {items.map((item) => {
+            const imageSource = resolveResponsiveImageSource(item.product.images?.[0]);
+            return (
             <div key={item.id} className="card cart-item">
               <div className="cart-item__media">
-                {item.product.images?.[0] ? (
+                {imageSource?.src ? (
                   <img
-                    src={resolveApiAssetUrl(item.product.images[0]) ?? item.product.images[0]}
+                    src={imageSource.src}
+                    srcSet={imageSource.srcSet}
                     alt={item.product.name}
                     loading="lazy"
                     decoding="async"
                     fetchPriority="low"
+                    sizes="120px"
                   />
                 ) : (
                   <div className="cart-item__placeholder" />
@@ -56,7 +60,8 @@ const CartPage = () => {
                 </div>
               </div>
             </div>
-          ))}
+            );
+          })}
           <div className="card">
             <h3>{t("cart.total")}</h3>
             <p>EGP {total.toLocaleString()}</p>
