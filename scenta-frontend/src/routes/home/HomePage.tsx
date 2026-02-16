@@ -254,6 +254,8 @@ const HomePage = () => {
                       alt=""
                       loading="eager"
                       fetchPriority="high"
+                      decoding="async"
+                      sizes="100vw"
                     />
                   </div>
                 </div>
@@ -311,18 +313,19 @@ const HomePage = () => {
                           if (!collection) return null;
                           const title = pickLocalized(collection.title, collection.titleAr, locale);
                           const resolvedTitle = item.title ?? title;
-                        return (
+                          const cardImage = resolveCollectionCardImage(collection.slug, item.image ?? collection.image);
+                          return (
                           <Link key={collection.id} className="collection-card" to={`/collections/${collection.slug}`}>
-                            <div
-                              className="collection-card__media"
-                              style={
-                                item.image || collection.image
-                                  ? {
-                                      backgroundImage: `url(${resolveCollectionCardImage(collection.slug, item.image ?? collection.image)})`
-                                    }
-                                  : undefined
-                              }
-                            />
+                            <div className="collection-card__media">
+                              <img
+                                className="collection-card__image"
+                                src={cardImage}
+                                alt={resolvedTitle}
+                                loading="lazy"
+                                decoding="async"
+                                sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 33vw"
+                              />
+                            </div>
                             <div className="collection-card__overlay">
                               <span className="button button--outline collection-card__cta">{resolvedTitle}</span>
                             </div>
@@ -381,13 +384,15 @@ const HomePage = () => {
                     </div>
                   ))}
                 </section>
-                <section
-                  className="editorial-banner"
-                  data-reveal
-                  style={{
-                    backgroundImage: `linear-gradient(110deg, rgba(27, 27, 27, 0.55), rgba(27, 27, 27, 0) 60%), url(${editorialImage})`
-                  }}
-                >
+                <section className="editorial-banner" data-reveal>
+                  <img
+                    className="editorial-banner__image"
+                    src={editorialImage}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    sizes="100vw"
+                  />
                   <div className="editorial-banner__content">
                     <p className="editorial-banner__eyebrow">{t("home.editorialEyebrow")}</p>
                     <h2 className="section-title">{editorialSetting.title ?? t("home.editorialTitle")}</h2>
@@ -503,8 +508,16 @@ const HomePage = () => {
                     className="siwa-offer__media"
                     role="presentation"
                     aria-hidden="true"
-                    style={{ backgroundImage: `url(${offerImage})` }}
-                  />
+                  >
+                    <img
+                      className="siwa-offer__image"
+                      src={offerImage}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      sizes="(max-width: 900px) 100vw, 40vw"
+                    />
+                  </div>
                 </div>
               </section>
             );
