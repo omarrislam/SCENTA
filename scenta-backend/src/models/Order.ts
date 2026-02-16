@@ -41,11 +41,7 @@ const OrderSchema = new Schema(
       shippingFee: Number,
       grandTotal: Number
     },
-    coupon: {
-      code: String,
-      type: String,
-      value: Number
-    }
+    coupon: Schema.Types.Mixed
   },
   { timestamps: true }
 );

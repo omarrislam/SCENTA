@@ -74,10 +74,6 @@ const OrderSchema = new mongoose_1.Schema({
         shippingFee: Number,
         grandTotal: Number
     },
-    coupon: {
-        code: String,
-        type: String,
-        value: Number
-    }
+    coupon: mongoose_1.Schema.Types.Mixed
 }, { timestamps: true });
 exports.Order = mongoose_1.default.model("Order", OrderSchema);

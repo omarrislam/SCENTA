@@ -68,7 +68,9 @@ export const validateCheckout = async (items: CheckoutItem[], couponCode?: strin
       throw new ApiError(400, "INVALID_COUPON", "Coupon is invalid or expired");
     }
     if (match.usageLimit && match.usageLimit > 0) {
-      const used = await Order.countDocuments({ "coupon.code": match.code });
+      const used = await Order.countDocuments({
+        $or: [{ "coupon.code": match.code }, { coupon: match.code }]
+      });
       if (used >= match.usageLimit) {
         throw new ApiError(400, "COUPON_LIMIT", "Coupon usage limit reached");
       }
