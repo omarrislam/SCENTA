@@ -157,6 +157,10 @@ const HomePage = () => {
   const collectionsCtaLabel = collectionsSetting.ctaLabel ?? "View collection";
   const collectionsCtaLink = collectionsSetting.ctaLink ?? "/shop";
   const heroLabel = getSectionSetting("hero").title ?? "Welcome to our store";
+  const offerImage = resolveApiAssetUrl("/images/iris-1.svg") ?? "/images/iris-1.svg";
+  const editorialImage = resolveApiAssetUrl(editorialSetting.backgroundImage ?? "/images/amber-1.svg")
+    ?? editorialSetting.backgroundImage
+    ?? "/images/amber-1.svg";
   const signatureFeatures = [
     {
       title: "Original creations",
@@ -365,13 +369,9 @@ const HomePage = () => {
                 <section
                   className="editorial-banner"
                   data-reveal
-                  style={
-                    editorialSetting.backgroundImage
-                      ? {
-                          backgroundImage: `linear-gradient(110deg, rgba(27, 27, 27, 0.55), rgba(27, 27, 27, 0) 60%), url(${resolveApiAssetUrl(editorialSetting.backgroundImage) ?? editorialSetting.backgroundImage})`
-                        }
-                      : undefined
-                  }
+                  style={{
+                    backgroundImage: `linear-gradient(110deg, rgba(27, 27, 27, 0.55), rgba(27, 27, 27, 0) 60%), url(${editorialImage})`
+                  }}
                 >
                   <div className="editorial-banner__content">
                     <p className="editorial-banner__eyebrow">{t("home.editorialEyebrow")}</p>
@@ -484,7 +484,12 @@ const HomePage = () => {
                       Shop now
                     </Link>
                   </div>
-                  <div className="siwa-offer__media" role="presentation" aria-hidden="true" />
+                  <div
+                    className="siwa-offer__media"
+                    role="presentation"
+                    aria-hidden="true"
+                    style={{ backgroundImage: `url(${offerImage})` }}
+                  />
                 </div>
               </section>
             );

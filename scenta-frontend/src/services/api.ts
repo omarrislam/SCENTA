@@ -1,5 +1,6 @@
 const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
 const publicBase = baseUrl.replace(/\/api\/?$/, "");
+const appBase = import.meta.env.BASE_URL || "/";
 const legacyImageMap: Record<string, string> = {
   "/images/silk-amber.png": "/images/amber-1.svg",
   "/images/rose-veil.png": "/images/rose-1.svg",
@@ -7,6 +8,13 @@ const legacyImageMap: Record<string, string> = {
   "/images/golden-oud.png": "/images/oud-1.svg",
   "/images/cidar-mist.png": "/images/cedar-1.svg",
   "/images/cirtus.png": "/images/citrus-1.svg"
+};
+
+const withAppBase = (pathLike: string) => {
+  if (!pathLike.startsWith("/")) return pathLike;
+  if (appBase === "/") return pathLike;
+  const cleanBase = appBase.endsWith("/") ? appBase.slice(0, -1) : appBase;
+  return `${cleanBase}${pathLike}`;
 };
 
 export interface ApiResponse<T> {
@@ -63,17 +71,17 @@ export const resolveApiAssetUrl = (value?: string) => {
 
   if (value.startsWith("/")) {
     const normalized = normalizeLegacy(value);
-    if (!publicBase) return normalized;
+    if (!publicBase) return withAppBase(normalized);
     if (value.startsWith("/uploads/")) {
       return `${publicBase}${value}`;
     }
-    return normalized;
+    return withAppBase(normalized);
   }
 
   try {
     const parsed = new URL(value);
     if (parsed.pathname.startsWith("/images/")) {
-      return `${normalizeLegacy(parsed.pathname)}${parsed.search}`;
+      return withAppBase(`${normalizeLegacy(parsed.pathname)}${parsed.search}`);
     }
     if (!publicBase) return value;
     const isLocalOrigin = parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1";
@@ -81,7 +89,7 @@ export const resolveApiAssetUrl = (value?: string) => {
       if (parsed.pathname.startsWith("/uploads/")) {
         return `${publicBase}${parsed.pathname}${parsed.search}`;
       }
-      return `${parsed.pathname}${parsed.search}`;
+      return withAppBase(`${parsed.pathname}${parsed.search}`);
     }
   } catch {
     return value;
