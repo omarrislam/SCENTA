@@ -286,7 +286,6 @@ const HomePage = () => {
                       srcSet={slideImageSource?.srcSet}
                       alt=""
                       loading="eager"
-                      fetchpriority="high"
                       decoding="async"
                       sizes="100vw"
                     />
@@ -363,7 +362,6 @@ const HomePage = () => {
                     alt=""
                     loading="lazy"
                     decoding="async"
-                    fetchpriority="low"
                     sizes="100vw"
                   />
                   <div className="editorial-banner__content">
@@ -483,7 +481,6 @@ const HomePage = () => {
                                   alt={resolvedTitle}
                                   loading="lazy"
                                   decoding="async"
-                                  fetchpriority="low"
                                   sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 33vw"
                                 />
                               </div>
@@ -560,7 +557,6 @@ const HomePage = () => {
                       alt=""
                       loading="lazy"
                       decoding="async"
-                      fetchpriority="low"
                       sizes="(max-width: 900px) 100vw, 40vw"
                     />
                   </div>
@@ -650,3 +646,4 @@ const HomePage = () => {
 };
 
 export default HomePage;
+

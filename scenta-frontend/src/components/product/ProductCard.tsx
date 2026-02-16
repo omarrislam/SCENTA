@@ -1,4 +1,4 @@
-﻿import { Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Product } from "../../services/types";
 import { resolveResponsiveImageSource } from "../../services/api";
@@ -44,7 +44,6 @@ const ProductCard = ({ product, onQuickAdd, onQuickView, showStockIndicator = fa
             alt={name}
             loading="lazy"
             decoding="async"
-            fetchpriority="low"
             sizes="(max-width: 600px) 50vw, (max-width: 1200px) 33vw, 25vw"
           />
         ) : (
@@ -80,3 +79,4 @@ const ProductCard = ({ product, onQuickAdd, onQuickView, showStockIndicator = fa
 };
 
 export default ProductCard;
+

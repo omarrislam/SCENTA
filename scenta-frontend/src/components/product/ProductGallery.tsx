@@ -76,7 +76,6 @@ const ProductGallery = ({ images, name = "Product" }: ProductGalleryProps) => {
             className="product-gallery__image"
             style={{ transformOrigin: zoomOrigin }}
             decoding="async"
-            fetchpriority="high"
             sizes="(max-width: 900px) 100vw, 70vw"
           />
         )}
@@ -119,7 +118,6 @@ const ProductGallery = ({ images, name = "Product" }: ProductGalleryProps) => {
                 alt={`Thumbnail ${index + 1}`}
                 loading="lazy"
                 decoding="async"
-                fetchpriority="low"
                 sizes="96px"
               />
             )}
@@ -131,3 +129,4 @@ const ProductGallery = ({ images, name = "Product" }: ProductGalleryProps) => {
 };
 
 export default ProductGallery;
+

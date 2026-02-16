@@ -57,7 +57,6 @@ const BlogPage = () => {
                     alt={item.title}
                     loading="lazy"
                     decoding="async"
-                    fetchpriority="low"
                     sizes="(max-width: 900px) 100vw, 50vw"
                   />
                 </div>
@@ -88,3 +87,4 @@ const BlogPage = () => {
 };
 
 export default BlogPage;
+

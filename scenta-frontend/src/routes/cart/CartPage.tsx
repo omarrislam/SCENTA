@@ -1,4 +1,4 @@
-﻿import { Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useCart } from "../../storefront/cart/CartContext";
 import Button from "../../components/ui/Button";
@@ -42,7 +42,6 @@ const CartPage = () => {
                     alt={item.product.name}
                     loading="lazy"
                     decoding="async"
-                    fetchpriority="low"
                     sizes="120px"
                   />
                 ) : (
@@ -86,3 +85,4 @@ const CartPage = () => {
 };
 
 export default CartPage;
+
