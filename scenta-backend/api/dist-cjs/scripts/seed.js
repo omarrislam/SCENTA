@@ -20,7 +20,7 @@ const seedProducts = [
         description: "A luminous amber with clean musk and saffron glow.",
         notes: { top: ["Amber", "Musk", "Saffron"] },
         flags: { isFeatured: true, isBestSeller: true },
-        images: [{ url: "/images/silk-amber.png" }, { url: "/images/amber-2.svg" }],
+        images: [{ url: "/images/amber-1.svg" }, { url: "/images/amber-2.svg" }],
         variants: [
             { key: "silk-amber-50", sizeMl: 50, price: 1890, stock: 12 },
             { key: "silk-amber-100", sizeMl: 100, price: 2690, stock: 6 }
@@ -33,7 +33,7 @@ const seedProducts = [
         description: "A sheer rose wrapped in pear and clean woods.",
         notes: { top: ["Rose", "Pear", "Cedar"] },
         flags: { isNew: true },
-        images: [{ url: "/images/rose-veil.png" }, { url: "/images/rose-2.svg" }],
+        images: [{ url: "/images/rose-1.svg" }, { url: "/images/rose-2.svg" }],
         variants: [
             { key: "rose-veil-50", sizeMl: 50, price: 1650, stock: 24 },
             { key: "rose-veil-100", sizeMl: 100, price: 2390, stock: 10 }
@@ -85,7 +85,7 @@ const seedProducts = [
         description: "Powdery iris wrapped in vanilla woods.",
         notes: { top: ["Iris", "Vanilla", "Sandalwood"] },
         flags: { isBestSeller: true },
-        images: [{ url: "/images/velvet-iris.png" }, { url: "/images/iris-2.svg" }],
+        images: [{ url: "/images/iris-1.svg" }, { url: "/images/iris-2.svg" }],
         variants: [
             { key: "velvet-iris-50", sizeMl: 50, price: 1980, stock: 14 },
             { key: "velvet-iris-100", sizeMl: 100, price: 2750, stock: 6 }

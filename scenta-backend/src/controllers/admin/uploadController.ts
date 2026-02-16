@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import fs from "fs";
 import path from "path";
 import { ApiError } from "../../utils/ApiError";
 import { sendSuccess } from "../../utils/response";
@@ -15,9 +16,21 @@ export const uploadAdminImage = (req: UploadRequest, res: Response, next: NextFu
     buffer?: Buffer;
     mimetype?: string;
     filename?: string;
+    path?: string;
   };
   if (memoryFile.buffer?.length && memoryFile.mimetype?.startsWith("image/")) {
     const encoded = memoryFile.buffer.toString("base64");
+    const url = `data:${memoryFile.mimetype};base64,${encoded}`;
+    return sendSuccess(res, { url });
+  }
+
+  if (
+    process.env.NODE_ENV === "production" &&
+    memoryFile.path &&
+    memoryFile.mimetype?.startsWith("image/") &&
+    fs.existsSync(memoryFile.path)
+  ) {
+    const encoded = fs.readFileSync(memoryFile.path).toString("base64");
     const url = `data:${memoryFile.mimetype};base64,${encoded}`;
     return sendSuccess(res, { url });
   }

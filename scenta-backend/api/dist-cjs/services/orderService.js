@@ -23,14 +23,16 @@ const finalizeStripeOrder = async (paymentIntentId) => {
         return order;
     }
     for (const item of order.items) {
-        const product = await Product_1.Product.findById(item.productId);
-        if (!product)
+        const qty = Math.max(0, item.qty ?? 0);
+        if (!qty)
             continue;
-        const variant = product.variants.find((v) => v.key === item.variantKey);
-        if (variant) {
-            variant.stock = Math.max(0, (variant.stock ?? 0) - (item.qty ?? 0));
-            await product.save();
-        }
+        await Product_1.Product.updateOne({
+            _id: item.productId,
+            "variants.key": item.variantKey,
+            "variants.stock": { $gte: qty }
+        }, {
+            $inc: { "variants.$.stock": -qty }
+        });
     }
     order.status = "paid";
     order.payment = order.payment ?? { method: "stripe" };

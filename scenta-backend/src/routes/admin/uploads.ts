@@ -8,9 +8,10 @@ import { auditLog } from "../../middleware/auditLog";
 
 const router = Router();
 const isVercelRuntime = Boolean(process.env.VERCEL);
+const shouldUseMemoryStorage = isVercelRuntime || process.env.NODE_ENV === "production";
 const uploadDir = isVercelRuntime ? path.join("/tmp", "uploads") : path.join(process.cwd(), "uploads");
 
-const storage = isVercelRuntime
+const storage = shouldUseMemoryStorage
   ? multer.memoryStorage()
   : multer.diskStorage({
       destination: (_req, _file, cb) => {
