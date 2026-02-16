@@ -1560,7 +1560,13 @@ main {
 .spinner {
   display: flex;
   align-items: center;
-  padding: 12px;
+  justify-content: center;
+  width: 100%;
+  padding: 20px 0;
+}
+
+.spinner--centered {
+  min-height: min(42vh, 280px);
 }
 
 .spinner__ring {
@@ -1568,6 +1574,12 @@ main {
   border: 3px solid rgba(27, 27, 27, 0.15);
   border-top-color: var(--color-gold);
   animation: spin 700ms linear infinite;
+}
+
+.route-fallback {
+  min-height: calc(100vh - var(--nav-height));
+  display: grid;
+  align-items: start;
 }
 
 @keyframes spin {

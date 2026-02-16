@@ -1,6 +1,7 @@
 import { Suspense, lazy, useEffect } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import Spinner from "../components/feedback/Spinner";
 const StorefrontLayout = lazy(() => import("../components/layout/StorefrontLayout"));
 const AdminLayout = lazy(() => import("../admin/layout/AdminLayout"));
 const HomePage = lazy(() => import("../routes/home/HomePage"));
@@ -18,7 +19,11 @@ const AdminRoutes = lazy(() => import("../admin/AdminRoutes"));
 const RequireAuth = lazy(() => import("./auth/RequireAuth"));
 const RequireAdmin = lazy(() => import("./auth/RequireAdmin"));
 
-const RouteFallback = () => <div className="page-shell">Loading...</div>;
+const RouteFallback = () => (
+  <div className="route-fallback">
+    <Spinner size={40} label="Loading page" />
+  </div>
+);
 
 const StorefrontShell = () => (
   <Suspense fallback={<RouteFallback />}>
