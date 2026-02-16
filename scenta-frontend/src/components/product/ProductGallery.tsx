@@ -9,7 +9,15 @@ const ProductGallery = ({ images }: { images: string[] }) => {
   return (
     <div className="product-gallery">
       <div className="product-gallery__main">
-        {mainImage && <img src={mainImage} alt="Product" className="product-gallery__image" />}
+        {mainImage && (
+          <img
+            src={mainImage}
+            alt="Product"
+            className="product-gallery__image"
+            decoding="async"
+            fetchPriority="high"
+          />
+        )}
       </div>
       <div className="product-gallery__thumbs">
         {normalizedImages.map((image, index) => (
@@ -20,7 +28,15 @@ const ProductGallery = ({ images }: { images: string[] }) => {
             type="button"
             aria-label={`View image ${index + 1}`}
           >
-            {image && <img src={image} alt={`Thumbnail ${index + 1}`} />}
+            {image && (
+              <img
+                src={image}
+                alt={`Thumbnail ${index + 1}`}
+                loading="lazy"
+                decoding="async"
+                fetchPriority="low"
+              />
+            )}
           </button>
         ))}
       </div>

@@ -24,7 +24,13 @@ const CartPage = () => {
             <div key={item.id} className="card cart-item">
               <div className="cart-item__media">
                 {item.product.images?.[0] ? (
-                  <img src={resolveApiAssetUrl(item.product.images[0]) ?? item.product.images[0]} alt={item.product.name} />
+                  <img
+                    src={resolveApiAssetUrl(item.product.images[0]) ?? item.product.images[0]}
+                    alt={item.product.name}
+                    loading="lazy"
+                    decoding="async"
+                    fetchPriority="low"
+                  />
                 ) : (
                   <div className="cart-item__placeholder" />
                 )}

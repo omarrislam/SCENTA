@@ -48,7 +48,13 @@ const BlogPage = () => {
             <Link key={item.id} to={`/blog/${item.slug}`} className="card blog-card">
               {item.cover && (
                 <div className="blog-card__media">
-                  <img src={resolveApiAssetUrl(item.cover) ?? item.cover} alt={item.title} />
+                  <img
+                    src={resolveApiAssetUrl(item.cover) ?? item.cover}
+                    alt={item.title}
+                    loading="lazy"
+                    decoding="async"
+                    fetchPriority="low"
+                  />
                 </div>
               )}
               <strong>{pickLocalized(item.title, item.titleAr, locale)}</strong>

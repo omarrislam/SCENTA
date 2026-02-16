@@ -35,7 +35,14 @@ const ProductCard = ({ product, onQuickAdd }: ProductCardProps) => {
     <div className="product-card">
       <div className="product-card__media">
         {imageUrl ? (
-          <img className="product-card__image" src={imageUrl} alt={name} loading="lazy" />
+          <img
+            className="product-card__image"
+            src={imageUrl}
+            alt={name}
+            loading="lazy"
+            decoding="async"
+            fetchPriority="low"
+          />
         ) : (
           <div className="product-card__image product-card__image--placeholder" />
         )}
