@@ -15,11 +15,12 @@ import { ThemeProvider } from "./theme/ThemeProvider";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 30,
-      gcTime: 1000 * 60 * 10,
-      retry: 1,
+      staleTime: 1000 * 60 * 5,
+      gcTime: 1000 * 60 * 30,
+      retry: 0,
       refetchOnWindowFocus: false,
-      refetchOnReconnect: false
+      refetchOnReconnect: false,
+      refetchOnMount: false
     }
   }
 });

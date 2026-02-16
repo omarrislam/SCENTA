@@ -323,6 +323,7 @@ const HomePage = () => {
                                 alt={resolvedTitle}
                                 loading="lazy"
                                 decoding="async"
+                                fetchPriority="low"
                                 sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 33vw"
                               />
                             </div>
@@ -391,6 +392,7 @@ const HomePage = () => {
                     alt=""
                     loading="lazy"
                     decoding="async"
+                    fetchPriority="low"
                     sizes="100vw"
                   />
                   <div className="editorial-banner__content">
@@ -515,6 +517,7 @@ const HomePage = () => {
                       alt=""
                       loading="lazy"
                       decoding="async"
+                      fetchPriority="low"
                       sizes="(max-width: 900px) 100vw, 40vw"
                     />
                   </div>

@@ -112,8 +112,8 @@ export interface ThemeConfig {
 const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
 const hasApi = Boolean(baseUrl);
 const THEME_STORAGE_KEY = "scenta-theme";
-const MAX_IMAGE_EDGE = 1400;
-const TARGET_UPLOAD_BYTES = 350 * 1024;
+const MAX_IMAGE_EDGE = 1200;
+const TARGET_UPLOAD_BYTES = 220 * 1024;
 
 const loadImageBitmap = async (file: File): Promise<ImageBitmap | null> => {
   if (typeof createImageBitmap !== "function") return null;
@@ -126,9 +126,6 @@ const loadImageBitmap = async (file: File): Promise<ImageBitmap | null> => {
 
 const optimizeImageForUpload = async (file: File): Promise<File> => {
   if (!file.type.startsWith("image/") || file.type === "image/svg+xml") {
-    return file;
-  }
-  if (file.size <= TARGET_UPLOAD_BYTES) {
     return file;
   }
 
@@ -170,6 +167,9 @@ const optimizeImageForUpload = async (file: File): Promise<File> => {
   }
 
   if (!candidate) {
+    return file;
+  }
+  if (candidate.size >= file.size) {
     return file;
   }
 
