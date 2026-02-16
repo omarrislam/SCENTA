@@ -178,6 +178,21 @@ const HomePage = () => {
       link: { label: "Shop now", to: "/shop" }
     }
   ];
+  const collectionFallbackImage = (slug: string) => {
+    const fallbackBySlug: Record<string, string> = {
+      "amber-signature": "/images/silk-amber.png",
+      "floral-veil": "/images/rose-veil.png"
+    };
+    return fallbackBySlug[slug] ?? "/images/amber-1.svg";
+  };
+  const resolveCollectionCardImage = (slug: string, image?: string) => {
+    const resolved = resolveApiAssetUrl(image) ?? image;
+    if (!resolved || /\/uploads\//.test(resolved)) {
+      const fallback = collectionFallbackImage(slug);
+      return resolveApiAssetUrl(fallback) ?? fallback;
+    }
+    return resolved;
+  };
 
   const handleQuickAdd = (item: (typeof products)[number]) => {
     const variant = item.variants[0];
@@ -303,7 +318,7 @@ const HomePage = () => {
                               style={
                                 item.image || collection.image
                                   ? {
-                                      backgroundImage: `url(${resolveApiAssetUrl(item.image ?? collection.image) ?? (item.image ?? collection.image)})`
+                                      backgroundImage: `url(${resolveCollectionCardImage(collection.slug, item.image ?? collection.image)})`
                                     }
                                   : undefined
                               }

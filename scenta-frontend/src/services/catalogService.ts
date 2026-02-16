@@ -7,6 +7,22 @@ const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
 const hasApi = Boolean(baseUrl);
 
 const resolveImageUrl = (value?: string) => resolveApiAssetUrl(value);
+const isUploadPath = (value?: string) => Boolean(value && /\/uploads\//.test(value));
+const fallbackCollectionImage = (slug: string) => {
+  const fallbackBySlug: Record<string, string> = {
+    "amber-signature": "/images/silk-amber.png",
+    "floral-veil": "/images/rose-veil.png"
+  };
+  return fallbackBySlug[slug] ?? "/images/amber-1.svg";
+};
+
+const resolveCollectionImage = (slug: string, image?: string) => {
+  const resolved = resolveImageUrl(image);
+  if (!resolved || isUploadPath(resolved) || isUploadPath(image)) {
+    return resolveImageUrl(fallbackCollectionImage(slug)) ?? fallbackCollectionImage(slug);
+  }
+  return resolved;
+};
 
 interface BackendCollection {
   _id: string;
@@ -66,7 +82,7 @@ export const listCollections = async (): Promise<Collection[]> => {
     title: collection.title,
     description: collection.description ?? "",
     productIds: collection.productIds?.map((id) => String(id)) ?? [],
-    image: resolveImageUrl(collection.image)
+    image: resolveCollectionImage(collection.slug, collection.image)
   }));
 };
 
@@ -82,7 +98,7 @@ export const getCollection = async (slug: string): Promise<Collection | null> =>
     title: collection.title,
     description: collection.description ?? "",
     productIds: collection.productIds?.map((id) => String(id)) ?? [],
-    image: resolveImageUrl(collection.image)
+    image: resolveCollectionImage(collection.slug, collection.image)
   };
 };
 
