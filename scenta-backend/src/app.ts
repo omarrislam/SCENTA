@@ -90,7 +90,16 @@ export const createApp = () => {
   app.use("/api/admin/reports", adminReportsRoutes);
   app.use("/api/admin/uploads", adminUploadRoutes);
 
-  app.use("/uploads", express.static(uploadStaticDir));
+  app.use(
+    "/uploads",
+    express.static(uploadStaticDir, {
+      maxAge: "30d",
+      immutable: true,
+      setHeaders: (res) => {
+        res.setHeader("Cache-Control", "public, max-age=2592000, immutable");
+      }
+    })
+  );
 
   app.use(errorHandler);
 

@@ -278,6 +278,7 @@ main {
   height: 100%;
   object-fit: cover;
   display: block;
+  image-rendering: auto;
   opacity: 1;
   transition: opacity 420ms ease, transform 8s ease;
   position: relative;
@@ -594,6 +595,8 @@ main {
   isolation: isolate;
   background-size: cover;
   background-position: center;
+  content-visibility: auto;
+  contain-intrinsic-size: 720px;
 }
 
 .section-block::before {
@@ -612,6 +615,8 @@ main {
   width: 100%;
   margin-left: 0;
   margin-right: 0;
+  content-visibility: visible;
+  contain-intrinsic-size: auto;
 }
 
 @media (min-width: 901px) {
@@ -774,6 +779,7 @@ main {
   background-position: center;
   transition: transform 6s ease;
   position: relative;
+  will-change: transform;
 }
 
 .collection-card__media::after {

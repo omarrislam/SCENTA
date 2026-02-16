@@ -31,14 +31,33 @@ export const CartProvider = ({ children }: PropsWithChildren) => {
     return stored ? (JSON.parse(stored) as CartItem[]) : [];
   });
   const lastSyncSignature = useRef("");
+  const lastRequestedSignature = useRef("");
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
   }, [items]);
 
   useEffect(() => {
+    if (items.length === 0) {
+      lastSyncSignature.current = "";
+      lastRequestedSignature.current = "";
+    }
+  }, [items.length]);
+
+  const cartSignature = useMemo(
+    () =>
+      items
+        .map((item) => `${item.product.id}:${item.variant.id}:${item.quantity}`)
+        .sort()
+        .join("|"),
+    [items]
+  );
+
+  useEffect(() => {
     if (!hasApi || items.length === 0) return;
+    if (cartSignature === lastRequestedSignature.current) return;
     let isActive = true;
+    lastRequestedSignature.current = cartSignature;
 
     const syncItems = async () => {
       const ids = items.map((item) => item.product.id).filter(isMongoId);
@@ -84,7 +103,7 @@ export const CartProvider = ({ children }: PropsWithChildren) => {
     return () => {
       isActive = false;
     };
-  }, [items]);
+  }, [cartSignature]);
 
   const addItem = (product: Product, variant: ProductVariant) => {
     if ((variant?.stock ?? 0) <= 0) {
