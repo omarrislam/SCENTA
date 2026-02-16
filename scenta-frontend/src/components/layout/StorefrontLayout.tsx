@@ -100,11 +100,19 @@ const StorefrontLayout = ({ children }: PropsWithChildren) => {
       )}
       <header className="navbar">
         <div className="navbar__inner container">
-          <button className="nav-toggle" type="button" onClick={() => setIsOpen((prev) => !prev)}>
+          <button
+            className={`nav-toggle ${isOpen ? "is-open" : ""}`.trim()}
+            type="button"
+            aria-expanded={isOpen}
+            aria-controls="mobile-nav"
+            onClick={() => setIsOpen((prev) => !prev)}
+          >
             <span className="nav-toggle__icon" aria-hidden="true">
-              <span />
-              <span />
-              <span />
+              <span className="nav-toggle__line nav-toggle__line--top" />
+              <span className="nav-toggle__line nav-toggle__line--mid" />
+              <span className="nav-toggle__line nav-toggle__line--bot" />
+              <span className="nav-toggle__spark nav-toggle__spark--a" />
+              <span className="nav-toggle__spark nav-toggle__spark--b" />
             </span>
             <span className="sr-only">Menu</span>
           </button>
@@ -125,47 +133,57 @@ const StorefrontLayout = ({ children }: PropsWithChildren) => {
             </Link>
             <LocaleToggle />
           </div>
-          <nav className={`nav-links ${isOpen ? "nav-links--open" : ""}`.trim()}>
-            <Link to="/shop" onClick={closeMenu}>{t("nav.shop")}</Link>
-            <Link to="/collections/amber-signature" onClick={closeMenu}>{t("nav.collections")}</Link>
-            <Link to="/quiz" onClick={closeMenu}>{t("nav.quiz")}</Link>
-            <Link to="/blog" onClick={closeMenu}>{t("nav.blog")}</Link>
-            <Link to="/account" onClick={closeMenu}>{t("nav.account")}</Link>
-            {user?.role === "admin" && <Link to="/admin" onClick={closeMenu}>{t("nav.admin")}</Link>}
-            <Link to="/cart" className="nav-icon nav-icon--cart" onClick={closeMenu}>
-              <span className="nav-icon__glyph" aria-hidden="true">
-                <svg viewBox="0 0 24 24" role="presentation">
-                  <path
-                    d="M7 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm10 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM6.2 6h13.2l-1.2 7H7.1L6.2 6Zm13.6-2H5.6L4.9 2H2v2h1.6l2.2 11.2A2 2 0 0 0 7.7 17h9.8a2 2 0 0 0 2-1.6L21 4Z"
-                    fill="currentColor"
-                  />
-                </svg>
-              </span>
-              <span className="nav-icon__label">{t("nav.cart")}</span>
-              <span className="nav-icon__count">{items.length}</span>
-            </Link>
-            {user ? (
-              <button className="button" type="button" onClick={() => { logout(); closeMenu(); }}>
-                {t("nav.signOut")}
-              </button>
-            ) : (
-              <Link
-                to="/auth/login"
-                className="nav-icon nav-icon--account"
-                aria-label={t("nav.account")}
-                onClick={closeMenu}
-              >
+          <nav id="mobile-nav" className={`nav-links ${isOpen ? "nav-links--open" : ""}`.trim()}>
+            <div className="nav-links__header">
+              <p className="nav-links__eyebrow">Scent Journey</p>
+              <strong className="nav-links__title">{t("brand")}</strong>
+              <p className="nav-links__subtitle">Choose where your ritual starts.</p>
+            </div>
+            <div className="nav-links__items">
+              <Link to="/shop" onClick={closeMenu}>{t("nav.shop")}</Link>
+              <Link to="/collections/amber-signature" onClick={closeMenu}>{t("nav.collections")}</Link>
+              <Link to="/quiz" onClick={closeMenu}>{t("nav.quiz")}</Link>
+              <Link to="/blog" onClick={closeMenu}>{t("nav.blog")}</Link>
+              <Link to="/account" onClick={closeMenu}>{t("nav.account")}</Link>
+            </div>
+            <div className="nav-links__meta">
+              {user?.role === "admin" && <Link to="/admin" onClick={closeMenu}>{t("nav.admin")}</Link>}
+              <Link to="/cart" className="nav-icon nav-icon--cart" onClick={closeMenu}>
                 <span className="nav-icon__glyph" aria-hidden="true">
                   <svg viewBox="0 0 24 24" role="presentation">
                     <path
-                      d="M12 12a4 4 0 1 0-0.01-8.01A4 4 0 0 0 12 12Zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5Z"
+                      d="M7 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm10 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM6.2 6h13.2l-1.2 7H7.1L6.2 6Zm13.6-2H5.6L4.9 2H2v2h1.6l2.2 11.2A2 2 0 0 0 7.7 17h9.8a2 2 0 0 0 2-1.6L21 4Z"
                       fill="currentColor"
                     />
                   </svg>
                 </span>
-                <span className="nav-icon__label">{t("nav.account")}</span>
+                <span className="nav-icon__label">{t("nav.cart")}</span>
+                <span className="nav-icon__count">{items.length}</span>
               </Link>
-            )}
+              {user ? (
+                <button className="button" type="button" onClick={() => { logout(); closeMenu(); }}>
+                  {t("nav.signOut")}
+                </button>
+              ) : (
+                <Link
+                  to="/auth/login"
+                  className="nav-icon nav-icon--account"
+                  aria-label={t("nav.account")}
+                  onClick={closeMenu}
+                >
+                  <span className="nav-icon__glyph" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" role="presentation">
+                      <path
+                        d="M12 12a4 4 0 1 0-0.01-8.01A4 4 0 0 0 12 12Zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5Z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </span>
+                  <span className="nav-icon__label">{t("nav.account")}</span>
+                </Link>
+              )}
+            </div>
+            <div className="nav-links__footer">SCENTA</div>
           </nav>
         </div>
         <button
