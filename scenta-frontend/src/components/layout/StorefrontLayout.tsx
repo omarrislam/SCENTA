@@ -22,6 +22,11 @@ const StorefrontLayout = ({ children }: PropsWithChildren) => {
       : [t("promo.shipping"), t("promo.cod"), t("promo.crafted")];
   const promoShowIcon = theme.home?.promoShowIcon ?? true;
   const closeMenu = () => setIsOpen(false);
+  const isPathActive = (path: string) => {
+    if (path === "/") return location.pathname === "/";
+    return location.pathname === path || location.pathname.startsWith(`${path}/`);
+  };
+  const navItemClass = (path: string) => `nav-links__link ${isPathActive(path) ? "is-active" : ""}`.trim();
 
   useEffect(() => {
     const refresh = () => {
@@ -139,49 +144,36 @@ const StorefrontLayout = ({ children }: PropsWithChildren) => {
               <strong className="nav-links__title">{t("brand")}</strong>
               <p className="nav-links__subtitle">Choose where your ritual starts.</p>
             </div>
-            <div className="nav-links__items">
-              <Link to="/shop" onClick={closeMenu}>{t("nav.shop")}</Link>
-              <Link to="/collections/amber-signature" onClick={closeMenu}>{t("nav.collections")}</Link>
-              <Link to="/quiz" onClick={closeMenu}>{t("nav.quiz")}</Link>
-              <Link to="/blog" onClick={closeMenu}>{t("nav.blog")}</Link>
-              <Link to="/account" onClick={closeMenu}>{t("nav.account")}</Link>
+            <div className="nav-links__group">
+              <p className="nav-links__group-label">Shop</p>
+              <div className="nav-links__items">
+                <Link className={navItemClass("/shop")} to="/shop" onClick={closeMenu}>{t("nav.shop")}</Link>
+                <Link className={navItemClass("/collections")} to="/collections/amber-signature" onClick={closeMenu}>{t("nav.collections")}</Link>
+                <Link className={navItemClass("/quiz")} to="/quiz" onClick={closeMenu}>{t("nav.quiz")}</Link>
+                <Link className={navItemClass("/blog")} to="/blog" onClick={closeMenu}>{t("nav.blog")}</Link>
+              </div>
             </div>
-            <div className="nav-links__meta">
-              {user?.role === "admin" && <Link to="/admin" onClick={closeMenu}>{t("nav.admin")}</Link>}
-              <Link to="/cart" className="nav-icon nav-icon--cart" onClick={closeMenu}>
-                <span className="nav-icon__glyph" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" role="presentation">
-                    <path
-                      d="M7 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm10 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM6.2 6h13.2l-1.2 7H7.1L6.2 6Zm13.6-2H5.6L4.9 2H2v2h1.6l2.2 11.2A2 2 0 0 0 7.7 17h9.8a2 2 0 0 0 2-1.6L21 4Z"
-                      fill="currentColor"
-                    />
-                  </svg>
-                </span>
-                <span className="nav-icon__label">{t("nav.cart")}</span>
-                <span className="nav-icon__count">{items.length}</span>
-              </Link>
-              {user ? (
-                <button className="button" type="button" onClick={() => { logout(); closeMenu(); }}>
-                  {t("nav.signOut")}
-                </button>
-              ) : (
-                <Link
-                  to="/auth/login"
-                  className="nav-icon nav-icon--account"
-                  aria-label={t("nav.account")}
-                  onClick={closeMenu}
-                >
-                  <span className="nav-icon__glyph" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" role="presentation">
-                      <path
-                        d="M12 12a4 4 0 1 0-0.01-8.01A4 4 0 0 0 12 12Zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5Z"
-                        fill="currentColor"
-                      />
-                    </svg>
-                  </span>
-                  <span className="nav-icon__label">{t("nav.account")}</span>
-                </Link>
-              )}
+            <div className="nav-links__group">
+              <p className="nav-links__group-label">Account</p>
+              <div className="nav-links__meta">
+                <Link className={navItemClass("/account")} to="/account" onClick={closeMenu}>{t("nav.account")}</Link>
+                <Link className={navItemClass("/cart")} to="/cart" onClick={closeMenu}>{t("nav.cart")} ({items.length})</Link>
+                {user?.role === "admin" && <Link className={navItemClass("/admin")} to="/admin" onClick={closeMenu}>{t("nav.admin")}</Link>}
+                {user ? (
+                  <button className="button nav-links__auth-button" type="button" onClick={() => { logout(); closeMenu(); }}>
+                    {t("nav.signOut")}
+                  </button>
+                ) : (
+                  <Link
+                    to="/auth/login"
+                    className={`${navItemClass("/auth")} nav-links__auth-link`.trim()}
+                    aria-label={t("nav.account")}
+                    onClick={closeMenu}
+                  >
+                    {t("nav.signIn")}
+                  </Link>
+                )}
+              </div>
             </div>
             <div className="nav-links__footer">SCENTA</div>
           </nav>

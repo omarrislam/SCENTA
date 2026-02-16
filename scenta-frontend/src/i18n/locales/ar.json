@@ -55,11 +55,20 @@
     "title": "المتجر",
     "searchLabel": "بحث",
     "searchPlaceholder": "ابحث عن العطور",
+    "showFilters": "الفلاتر",
+    "hideFilters": "إخفاء",
+    "filtersApplied": "تم تطبيق فلاتر",
+    "filtersNone": "بدون فلاتر",
     "sortLabel": "ترتيب",
     "sortFeatured": "الأبرز",
     "sortPriceAsc": "السعر من الأقل للأعلى",
     "sortPriceDesc": "السعر من الأعلى للأقل",
     "tagsLabel": "الوسوم",
+    "quickView": "عرض سريع",
+    "quickViewTitle": "عرض سريع للمنتج",
+    "clear": "مسح",
+    "clearTag": "مسح الوسم",
+    "close": "إغلاق",
     "prev": "السابق",
     "next": "التالي",
     "pageOf": "صفحة {{current}} من {{total}}"
@@ -75,6 +84,7 @@
   "checkout": {
     "title": "الدفع",
     "empty": "سلتك فارغة. أضف منتجات قبل الدفع.",
+    "progressTitle": "تقدم إتمام الشراء",
     "stepLabel": "خطوة {{current}} من {{total}}: {{label}}",
     "steps": {
       "address": "العنوان",
@@ -104,6 +114,8 @@
     "applyCoupon": "تطبيق",
     "couponApplied": "تم تطبيق الكوبون",
     "couponInvalid": "كوبون غير صالح",
+    "fieldRequired": "هذا الحقل مطلوب.",
+    "phoneInvalid": "يرجى إدخال رقم هاتف صالح.",
     "discount": "الخصم",
     "finalTotal": "الإجمالي بعد الخصم",
     "addressMissing": "يرجى استكمال عنوان التوصيل.",
@@ -132,6 +144,12 @@
   },
   "product": {
     "loading": "جارٍ التحميل...",
+    "trust": {
+      "title": "مزايا الثقة في الشراء",
+      "delivery": "شحن مجاني فوق ١٥٠٠ جنيه",
+      "returns": "استرجاع سهل خلال ١٤ يومًا",
+      "payment": "دفع آمن بالبطاقة أو عند الاستلام"
+    },
     "tabs": {
       "description": "الوصف",
       "notes": "النغمات",

@@ -27,7 +27,7 @@ const NoteBadges = ({ notes, labels }: { notes: string[]; labels?: string[] }) =
             className="note-badge__icon"
             loading="lazy"
             decoding="async"
-            fetchPriority="low"
+            fetchpriority="low"
             onError={(event) => {
               const target = event.currentTarget;
               target.onerror = null;

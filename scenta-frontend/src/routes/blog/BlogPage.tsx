@@ -57,7 +57,7 @@ const BlogPage = () => {
                     alt={item.title}
                     loading="lazy"
                     decoding="async"
-                    fetchPriority="low"
+                    fetchpriority="low"
                     sizes="(max-width: 900px) 100vw, 50vw"
                   />
                 </div>
@@ -69,7 +69,19 @@ const BlogPage = () => {
           ))}
         </div>
       ) : (
-        <div className="card">{t("blog.empty")}</div>
+        <div className="card empty-state">
+          <div className="empty-state__icon" aria-hidden="true">journal</div>
+          <h2 className="empty-state__title">{t("blog.empty")}</h2>
+          <p className="empty-state__body">{t("home.newsletterBody")}</p>
+          <div className="empty-state__actions">
+            <Link className="button button--primary" to="/shop">
+              {t("cta.explore")}
+            </Link>
+            <Link className="button button--outline" to="/">
+              {t("brand")}
+            </Link>
+          </div>
+        </div>
       )}
     </div>
   );

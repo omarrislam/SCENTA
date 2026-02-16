@@ -78,13 +78,13 @@ const ProductPage = () => {
 
   return (
     <div className="grid product-detail">
-      <ProductGallery images={product.images} />
-      <div>
+      <ProductGallery images={product.images} name={localizedName} />
+      <div className="product-detail__content">
         <h1 className="section-title">{localizedName}</h1>
         <p className="hero__subtitle">{localizedDescription}</p>
-        <p>EGP {selectedVariant.price.toLocaleString()}</p>
+        <p className="product-detail__price">EGP {selectedVariant.price.toLocaleString()}</p>
         <StockIndicator stock={selectedVariant.stock ?? 0} />
-        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+        <div className="product-detail__variants">
           {product.variants.map((variant) => (
             <Button
               key={variant.id}
@@ -96,8 +96,8 @@ const ProductPage = () => {
             </Button>
           ))}
         </div>
-        <div style={{ marginTop: "16px", display: "flex", gap: "12px", alignItems: "center" }}>
-          <Button className="button--primary" type="button" onClick={handleAddToCart}>
+        <div className="product-detail__actions">
+          <Button className="button--primary" type="button" onClick={handleAddToCart} disabled={isOut}>
             {t("cta.addToCart")}
           </Button>
           <button
@@ -114,7 +114,18 @@ const ProductPage = () => {
             <span className="sr-only">{t("cta.wishlist")}</span>
           </button>
         </div>
-        <div style={{ marginTop: "24px", display: "flex", gap: "8px", flexWrap: "wrap" }}>
+        <div className="product-trust-row" role="list" aria-label={t("product.trust.title")}>
+          <span className="product-trust-row__item" role="listitem">
+            {t("product.trust.delivery")}
+          </span>
+          <span className="product-trust-row__item" role="listitem">
+            {t("product.trust.returns")}
+          </span>
+          <span className="product-trust-row__item" role="listitem">
+            {t("product.trust.payment")}
+          </span>
+        </div>
+        <div className="product-detail__tabs">
           {tabs.map((key) => (
             <button
               key={key}
@@ -126,7 +137,7 @@ const ProductPage = () => {
             </button>
           ))}
         </div>
-        <div className="card" style={{ marginTop: "16px" }}>
+        <div className="card product-detail__panel">
           {tab === "description" && <p>{localizedDescription}</p>}
           {tab === "notes" && <NoteBadges notes={product.notes} labels={localizedNotes} />}
           {tab === "specs" && (
@@ -138,6 +149,15 @@ const ProductPage = () => {
           )}
           {tab === "reviews" && <ReviewsList productId={product.id} />}
         </div>
+      </div>
+      <div className="product-sticky-cta">
+        <div className="product-sticky-cta__meta">
+          <strong>{t("cta.addToCart")}</strong>
+          <span>EGP {selectedVariant.price.toLocaleString()}</span>
+        </div>
+        <Button className="button--primary" type="button" onClick={handleAddToCart} disabled={isOut}>
+          {t("cta.addToCart")}
+        </Button>
       </div>
     </div>
   );

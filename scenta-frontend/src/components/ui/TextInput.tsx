@@ -5,13 +5,19 @@ import { cn } from "@/lib/utils";
 const inputVariants = cva("input", {
   variants: {
     inputSize: {
-      default: "",
-      sm: "",
-      lg: ""
+      default: "input--md",
+      sm: "input--sm",
+      lg: "input--lg"
+    },
+    intent: {
+      default: "input--default",
+      subtle: "input--subtle",
+      error: "input--error"
     }
   },
   defaultVariants: {
-    inputSize: "default"
+    inputSize: "default",
+    intent: "default"
   }
 });
 
@@ -20,8 +26,8 @@ interface TextInputProps
     VariantProps<typeof inputVariants> {}
 
 const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(
-  ({ className, inputSize, ...props }, ref) => {
-    return <input ref={ref} className={cn(inputVariants({ inputSize }), className)} {...props} />;
+  ({ className, inputSize, intent, ...props }, ref) => {
+    return <input ref={ref} className={cn(inputVariants({ inputSize, intent }), className)} {...props} />;
   }
 );
 

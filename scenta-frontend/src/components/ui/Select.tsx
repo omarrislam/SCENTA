@@ -5,13 +5,19 @@ import { cn } from "@/lib/utils";
 const selectVariants = cva("select", {
   variants: {
     selectSize: {
-      default: "",
-      sm: "",
-      lg: ""
+      default: "select--md",
+      sm: "select--sm",
+      lg: "select--lg"
+    },
+    intent: {
+      default: "select--default",
+      subtle: "select--subtle",
+      error: "select--error"
     }
   },
   defaultVariants: {
-    selectSize: "default"
+    selectSize: "default",
+    intent: "default"
   }
 });
 
@@ -20,8 +26,8 @@ interface SelectProps
     VariantProps<typeof selectVariants> {}
 
 const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
-  ({ className, selectSize, ...props }, ref) => {
-    return <select ref={ref} className={cn(selectVariants({ selectSize }), className)} {...props} />;
+  ({ className, selectSize, intent, ...props }, ref) => {
+    return <select ref={ref} className={cn(selectVariants({ selectSize, intent }), className)} {...props} />;
   }
 );
 

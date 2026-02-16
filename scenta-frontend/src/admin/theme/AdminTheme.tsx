@@ -415,6 +415,12 @@ const AdminTheme = () => {
     });
   };
 
+  const previewHeroSlide = heroSlides[0];
+  const previewSurface = mode === "dark" ? colors.accentDark : colors.surface;
+  const previewText = mode === "dark" ? "#f6efe7" : colors.text;
+  const previewMuted = mode === "dark" ? "#d1c4b8" : colors.muted;
+  const previewAccent = colors.accent;
+
   return (
     <div className="card grid admin-theme admin-theme-editor">
       <div className="admin-theme__header">
@@ -985,14 +991,48 @@ const AdminTheme = () => {
           />
           {fieldErrors["radius.lg"] && <p className="admin-theme__field-error">{fieldErrors["radius.lg"]}</p>}
         </div>
-        <div className="card">
+        <div className="card admin-theme-live-preview">
           <h2 className="section-title">Preview</h2>
-          <div style={{ display: "grid", gap: "12px" }}>
-            <p style={{ margin: 0 }}>Preview text uses your palette.</p>
-            <Button className="button--primary" type="button">
-              Primary CTA
-            </Button>
-            <div className="badge">Badge</div>
+          <div
+            className="admin-theme-live-preview__panel"
+            style={{
+              background: `linear-gradient(145deg, ${colors.bgStart}, ${colors.bgEnd})`,
+              color: previewText,
+              borderRadius: `${radius.md}px`
+            }}
+          >
+            <div className="admin-theme-live-preview__hero">
+              <p className="admin-theme-live-preview__eyebrow">{sectionSettings.hero?.title ?? t("hero.label")}</p>
+              <h3>{previewHeroSlide?.title ?? t("hero.title")}</h3>
+              <p>{previewHeroSlide?.subtitle ?? t("hero.subtitle")}</p>
+              <div className="admin-theme-live-preview__cta">
+                <span className="button button--primary">{previewHeroSlide?.primaryLabel ?? t("hero.primary")}</span>
+                <span className="button button--outline">{previewHeroSlide?.secondaryLabel ?? t("hero.secondary")}</span>
+              </div>
+            </div>
+            <div
+              className="admin-theme-live-preview__card"
+              style={{
+                background: previewSurface,
+                color: previewText,
+                borderRadius: `${radius.sm}px`
+              }}
+            >
+              <strong>{sectionSettings.editorial?.title ?? t("home.editorialTitle")}</strong>
+              <p style={{ color: previewMuted }}>
+                {sectionSettings.editorial?.subtitle ?? t("home.editorialBody")}
+              </p>
+              <span
+                className="badge"
+                style={{
+                  background: badgeSettings.backgroundColor ?? "#2f2623",
+                  color: badgeSettings.textColor ?? "#ffffff"
+                }}
+              >
+                {badgeSettings.bestLabel ?? "Best"}
+              </span>
+              <span className="admin-theme-live-preview__accent" style={{ background: previewAccent }} />
+            </div>
           </div>
         </div>
       </div>

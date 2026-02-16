@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -30,9 +30,9 @@ const HomePage = () => {
     queryFn: () => listCollections(),
     staleTime: 1000 * 60
   });
-  const products = data?.items ?? [];
-  const bestSellers = products.filter((item) => item.flags.bestSeller);
-  const newArrivals = products.filter((item) => item.flags.new);
+  const products = useMemo(() => data?.items ?? [], [data?.items]);
+  const bestSellers = useMemo(() => products.filter((item) => item.flags.bestSeller), [products]);
+  const newArrivals = useMemo(() => products.filter((item) => item.flags.new), [products]);
   const sections = theme?.homeSections?.length ? theme.homeSections : themeSections;
   const sectionSettings = theme?.home?.sectionSettings ?? {};
 
@@ -110,15 +110,21 @@ const HomePage = () => {
     return () => window.clearTimeout(handle);
   }, [activeSlide]);
 
-  const isWarm = (item: (typeof products)[number]) =>
-    item.tags.some((tag) => ["warm", "bold", "night", "evening"].includes(tag));
-  const isFresh = (item: (typeof products)[number]) =>
-    item.tags.some((tag) => ["fresh", "day"].includes(tag));
-
-  const genderTabs = [
-    { key: "women", label: "Women", filter: (item: typeof products[number]) => isFresh(item) },
-    { key: "men", label: "Men", filter: (item: typeof products[number]) => isWarm(item) }
-  ];
+  const genderTabs = useMemo(
+    () => [
+      {
+        key: "women",
+        label: "Women",
+        filter: (item: typeof products[number]) => item.tags.some((tag) => ["fresh", "day"].includes(tag))
+      },
+      {
+        key: "men",
+        label: "Men",
+        filter: (item: typeof products[number]) => item.tags.some((tag) => ["warm", "bold", "night", "evening"].includes(tag))
+      }
+    ],
+    []
+  );
 
   const [activeBestTab, setActiveBestTab] = useState(genderTabs[0]?.key ?? "women");
   const [activeNewTab, setActiveNewTab] = useState(genderTabs[0]?.key ?? "women");
@@ -155,6 +161,28 @@ const HomePage = () => {
   const quizSetting = getSectionSetting("quiz");
   const editorialSetting = getSectionSetting("editorial");
   const newsletterSetting = getSectionSetting("newsletter");
+  const shippingSetting = getSectionSetting("shipping");
+
+  const orderedSections = useMemo(() => {
+    const priority: Record<string, number> = {
+      hero: 0,
+      bestsellers: 1,
+      newin: 2,
+      quiz: 3,
+      offers: 4,
+      signature: 5,
+      newsletter: 6
+    };
+    return [...sections]
+      .filter((section) => section.isVisible)
+      .sort((a, b) => (priority[a.id] ?? 99) - (priority[b.id] ?? 99));
+  }, [sections]);
+  const [showDeferredSections, setShowDeferredSections] = useState(false);
+
+  useEffect(() => {
+    const handle = window.setTimeout(() => setShowDeferredSections(true), 550);
+    return () => window.clearTimeout(handle);
+  }, []);
   const collectionsCtaLabel = collectionsSetting.ctaLabel ?? "View collection";
   const collectionsCtaLink = collectionsSetting.ctaLink ?? "/shop";
   const heroLabel = getSectionSetting("hero").title ?? "Welcome to our store";
@@ -214,12 +242,13 @@ const HomePage = () => {
   return (
     <div className="home-page">
       <div className="home-stack">
-      {sections
-        .filter((section) => section.isVisible)
-        .map((section) => {
+      {orderedSections.map((section) => {
+          if (["offers", "signature", "newsletter"].includes(section.id) && !showDeferredSections) {
+            return null;
+          }
           if (section.id === "hero") {
             return (
-              <section key={section.id} className="section-block section-block--hero" data-reveal>
+              <section key={section.id} className="section-block section-block--hero section-block--narrative" data-reveal>
                 <div
                   className={`hero hero--slider hero--${heroAlignment} ${isAnimating ? "is-animating" : ""}`.trim()}
                   onMouseEnter={() => heroPauseOnHover && setIsPaused(true)}
@@ -257,7 +286,7 @@ const HomePage = () => {
                       srcSet={slideImageSource?.srcSet}
                       alt=""
                       loading="eager"
-                      fetchPriority="high"
+                      fetchpriority="high"
                       decoding="async"
                       sizes="100vw"
                     />
@@ -276,9 +305,134 @@ const HomePage = () => {
                     ))}
                   </div>
                 </div>
+              </section>
+            );
+          }
+          if (section.id === "bestsellers") {
+            return (
+              <Fragment key={section.id}>
+                <section
+                  className="section-block section-block--accent section-block--narrative section-transition"
+                  data-reveal
+                  style={
+                    bestSetting.backgroundImage
+                      ? { backgroundImage: `url(${resolveApiAssetUrl(bestSetting.backgroundImage) ?? bestSetting.backgroundImage})` }
+                      : undefined
+                  }
+                >
+                  <div className="siwa-section-header">
+                    <div>
+                      <p className="siwa-eyebrow">Our best sellers</p>
+                      <h2 className="section-title">{bestSetting.title ?? "Our best sellers"}</h2>
+                      {bestSetting.subtitle && <p className="siwa-section-header__meta">{bestSetting.subtitle}</p>}
+                    </div>
+                    <Link className="button button--outline" to="/shop">
+                      View collection
+                    </Link>
+                  </div>
+                  <div className="tabs">
+                    {genderTabs.map((tab) => (
+                      <button
+                        key={tab.key}
+                        className={`tab ${tab.key === activeBestTab ? "is-active" : ""}`.trim()}
+                        type="button"
+                        onClick={() => setActiveBestTab(tab.key)}
+                      >
+                        {tab.label}
+                      </button>
+                    ))}
+                  </div>
+                  <div className={bestSetting.layout === "grid" ? "product-grid" : "product-carousel"}>
+                    {bestSellerProducts
+                      .slice(0, bestSetting.maxItems ?? 6)
+                      .map((product) => (
+                        <ProductCard
+                          key={product.id}
+                          product={product}
+                          onQuickAdd={handleQuickAdd}
+                          showStockIndicator={false}
+                        />
+                      ))}
+                  </div>
+                </section>
+                <section className="editorial-banner section-transition" data-reveal>
+                  <img
+                    className="editorial-banner__image"
+                    src={editorialImageSource?.src ?? editorialImage}
+                    srcSet={editorialImageSource?.srcSet}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    fetchpriority="low"
+                    sizes="100vw"
+                  />
+                  <div className="editorial-banner__content">
+                    <p className="editorial-banner__eyebrow">{t("home.editorialEyebrow")}</p>
+                    <h2 className="section-title">{editorialSetting.title ?? t("home.editorialTitle")}</h2>
+                    <p>{editorialSetting.subtitle ?? t("home.editorialBody")}</p>
+                    {editorialSetting.ctaLabel && editorialSetting.ctaLink ? (
+                      <Link className="button button--primary" to={editorialSetting.ctaLink}>
+                        {editorialSetting.ctaLabel}
+                      </Link>
+                    ) : (
+                      <Link className="button button--primary" to="/shop">
+                        {t("home.editorialCta")}
+                      </Link>
+                    )}
+                  </div>
+                </section>
+                <section
+                  className="shipping-strip card section-block section-block--divider section-transition"
+                  data-reveal
+                  style={
+                    shippingSetting.backgroundImage
+                      ? {
+                          backgroundImage: `url(${resolveApiAssetUrl(shippingSetting.backgroundImage) ?? shippingSetting.backgroundImage})`
+                        }
+                      : undefined
+                  }
+                >
+                  {shippingItems
+                    .filter((item) => item.enabled !== false)
+                    .slice(0, shippingSetting.maxItems ?? shippingItems.length)
+                    .map((item) => (
+                      <div key={item.title} className="shipping-item">
+                        <span className="shipping-item__icon" aria-hidden="true">
+                          {item.icon === "truck" && (
+                            <svg viewBox="0 0 24 24">
+                              <path
+                                d="M3 6h11v9H3V6Zm12 4h3.2l2.8 3.5V15h-6v-5Zm-9.5 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Zm11 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"
+                                fill="currentColor"
+                              />
+                            </svg>
+                          )}
+                          {item.icon === "cash" && (
+                            <svg viewBox="0 0 24 24">
+                              <path
+                                d="M4 7h16a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Zm2 2a2 2 0 0 1-2 2v2a2 2 0 0 1 2 2h12a2 2 0 0 1 2-2v-2a2 2 0 0 1-2-2H6Zm6 5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
+                                fill="currentColor"
+                              />
+                            </svg>
+                          )}
+                          {item.icon === "gift" && (
+                            <svg viewBox="0 0 24 24">
+                              <path
+                                d="M3 10h18v4H3v-4Zm2 5h6v6H5v-6Zm8 0h6v6h-6v-6ZM9 6a2 2 0 0 1 4 0v1H9V6Zm-2 1V6a4 4 0 0 1 8 0v1h5v3H4V7h3Z"
+                                fill="currentColor"
+                              />
+                            </svg>
+                          )}
+                        </span>
+                        <div>
+                          <strong>{item.title}</strong>
+                          <p>{item.body}</p>
+                        </div>
+                      </div>
+                    ))}
+                </section>
                 {collections.length > 0 && (
                   <section
-                    className="collection-strip section-block section-block--divider"
+                    className="collection-strip section-block section-block--divider section-transition"
                     data-reveal
                     style={
                       collectionsSetting.backgroundImage
@@ -320,158 +474,34 @@ const HomePage = () => {
                           const cardImage = resolveCollectionCardImage(collection.slug, item.image ?? collection.image);
                           const cardImageSource = resolveResponsiveImageSource(cardImage);
                           return (
-                          <Link key={collection.id} className="collection-card" to={`/collections/${collection.slug}`}>
-                            <div className="collection-card__media">
-                              <img
-                                className="collection-card__image"
-                                src={cardImageSource?.src ?? cardImage}
-                                srcSet={cardImageSource?.srcSet}
-                                alt={resolvedTitle}
-                                loading="lazy"
-                                decoding="async"
-                                fetchPriority="low"
-                                sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 33vw"
-                              />
-                            </div>
-                            <div className="collection-card__overlay">
-                              <span className="button button--outline collection-card__cta">{resolvedTitle}</span>
-                            </div>
-                          </Link>
-                        );
-                      })}
+                            <Link key={collection.id} className="collection-card" to={`/collections/${collection.slug}`}>
+                              <div className="collection-card__media">
+                                <img
+                                  className="collection-card__image"
+                                  src={cardImageSource?.src ?? cardImage}
+                                  srcSet={cardImageSource?.srcSet}
+                                  alt={resolvedTitle}
+                                  loading="lazy"
+                                  decoding="async"
+                                  fetchpriority="low"
+                                  sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 33vw"
+                                />
+                              </div>
+                              <div className="collection-card__overlay">
+                                <span className="button button--outline collection-card__cta">{resolvedTitle}</span>
+                              </div>
+                            </Link>
+                          );
+                        })}
                     </div>
                   </section>
                 )}
-                <section
-                  className="shipping-strip card section-block section-block--divider"
-                  data-reveal
-                  style={
-                    getSectionSetting("shipping").backgroundImage
-                      ? {
-                          backgroundImage: `url(${resolveApiAssetUrl(getSectionSetting("shipping").backgroundImage) ?? getSectionSetting("shipping").backgroundImage})`
-                        }
-                      : undefined
-                  }
-                >
-                  {shippingItems
-                    .filter((item) => item.enabled !== false)
-                    .slice(0, getSectionSetting("shipping").maxItems ?? shippingItems.length)
-                    .map((item) => (
-                    <div key={item.title} className="shipping-item">
-                      <span className="shipping-item__icon" aria-hidden="true">
-                        {item.icon === "truck" && (
-                          <svg viewBox="0 0 24 24">
-                            <path
-                              d="M3 6h11v9H3V6Zm12 4h3.2l2.8 3.5V15h-6v-5Zm-9.5 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Zm11 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"
-                              fill="currentColor"
-                            />
-                          </svg>
-                        )}
-                        {item.icon === "cash" && (
-                          <svg viewBox="0 0 24 24">
-                            <path
-                              d="M4 7h16a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Zm2 2a2 2 0 0 1-2 2v2a2 2 0 0 1 2 2h12a2 2 0 0 1 2-2v-2a2 2 0 0 1-2-2H6Zm6 5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
-                              fill="currentColor"
-                            />
-                          </svg>
-                        )}
-                        {item.icon === "gift" && (
-                          <svg viewBox="0 0 24 24">
-                            <path
-                              d="M3 10h18v4H3v-4Zm2 5h6v6H5v-6Zm8 0h6v6h-6v-6ZM9 6a2 2 0 0 1 4 0v1H9V6Zm-2 1V6a4 4 0 0 1 8 0v1h5v3H4V7h3Z"
-                              fill="currentColor"
-                            />
-                          </svg>
-                        )}
-                      </span>
-                      <div>
-                        <strong>{item.title}</strong>
-                        <p>{item.body}</p>
-                      </div>
-                    </div>
-                  ))}
-                </section>
-                <section className="editorial-banner" data-reveal>
-                  <img
-                    className="editorial-banner__image"
-                    src={editorialImageSource?.src ?? editorialImage}
-                    srcSet={editorialImageSource?.srcSet}
-                    alt=""
-                    loading="lazy"
-                    decoding="async"
-                    fetchPriority="low"
-                    sizes="100vw"
-                  />
-                  <div className="editorial-banner__content">
-                    <p className="editorial-banner__eyebrow">{t("home.editorialEyebrow")}</p>
-                    <h2 className="section-title">{editorialSetting.title ?? t("home.editorialTitle")}</h2>
-                    <p>{editorialSetting.subtitle ?? t("home.editorialBody")}</p>
-                    {editorialSetting.ctaLabel && editorialSetting.ctaLink ? (
-                      <Link className="button button--primary" to={editorialSetting.ctaLink}>
-                        {editorialSetting.ctaLabel}
-                      </Link>
-                    ) : (
-                      <Link className="button button--primary" to="/shop">
-                        {t("home.editorialCta")}
-                      </Link>
-                    )}
-                  </div>
-                </section>
-              </section>
-            );
-          }
-          if (section.id === "bestsellers") {
-            return (
-              <section
-                key={section.id}
-                className="section-block section-block--accent"
-                data-reveal
-                style={
-                  bestSetting.backgroundImage
-                    ? { backgroundImage: `url(${resolveApiAssetUrl(bestSetting.backgroundImage) ?? bestSetting.backgroundImage})` }
-                    : undefined
-                }
-              >
-                <div className="siwa-section-header">
-                  <div>
-                    <p className="siwa-eyebrow">Our best sellers</p>
-                    <h2 className="section-title">{bestSetting.title ?? "Our best sellers"}</h2>
-                    {bestSetting.subtitle && <p className="siwa-section-header__meta">{bestSetting.subtitle}</p>}
-                  </div>
-                  <Link className="button button--outline" to="/shop">
-                    View collection
-                  </Link>
-                </div>
-                <div className="tabs">
-                  {genderTabs.map((tab) => (
-                    <button
-                      key={tab.key}
-                      className={`tab ${tab.key === activeBestTab ? "is-active" : ""}`.trim()}
-                      type="button"
-                      onClick={() => setActiveBestTab(tab.key)}
-                    >
-                      {tab.label}
-                    </button>
-                  ))}
-                </div>
-                <div className={bestSetting.layout === "grid" ? "product-grid" : "product-carousel"}>
-                  {bestSellerProducts
-                    .slice(0, bestSetting.maxItems ?? 6)
-                    .map((product) => (
-                      <ProductCard
-                        key={product.id}
-                        product={product}
-                        onQuickAdd={handleQuickAdd}
-                        showStockIndicator={false}
-                      />
-                    ))}
-                </div>
-              </section>
+              </Fragment>
             );
           }
           if (section.id === "newin") {
             return (
-              <section key={section.id} className="section-block" data-reveal>
+              <section key={section.id} className="section-block section-block--support section-transition" data-reveal>
                 <div className="siwa-section-header">
                   <div>
                     <p className="siwa-eyebrow">New in</p>
@@ -506,7 +536,7 @@ const HomePage = () => {
           }
           if (section.id === "offers") {
             return (
-              <section key={section.id} className="section-block" data-reveal>
+              <section key={section.id} className="section-block section-block--support section-transition" data-reveal>
                 <div className="siwa-offer">
                   <div>
                     <p className="siwa-eyebrow">Offers &amp; discounts</p>
@@ -530,7 +560,7 @@ const HomePage = () => {
                       alt=""
                       loading="lazy"
                       decoding="async"
-                      fetchPriority="low"
+                      fetchpriority="low"
                       sizes="(max-width: 900px) 100vw, 40vw"
                     />
                   </div>
@@ -540,7 +570,7 @@ const HomePage = () => {
           }
           if (section.id === "signature") {
             return (
-              <section key={section.id} className="section-block" data-reveal>
+              <section key={section.id} className="section-block section-block--support section-transition" data-reveal>
                 <div className="siwa-section-header">
                   <div>
                     <p className="siwa-eyebrow">Signature luxury</p>
@@ -568,7 +598,7 @@ const HomePage = () => {
             return (
               <section
                 key={section.id}
-                className="card section-block section-block--divider"
+                className="card section-block section-block--support section-block--divider section-transition"
                 data-reveal
                 style={
                   quizSetting.backgroundImage
@@ -594,7 +624,7 @@ const HomePage = () => {
             return (
               <section
                 key={section.id}
-                className="card section-block"
+                className="card section-block section-block--support section-transition"
                 data-reveal
                 style={
                   newsletterSetting.backgroundImage

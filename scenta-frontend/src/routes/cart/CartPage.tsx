@@ -15,8 +15,18 @@ const CartPage = () => {
     <div>
       <h1 className="section-title">{t("cart.title")}</h1>
       {!items.length ? (
-        <div className="card">
-          <p>{t("cart.empty")}</p>
+        <div className="card empty-state">
+          <div className="empty-state__icon" aria-hidden="true">bag</div>
+          <h2 className="empty-state__title">{t("cart.empty")}</h2>
+          <p className="empty-state__body">{t("home.quizBody")}</p>
+          <div className="empty-state__actions">
+            <Link className="button button--primary" to="/shop">
+              {t("cta.explore")}
+            </Link>
+            <Link className="button button--outline" to="/quiz">
+              {t("nav.quiz")}
+            </Link>
+          </div>
         </div>
       ) : (
         <div className="grid">
@@ -32,7 +42,7 @@ const CartPage = () => {
                     alt={item.product.name}
                     loading="lazy"
                     decoding="async"
-                    fetchPriority="low"
+                    fetchpriority="low"
                     sizes="120px"
                   />
                 ) : (

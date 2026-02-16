@@ -12,10 +12,11 @@ import { useTheme } from "../../theme/ThemeProvider";
 interface ProductCardProps {
   product: Product;
   onQuickAdd?: (product: Product) => void;
+  onQuickView?: (product: Product) => void;
   showStockIndicator?: boolean;
 }
 
-const ProductCard = ({ product, onQuickAdd, showStockIndicator = true }: ProductCardProps) => {
+const ProductCard = ({ product, onQuickAdd, onQuickView, showStockIndicator = false }: ProductCardProps) => {
   const { t, i18n } = useTranslation();
   const locale = resolveLocale(i18n.language);
   const { theme } = useTheme();
@@ -43,7 +44,7 @@ const ProductCard = ({ product, onQuickAdd, showStockIndicator = true }: Product
             alt={name}
             loading="lazy"
             decoding="async"
-            fetchPriority="low"
+            fetchpriority="low"
             sizes="(max-width: 600px) 50vw, (max-width: 1200px) 33vw, 25vw"
           />
         ) : (
@@ -63,6 +64,11 @@ const ProductCard = ({ product, onQuickAdd, showStockIndicator = true }: Product
         <div className="product-card__footer">
           <span>EGP {price.toLocaleString()}</span>
           <div className="product-card__actions">
+            {onQuickView ? (
+              <Button type="button" variant="outline" onClick={() => onQuickView(product)}>
+                {t("shop.quickView")}
+              </Button>
+            ) : null}
             <Button className="button--primary" type="button" onClick={() => onQuickAdd?.(product)}>
               {t("cta.addToCart")}
             </Button>

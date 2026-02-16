@@ -36,6 +36,7 @@ const AdminProductForm = () => {
   const [status, setStatus] = useState("draft");
   const [flags, setFlags] = useState({ isFeatured: false, isBestSeller: false, isNew: false });
   const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (!data) return;
@@ -73,7 +74,21 @@ const AdminProductForm = () => {
   });
 
   const handleSubmit = () => {
+    const nextErrors: Record<string, string> = {};
+    if (!title.trim()) nextErrors.title = "Product name is required.";
+    if (!slug.trim()) nextErrors.slug = "Slug is required.";
+    if (!description.trim()) nextErrors.description = "Description is required.";
+    if (Number.isNaN(Number(price)) || Number(price) <= 0) nextErrors.price = "Price must be greater than 0.";
+    if (Number.isNaN(Number(stock)) || Number(stock) < 0) nextErrors.stock = "Stock cannot be negative.";
+    if (Number.isNaN(Number(sizeMl)) || Number(sizeMl) <= 0) nextErrors.sizeMl = "Size must be greater than 0.";
     const cleanedImages = images.map((url) => url.trim()).filter(Boolean);
+    if (!cleanedImages.length) nextErrors.images = "Add at least one image URL or upload.";
+    setFormErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) {
+      pushToast("Fix the highlighted product fields before saving.", "error");
+      return;
+    }
+
     const payload: Partial<AdminProduct> = {
       title,
       slug,
@@ -121,96 +136,148 @@ const AdminProductForm = () => {
   };
 
   return (
-    <div className="card grid">
+    <div className="card grid admin-form-layout">
       <h1 className="section-title">{isEditing ? "Edit Product" : "New Product"}</h1>
-      <TextInput placeholder="Product name" value={title} onChange={(event) => setTitle(event.target.value)} />
-      <TextInput placeholder="Slug" value={slug} onChange={(event) => setSlug(event.target.value)} />
-      <textarea
-        className="input"
-        placeholder="Description"
-        value={description}
-        onChange={(event) => setDescription(event.target.value)}
-      />
-      <div className="grid" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
+      <section className="card admin-form-section">
+        <h2 className="section-title">Core details</h2>
         <label className="input-label">
-          Size (ml)
-          <TextInput value={sizeMl} onChange={(event) => setSizeMl(event.target.value)} />
+          Product name
+          <TextInput
+            intent={formErrors.title ? "error" : "default"}
+            placeholder="Product name"
+            value={title}
+            onChange={(event) => setTitle(event.target.value)}
+          />
+          {formErrors.title ? <span className="admin-form-error">{formErrors.title}</span> : null}
         </label>
         <label className="input-label">
-          Price
-          <TextInput value={price} onChange={(event) => setPrice(event.target.value)} />
+          Slug
+          <TextInput
+            intent={formErrors.slug ? "error" : "default"}
+            placeholder="Slug"
+            value={slug}
+            onChange={(event) => setSlug(event.target.value)}
+          />
+          <span className="admin-form-help">Use lowercase letters and hyphens.</span>
+          {formErrors.slug ? <span className="admin-form-error">{formErrors.slug}</span> : null}
         </label>
         <label className="input-label">
-          Stock
-          <TextInput value={stock} onChange={(event) => setStock(event.target.value)} />
+          Description
+          <textarea
+            className={`input ${formErrors.description ? "input--error" : ""}`.trim()}
+            placeholder="Description"
+            value={description}
+            onChange={(event) => setDescription(event.target.value)}
+          />
+          {formErrors.description ? <span className="admin-form-error">{formErrors.description}</span> : null}
         </label>
-      </div>
-      <div className="grid" style={{ gap: "12px" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
-          <span>Images</span>
-          <Button type="button" onClick={handleAddImage}>
-            Add image
-          </Button>
+      </section>
+
+      <section className="card admin-form-section">
+        <h2 className="section-title">Pricing and inventory</h2>
+        <div className="admin-form-grid-3">
+          <label className="input-label">
+            Size (ml)
+            <TextInput intent={formErrors.sizeMl ? "error" : "default"} value={sizeMl} onChange={(event) => setSizeMl(event.target.value)} />
+            {formErrors.sizeMl ? <span className="admin-form-error">{formErrors.sizeMl}</span> : null}
+          </label>
+          <label className="input-label">
+            Price
+            <TextInput intent={formErrors.price ? "error" : "default"} value={price} onChange={(event) => setPrice(event.target.value)} />
+            {formErrors.price ? <span className="admin-form-error">{formErrors.price}</span> : null}
+          </label>
+          <label className="input-label">
+            Stock
+            <TextInput intent={formErrors.stock ? "error" : "default"} value={stock} onChange={(event) => setStock(event.target.value)} />
+            {formErrors.stock ? <span className="admin-form-error">{formErrors.stock}</span> : null}
+          </label>
         </div>
-        {images.map((image, index) => (
-          <div key={`image-${index}`} className="card" style={{ display: "grid", gap: "10px" }}>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(event) => void handleUploadImage(index, event.target.files?.[0])}
-            />
-            <TextInput
-              placeholder={`Image URL ${index + 1}`}
-              value={image}
-              onChange={(event) => handleImageChange(index, event.target.value)}
-            />
-            <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
-              <small style={{ color: "var(--color-muted)" }}>
-                {uploadingIndex === index ? "Uploading image..." : "Upload an image or paste a URL."}
-              </small>
-              {images.length > 1 ? (
-                <Button type="button" onClick={() => handleRemoveImage(index)}>
-                  Remove
-                </Button>
-              ) : null}
-            </div>
+      </section>
+
+      <section className="card admin-form-section">
+        <h2 className="section-title">Media</h2>
+        <p className="admin-form-help">Upload product media or paste hosted URLs.</p>
+        <div className="grid" style={{ gap: "12px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
+            <span>Images</span>
+            <Button type="button" onClick={handleAddImage}>
+              Add image
+            </Button>
           </div>
-        ))}
+          {formErrors.images ? <p className="admin-form-error">{formErrors.images}</p> : null}
+          {images.map((image, index) => (
+            <div key={`image-${index}`} className="card" style={{ display: "grid", gap: "10px" }}>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(event) => void handleUploadImage(index, event.target.files?.[0])}
+              />
+              <TextInput
+                placeholder={`Image URL ${index + 1}`}
+                value={image}
+                onChange={(event) => handleImageChange(index, event.target.value)}
+              />
+              <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
+                <small style={{ color: "var(--color-muted)" }}>
+                  {uploadingIndex === index ? "Uploading image..." : "Upload an image or paste a URL."}
+                </small>
+                {images.length > 1 ? (
+                  <Button type="button" onClick={() => handleRemoveImage(index)}>
+                    Remove
+                  </Button>
+                ) : null}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="card admin-form-section">
+        <h2 className="section-title">Publishing</h2>
+        <label className="input-label">
+          Notes (comma separated)
+          <TextInput placeholder="Notes (comma separated)" value={notes} onChange={(event) => setNotes(event.target.value)} />
+        </label>
+        <label className="input-label">
+          Status
+          <Select value={status} onChange={(event) => setStatus(event.target.value)}>
+            <option value="draft">Draft</option>
+            <option value="published">Published</option>
+          </Select>
+        </label>
+        <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+          <label>
+            <input
+              type="checkbox"
+              checked={flags.isFeatured}
+              onChange={(event) => setFlags((prev) => ({ ...prev, isFeatured: event.target.checked }))}
+            />
+            Featured
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={flags.isBestSeller}
+              onChange={(event) => setFlags((prev) => ({ ...prev, isBestSeller: event.target.checked }))}
+            />
+            Best seller
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={flags.isNew}
+              onChange={(event) => setFlags((prev) => ({ ...prev, isNew: event.target.checked }))}
+            />
+            New
+          </label>
+        </div>
+      </section>
+
+      <div className="admin-form-actions">
+        <Button className="button--primary" type="button" onClick={handleSubmit} disabled={mutation.isPending}>
+          {mutation.isPending ? "Saving..." : "Save"}
+        </Button>
       </div>
-      <TextInput placeholder="Notes (comma separated)" value={notes} onChange={(event) => setNotes(event.target.value)} />
-      <Select value={status} onChange={(event) => setStatus(event.target.value)}>
-        <option value="draft">Draft</option>
-        <option value="published">Published</option>
-      </Select>
-      <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
-        <label>
-          <input
-            type="checkbox"
-            checked={flags.isFeatured}
-            onChange={(event) => setFlags((prev) => ({ ...prev, isFeatured: event.target.checked }))}
-          />
-          Featured
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            checked={flags.isBestSeller}
-            onChange={(event) => setFlags((prev) => ({ ...prev, isBestSeller: event.target.checked }))}
-          />
-          Best seller
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            checked={flags.isNew}
-            onChange={(event) => setFlags((prev) => ({ ...prev, isNew: event.target.checked }))}
-          />
-          New
-        </label>
-      </div>
-      <Button className="button--primary" type="button" onClick={handleSubmit} disabled={mutation.isPending}>
-        {mutation.isPending ? "Saving..." : "Save"}
-      </Button>
     </div>
   );
 };

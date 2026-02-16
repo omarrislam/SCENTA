@@ -55,11 +55,20 @@
     "title": "Shop",
     "searchLabel": "Search",
     "searchPlaceholder": "Search fragrances",
+    "showFilters": "Filters",
+    "hideFilters": "Hide",
+    "filtersApplied": "Filters applied",
+    "filtersNone": "No filters",
     "sortLabel": "Sort",
     "sortFeatured": "Featured",
     "sortPriceAsc": "Price low to high",
     "sortPriceDesc": "Price high to low",
     "tagsLabel": "Tags",
+    "quickView": "Quick view",
+    "quickViewTitle": "Product quick view",
+    "clear": "Clear",
+    "clearTag": "Clear tag",
+    "close": "Close",
     "prev": "Prev",
     "next": "Next",
     "pageOf": "Page {{current}} of {{total}}"
@@ -75,6 +84,7 @@
   "checkout": {
     "title": "Checkout",
     "empty": "Your cart is empty. Add items before checking out.",
+    "progressTitle": "Checkout progress",
     "stepLabel": "Step {{current}} of {{total}}: {{label}}",
     "steps": {
       "address": "Address",
@@ -104,6 +114,8 @@
     "applyCoupon": "Apply",
     "couponApplied": "Coupon applied",
     "couponInvalid": "Invalid coupon",
+    "fieldRequired": "This field is required.",
+    "phoneInvalid": "Enter a valid phone number.",
     "discount": "Discount",
     "finalTotal": "Final total",
     "addressMissing": "Please complete your delivery address.",
@@ -132,6 +144,12 @@
   },
   "product": {
     "loading": "Loading...",
+    "trust": {
+      "title": "Shopping trust highlights",
+      "delivery": "Free delivery over EGP 1500",
+      "returns": "Easy returns within 14 days",
+      "payment": "Secure card and COD payment"
+    },
     "tabs": {
       "description": "Description",
       "notes": "Notes",

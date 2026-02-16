@@ -12,9 +12,9 @@ const buttonVariants = cva("button", {
       ghost: "button--ghost"
     },
     size: {
-      default: "",
-      sm: "",
-      lg: "",
+      default: "button--md",
+      sm: "button--sm",
+      lg: "button--lg",
       icon: "icon-button"
     }
   },

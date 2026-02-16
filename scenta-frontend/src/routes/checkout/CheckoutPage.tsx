@@ -24,6 +24,7 @@ import { getProduct } from "../../services/catalogService";
 
 const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY as string | undefined;
 const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null;
+type AddressField = keyof ShippingAddressPayload;
 
 const StripePaymentForm = ({
   orderId,
@@ -89,6 +90,7 @@ const CheckoutPage = () => {
   const [couponCode, setCouponCode] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
   const [couponError, setCouponError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<AddressField, string>>>({});
   const [shippingAddress, setShippingAddress] = useState<ShippingAddressPayload>({
     fullName: "",
     phone: "",
@@ -113,7 +115,27 @@ const CheckoutPage = () => {
     t("checkout.steps.review")
   ];
 
-  const next = () => setStep((prev) => Math.min(prev + 1, stepLabels.length - 1));
+  const validateAddressStep = () => {
+    const nextErrors: Partial<Record<AddressField, string>> = {};
+    const requiredFields: AddressField[] = ["fullName", "phone", "city", "area", "street", "building"];
+    requiredFields.forEach((field) => {
+      if (!shippingAddress[field]?.trim()) {
+        nextErrors[field] = t("checkout.fieldRequired");
+      }
+    });
+    if (shippingAddress.phone.trim() && shippingAddress.phone.trim().length < 8) {
+      nextErrors.phone = t("checkout.phoneInvalid");
+    }
+    setFieldErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
+  };
+
+  const next = () => {
+    if (step === 0 && !validateAddressStep()) {
+      return;
+    }
+    setStep((prev) => Math.min(prev + 1, stepLabels.length - 1));
+  };
   const back = () => setStep((prev) => Math.max(prev - 1, 0));
 
   const applyCoupon = () => {
@@ -180,6 +202,18 @@ const CheckoutPage = () => {
     shippingAddress.area &&
     shippingAddress.street &&
     shippingAddress.building;
+
+  const updateAddressField = (field: AddressField, value: string) => {
+    setShippingAddress((prev) => ({ ...prev, [field]: value }));
+    setFieldErrors((prev) => {
+      if (!prev[field]) {
+        return prev;
+      }
+      const nextErrors = { ...prev };
+      delete nextErrors[field];
+      return nextErrors;
+    });
+  };
 
   const { data: checkoutTotals } = useQuery({
     queryKey: ["checkout", payloadItems, shippingAddress, appliedCoupon?.code],
@@ -252,58 +286,91 @@ const CheckoutPage = () => {
           <p>{t("checkout.empty")}</p>
         ) : (
           <>
-            <p>{t("checkout.stepLabel", { current: step + 1, total: stepLabels.length, label: stepLabels[step] })}</p>
+            <ol className="checkout-progress" aria-label={t("checkout.progressTitle")}>
+              {stepLabels.map((label, index) => {
+                const isCurrent = step === index;
+                const isCompleted = step > index;
+                return (
+                  <li
+                    key={label}
+                    className={`checkout-progress__item ${isCurrent ? "is-current" : ""} ${isCompleted ? "is-complete" : ""}`.trim()}
+                  >
+                    <span className="checkout-progress__dot" aria-hidden="true">{isCompleted ? "ok" : index + 1}</span>
+                    <span className="checkout-progress__label">{label}</span>
+                  </li>
+                );
+              })}
+            </ol>
+            <p className="checkout-progress__summary">
+              {t("checkout.stepLabel", { current: step + 1, total: stepLabels.length, label: stepLabels[step] })}
+            </p>
             {step === 0 && (
               <div className="checkout-form">
-                <TextInput
-                  placeholder={t("checkout.fullName")}
-                  value={shippingAddress.fullName}
-                  onChange={(event) =>
-                    setShippingAddress((prev) => ({ ...prev, fullName: event.target.value }))
-                  }
-                />
-                <TextInput
-                  placeholder={t("checkout.phone")}
-                  value={shippingAddress.phone}
-                  onChange={(event) =>
-                    setShippingAddress((prev) => ({ ...prev, phone: event.target.value }))
-                  }
-                />
-                <TextInput
-                  placeholder={t("checkout.city")}
-                  value={shippingAddress.city}
-                  onChange={(event) =>
-                    setShippingAddress((prev) => ({ ...prev, city: event.target.value }))
-                  }
-                />
-                <TextInput
-                  placeholder={t("checkout.area")}
-                  value={shippingAddress.area}
-                  onChange={(event) =>
-                    setShippingAddress((prev) => ({ ...prev, area: event.target.value }))
-                  }
-                />
-                <TextInput
-                  placeholder={t("checkout.street")}
-                  value={shippingAddress.street}
-                  onChange={(event) =>
-                    setShippingAddress((prev) => ({ ...prev, street: event.target.value }))
-                  }
-                />
-                <TextInput
-                  placeholder={t("checkout.building")}
-                  value={shippingAddress.building}
-                  onChange={(event) =>
-                    setShippingAddress((prev) => ({ ...prev, building: event.target.value }))
-                  }
-                />
+                <label className="checkout-field">
+                  <span className="checkout-field__label">{t("checkout.fullName")}</span>
+                  <TextInput
+                    placeholder={t("checkout.fullName")}
+                    value={shippingAddress.fullName}
+                    intent={fieldErrors.fullName ? "error" : "default"}
+                    onChange={(event) => updateAddressField("fullName", event.target.value)}
+                  />
+                  {fieldErrors.fullName ? <span className="checkout-field__error">{fieldErrors.fullName}</span> : null}
+                </label>
+                <label className="checkout-field">
+                  <span className="checkout-field__label">{t("checkout.phone")}</span>
+                  <TextInput
+                    placeholder={t("checkout.phone")}
+                    value={shippingAddress.phone}
+                    intent={fieldErrors.phone ? "error" : "default"}
+                    onChange={(event) => updateAddressField("phone", event.target.value)}
+                  />
+                  {fieldErrors.phone ? <span className="checkout-field__error">{fieldErrors.phone}</span> : null}
+                </label>
+                <label className="checkout-field">
+                  <span className="checkout-field__label">{t("checkout.city")}</span>
+                  <TextInput
+                    placeholder={t("checkout.city")}
+                    value={shippingAddress.city}
+                    intent={fieldErrors.city ? "error" : "default"}
+                    onChange={(event) => updateAddressField("city", event.target.value)}
+                  />
+                  {fieldErrors.city ? <span className="checkout-field__error">{fieldErrors.city}</span> : null}
+                </label>
+                <label className="checkout-field">
+                  <span className="checkout-field__label">{t("checkout.area")}</span>
+                  <TextInput
+                    placeholder={t("checkout.area")}
+                    value={shippingAddress.area}
+                    intent={fieldErrors.area ? "error" : "default"}
+                    onChange={(event) => updateAddressField("area", event.target.value)}
+                  />
+                  {fieldErrors.area ? <span className="checkout-field__error">{fieldErrors.area}</span> : null}
+                </label>
+                <label className="checkout-field">
+                  <span className="checkout-field__label">{t("checkout.street")}</span>
+                  <TextInput
+                    placeholder={t("checkout.street")}
+                    value={shippingAddress.street}
+                    intent={fieldErrors.street ? "error" : "default"}
+                    onChange={(event) => updateAddressField("street", event.target.value)}
+                  />
+                  {fieldErrors.street ? <span className="checkout-field__error">{fieldErrors.street}</span> : null}
+                </label>
+                <label className="checkout-field">
+                  <span className="checkout-field__label">{t("checkout.building")}</span>
+                  <TextInput
+                    placeholder={t("checkout.building")}
+                    value={shippingAddress.building}
+                    intent={fieldErrors.building ? "error" : "default"}
+                    onChange={(event) => updateAddressField("building", event.target.value)}
+                  />
+                  {fieldErrors.building ? <span className="checkout-field__error">{fieldErrors.building}</span> : null}
+                </label>
                 <textarea
                   className="input checkout-notes"
                   placeholder={t("checkout.notes")}
                   value={shippingAddress.notes}
-                  onChange={(event) =>
-                    setShippingAddress((prev) => ({ ...prev, notes: event.target.value }))
-                  }
+                  onChange={(event) => updateAddressField("notes", event.target.value)}
                 />
               </div>
             )}
@@ -381,9 +448,9 @@ const CheckoutPage = () => {
                         </Button>
                       </div>
                     </div>
-                    {couponError && <p>{couponError}</p>}
+                    {couponError && <p className="checkout-field__error">{couponError}</p>}
                   </div>
-                  <div className="card checkout-receipt">
+                  <div className="card checkout-receipt checkout-receipt--sticky">
                     <strong>{t("checkout.reviewTotal")}</strong>
                     <div className="receipt-row">
                       <span>Subtotal</span>
