@@ -5,6 +5,10 @@ const env_1 = require("../config/env");
 const ApiError_1 = require("../utils/ApiError");
 const response_1 = require("../utils/response");
 const errorHandler = (err, req, res, _next) => {
+    const expressError = err;
+    if (expressError.type === "entity.too.large" || expressError.status === 413 || expressError.statusCode === 413) {
+        return (0, response_1.sendError)(res, 413, "PAYLOAD_TOO_LARGE", "Request payload is too large");
+    }
     if (err instanceof ApiError_1.ApiError) {
         // eslint-disable-next-line no-console
         console.error("API_ERROR", {

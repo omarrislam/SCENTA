@@ -64,8 +64,8 @@ const createApp = () => {
     app.use((0, helmet_1.default)({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
     app.use((0, compression_1.default)());
     app.use("/api/payments/stripe/webhook", express_1.default.raw({ type: "application/json" }));
-    app.use(express_1.default.json({ limit: "2mb" }));
-    app.use(express_1.default.urlencoded({ extended: true }));
+    app.use(express_1.default.json({ limit: "20mb" }));
+    app.use(express_1.default.urlencoded({ extended: true, limit: "20mb" }));
     app.use(httpLogger_1.httpLogger);
     app.use("/api", rateLimit_1.apiLimiter);
     app.use("/api/auth", auth_1.default);

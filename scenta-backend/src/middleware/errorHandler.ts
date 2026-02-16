@@ -9,6 +9,11 @@ export const errorHandler = (
   res: Response,
   _next: NextFunction
 ) => {
+  const expressError = err as Error & { status?: number; statusCode?: number; type?: string };
+  if (expressError.type === "entity.too.large" || expressError.status === 413 || expressError.statusCode === 413) {
+    return sendError(res, 413, "PAYLOAD_TOO_LARGE", "Request payload is too large");
+  }
+
   if (err instanceof ApiError) {
     // eslint-disable-next-line no-console
     console.error("API_ERROR", {
