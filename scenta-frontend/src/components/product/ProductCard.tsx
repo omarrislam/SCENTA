@@ -12,9 +12,10 @@ import { useTheme } from "../../theme/ThemeProvider";
 interface ProductCardProps {
   product: Product;
   onQuickAdd?: (product: Product) => void;
+  showStockIndicator?: boolean;
 }
 
-const ProductCard = ({ product, onQuickAdd }: ProductCardProps) => {
+const ProductCard = ({ product, onQuickAdd, showStockIndicator = true }: ProductCardProps) => {
   const { t, i18n } = useTranslation();
   const locale = resolveLocale(i18n.language);
   const { theme } = useTheme();
@@ -58,7 +59,7 @@ const ProductCard = ({ product, onQuickAdd }: ProductCardProps) => {
           <Link to={`/product/${product.slug}`}>{name}</Link>
         </h3>
         <NoteBadges notes={product.notes} labels={notes} />
-        <StockIndicator stock={stock} />
+        {showStockIndicator ? <StockIndicator stock={stock} /> : null}
         <div className="product-card__footer">
           <span>EGP {price.toLocaleString()}</span>
           <div className="product-card__actions">

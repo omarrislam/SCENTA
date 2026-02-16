@@ -458,7 +458,12 @@ const HomePage = () => {
                   {bestSellerProducts
                     .slice(0, bestSetting.maxItems ?? 6)
                     .map((product) => (
-                      <ProductCard key={product.id} product={product} onQuickAdd={handleQuickAdd} />
+                      <ProductCard
+                        key={product.id}
+                        product={product}
+                        onQuickAdd={handleQuickAdd}
+                        showStockIndicator={false}
+                      />
                     ))}
                 </div>
               </section>
