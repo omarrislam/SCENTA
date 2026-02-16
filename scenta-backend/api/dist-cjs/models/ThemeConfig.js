@@ -37,6 +37,7 @@ exports.ThemeConfig = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
 const ThemeConfigSchema = new mongoose_1.Schema({
     locale: { type: String, enum: ["ar", "en"], required: true },
+    home: mongoose_1.Schema.Types.Mixed,
     homeSections: [mongoose_1.Schema.Types.Mixed],
     mode: { type: String, enum: ["light", "dark"], default: "light" },
     colors: {
@@ -55,5 +56,8 @@ const ThemeConfigSchema = new mongoose_1.Schema({
         md: Number,
         lg: Number
     }
-}, { timestamps: true });
+}, {
+    timestamps: true,
+    strict: false
+});
 exports.ThemeConfig = mongoose_1.default.model("ThemeConfig", ThemeConfigSchema);

@@ -3,6 +3,7 @@
 const ThemeConfigSchema = new Schema(
   {
     locale: { type: String, enum: ["ar", "en"], required: true },
+    home: Schema.Types.Mixed,
     homeSections: [Schema.Types.Mixed],
     mode: { type: String, enum: ["light", "dark"], default: "light" },
     colors: {
@@ -22,7 +23,10 @@ const ThemeConfigSchema = new Schema(
       lg: Number
     }
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    strict: false
+  }
 );
 
 export const ThemeConfig = mongoose.model("ThemeConfig", ThemeConfigSchema);

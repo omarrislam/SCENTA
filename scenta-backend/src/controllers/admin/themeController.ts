@@ -13,10 +13,11 @@ export const getTheme = async (req: Request, res: Response, next: NextFunction) 
 
 export const updateTheme = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const locale = req.body?.locale ?? req.query?.locale ?? "en";
     const theme = await ThemeConfig.findOneAndUpdate(
-      { locale: req.body.locale },
-      req.body,
-      { new: true, upsert: true }
+      { locale },
+      { ...req.body, locale },
+      { new: true, upsert: true, setDefaultsOnInsert: true, runValidators: true }
     );
     return sendSuccess(res, theme);
   } catch (error) {
