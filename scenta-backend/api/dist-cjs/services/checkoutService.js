@@ -9,6 +9,7 @@ const Coupon_1 = require("../models/Coupon");
 const Order_1 = require("../models/Order");
 const Product_1 = require("../models/Product");
 const ApiError_1 = require("../utils/ApiError");
+const roundMoney = (value) => Math.round(value * 100) / 100;
 const validateCheckout = async (items, couponCode) => {
     if (!items.length) {
         throw new ApiError_1.ApiError(400, "EMPTY_CART", "Cart is empty");
@@ -37,7 +38,14 @@ const validateCheckout = async (items, couponCode) => {
                 variantKey: item.variantKey
             });
         }
-        subtotal += (variant.price ?? 0) * item.qty;
+        const unitPrice = Number(variant.price ?? 0);
+        if (!Number.isFinite(unitPrice) || unitPrice < 0) {
+            throw new ApiError_1.ApiError(400, "INVALID_PRODUCT_PRICE", "Product price is invalid", {
+                productId: item.productId,
+                variantKey: item.variantKey
+            });
+        }
+        subtotal += unitPrice * item.qty;
     }
     if (couponCode) {
         const normalized = couponCode.trim().toUpperCase();
@@ -59,14 +67,30 @@ const validateCheckout = async (items, couponCode) => {
                 throw new ApiError_1.ApiError(400, "COUPON_LIMIT", "Coupon usage limit reached");
             }
         }
-        if (match.type === "percent") {
-            discountTotal = (subtotal * (match.value ?? 0)) / 100;
+        const couponValue = Number(match.value ?? 0);
+        if (!Number.isFinite(couponValue) || couponValue < 0) {
+            throw new ApiError_1.ApiError(400, "INVALID_COUPON", "Coupon configuration is invalid");
         }
-        discountTotal = Math.min(discountTotal, subtotal);
-        coupon = { code: match.code ?? normalized, type: match.type ?? "percent", value: match.value ?? 0 };
+        const couponType = String(match.type ?? "percent").toLowerCase();
+        if (couponType === "percent") {
+            discountTotal = (subtotal * couponValue) / 100;
+        }
+        else if (couponType === "flat" || couponType === "fixed") {
+            discountTotal = couponValue;
+        }
+        else {
+            discountTotal = 0;
+        }
+        discountTotal = Math.min(roundMoney(discountTotal), roundMoney(subtotal));
+        coupon = {
+            code: match.code ?? normalized,
+            type: couponType || "percent",
+            value: couponValue
+        };
     }
+    subtotal = roundMoney(subtotal);
     const shippingFee = 60;
-    const grandTotal = Math.max(0, subtotal - discountTotal) + shippingFee;
+    const grandTotal = roundMoney(Math.max(0, subtotal - discountTotal) + shippingFee);
     return { subtotal, shippingFee, discountTotal, grandTotal, coupon };
 };
 exports.validateCheckout = validateCheckout;

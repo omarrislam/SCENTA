@@ -8,8 +8,12 @@ const stripe_1 = __importDefault(require("stripe"));
 const env_1 = require("../config/env");
 exports.stripe = new stripe_1.default(env_1.env.STRIPE_SECRET_KEY, { apiVersion: "2025-02-24.acacia" });
 const createPaymentIntent = async (amount, metadata) => {
+    const normalizedAmount = Math.max(50, Math.round(Number(amount)));
+    if (!Number.isFinite(normalizedAmount)) {
+        throw new Error("Invalid payment amount");
+    }
     return exports.stripe.paymentIntents.create({
-        amount,
+        amount: normalizedAmount,
         currency: "egp",
         metadata
     });

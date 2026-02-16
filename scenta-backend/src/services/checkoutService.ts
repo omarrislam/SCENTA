@@ -11,6 +11,8 @@ interface CheckoutItem {
   qty: number;
 }
 
+const roundMoney = (value: number) => Math.round(value * 100) / 100;
+
 export const validateCheckout = async (items: CheckoutItem[], couponCode?: string) => {
   if (!items.length) {
     throw new ApiError(400, "EMPTY_CART", "Cart is empty");
@@ -41,7 +43,14 @@ export const validateCheckout = async (items: CheckoutItem[], couponCode?: strin
         variantKey: item.variantKey
       });
     }
-    subtotal += (variant.price ?? 0) * item.qty;
+    const unitPrice = Number(variant.price ?? 0);
+    if (!Number.isFinite(unitPrice) || unitPrice < 0) {
+      throw new ApiError(400, "INVALID_PRODUCT_PRICE", "Product price is invalid", {
+        productId: item.productId,
+        variantKey: item.variantKey
+      });
+    }
+    subtotal += unitPrice * item.qty;
   }
 
   if (couponCode) {
@@ -64,15 +73,29 @@ export const validateCheckout = async (items: CheckoutItem[], couponCode?: strin
         throw new ApiError(400, "COUPON_LIMIT", "Coupon usage limit reached");
       }
     }
-    if (match.type === "percent") {
-      discountTotal = (subtotal * (match.value ?? 0)) / 100;
+    const couponValue = Number(match.value ?? 0);
+    if (!Number.isFinite(couponValue) || couponValue < 0) {
+      throw new ApiError(400, "INVALID_COUPON", "Coupon configuration is invalid");
     }
-    discountTotal = Math.min(discountTotal, subtotal);
-    coupon = { code: match.code ?? normalized, type: match.type ?? "percent", value: match.value ?? 0 };
+    const couponType = String(match.type ?? "percent").toLowerCase();
+    if (couponType === "percent") {
+      discountTotal = (subtotal * couponValue) / 100;
+    } else if (couponType === "flat" || couponType === "fixed") {
+      discountTotal = couponValue;
+    } else {
+      discountTotal = 0;
+    }
+    discountTotal = Math.min(roundMoney(discountTotal), roundMoney(subtotal));
+    coupon = {
+      code: match.code ?? normalized,
+      type: couponType || "percent",
+      value: couponValue
+    };
   }
 
+  subtotal = roundMoney(subtotal);
   const shippingFee = 60;
-  const grandTotal = Math.max(0, subtotal - discountTotal) + shippingFee;
+  const grandTotal = roundMoney(Math.max(0, subtotal - discountTotal) + shippingFee);
 
   return { subtotal, shippingFee, discountTotal, grandTotal, coupon };
 };
