@@ -78,6 +78,20 @@ const HomePage = () => {
     return fallbackSlides;
   }, [fallbackSlides, theme?.home?.heroSlides]);
 
+  useEffect(() => {
+    const first = heroSlides[0]?.image;
+    const href = resolveApiAssetUrl(first) ?? first;
+    if (!href) return;
+    const link = document.createElement("link");
+    link.rel = "preload";
+    link.as = "image";
+    link.href = href;
+    document.head.appendChild(link);
+    return () => {
+      document.head.removeChild(link);
+    };
+  }, [heroSlides]);
+
   const [activeSlide, setActiveSlide] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -219,7 +233,8 @@ const HomePage = () => {
                       className="hero__media-image"
                       src={slideImage}
                       alt=""
-                      loading="lazy"
+                      loading="eager"
+                      fetchPriority="high"
                     />
                   </div>
                 </div>
@@ -242,7 +257,9 @@ const HomePage = () => {
                     data-reveal
                     style={
                       collectionsSetting.backgroundImage
-                        ? { backgroundImage: `url(${collectionsSetting.backgroundImage})` }
+                        ? {
+                            backgroundImage: `url(${resolveApiAssetUrl(collectionsSetting.backgroundImage) ?? collectionsSetting.backgroundImage})`
+                          }
                         : undefined
                     }
                   >
@@ -301,7 +318,9 @@ const HomePage = () => {
                   data-reveal
                   style={
                     getSectionSetting("shipping").backgroundImage
-                      ? { backgroundImage: `url(${getSectionSetting("shipping").backgroundImage})` }
+                      ? {
+                          backgroundImage: `url(${resolveApiAssetUrl(getSectionSetting("shipping").backgroundImage) ?? getSectionSetting("shipping").backgroundImage})`
+                        }
                       : undefined
                   }
                 >
@@ -348,7 +367,9 @@ const HomePage = () => {
                   data-reveal
                   style={
                     editorialSetting.backgroundImage
-                      ? { backgroundImage: `linear-gradient(110deg, rgba(27, 27, 27, 0.55), rgba(27, 27, 27, 0) 60%), url(${editorialSetting.backgroundImage})` }
+                      ? {
+                          backgroundImage: `linear-gradient(110deg, rgba(27, 27, 27, 0.55), rgba(27, 27, 27, 0) 60%), url(${resolveApiAssetUrl(editorialSetting.backgroundImage) ?? editorialSetting.backgroundImage})`
+                        }
                       : undefined
                   }
                 >
@@ -378,7 +399,7 @@ const HomePage = () => {
                 data-reveal
                 style={
                   bestSetting.backgroundImage
-                    ? { backgroundImage: `url(${bestSetting.backgroundImage})` }
+                    ? { backgroundImage: `url(${resolveApiAssetUrl(bestSetting.backgroundImage) ?? bestSetting.backgroundImage})` }
                     : undefined
                 }
               >
@@ -502,7 +523,7 @@ const HomePage = () => {
                 data-reveal
                 style={
                   quizSetting.backgroundImage
-                    ? { backgroundImage: `url(${quizSetting.backgroundImage})` }
+                    ? { backgroundImage: `url(${resolveApiAssetUrl(quizSetting.backgroundImage) ?? quizSetting.backgroundImage})` }
                     : undefined
                 }
               >
@@ -528,7 +549,9 @@ const HomePage = () => {
                 data-reveal
                 style={
                   newsletterSetting.backgroundImage
-                    ? { backgroundImage: `url(${newsletterSetting.backgroundImage})` }
+                    ? {
+                        backgroundImage: `url(${resolveApiAssetUrl(newsletterSetting.backgroundImage) ?? newsletterSetting.backgroundImage})`
+                      }
                     : undefined
                 }
               >

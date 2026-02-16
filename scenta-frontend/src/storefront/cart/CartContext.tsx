@@ -81,10 +81,8 @@ export const CartProvider = ({ children }: PropsWithChildren) => {
     };
 
     void syncItems();
-    const interval = window.setInterval(syncItems, 5000);
     return () => {
       isActive = false;
-      window.clearInterval(interval);
     };
   }, [items]);
 
