@@ -180,6 +180,20 @@ const optimizeImageForUpload = async (file: File): Promise<File> => {
   });
 };
 
+const blobToDataUrl = (blob: Blob): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        resolve(reader.result);
+        return;
+      }
+      reject(new Error("Failed to encode image"));
+    };
+    reader.onerror = () => reject(new Error("Failed to encode image"));
+    reader.readAsDataURL(blob);
+  });
+
 const getStoredTheme = (locale: Locale): ThemeConfig | null => {
   const stored = localStorage.getItem(THEME_STORAGE_KEY);
   if (!stored) return null;
@@ -275,11 +289,21 @@ export const uploadImage = async (file: File): Promise<string> => {
   if (!url) {
     throw new Error("Upload failed");
   }
-  if (url.startsWith("/") && baseUrl) {
-    const publicBase = baseUrl.replace(/\/api\/?$/, "");
-    return `${publicBase}${url}`;
+  const resolvedUrl = url.startsWith("/") && baseUrl
+    ? `${baseUrl.replace(/\/api\/?$/, "")}${url}`
+    : url;
+  if (/\/uploads\//.test(resolvedUrl) && !resolvedUrl.startsWith("data:")) {
+    try {
+      const uploaded = await fetch(resolvedUrl);
+      if (uploaded.ok) {
+        const blob = await uploaded.blob();
+        return await blobToDataUrl(blob);
+      }
+    } catch {
+      // Ignore fallback conversion failure and return the source URL.
+    }
   }
-  return url;
+  return resolvedUrl;
 };
 
 export const listAdminCoupons = async () => fetchApi<Coupon[]>("/admin/coupons");
