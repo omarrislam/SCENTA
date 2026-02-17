@@ -108,9 +108,10 @@ const normalizeUploadBasePath = (pathname: string) => {
   if (/-((sm)|(md)|(lg))\.webp$/i.test(pathname)) {
     return pathname.replace(/-((sm)|(md)|(lg))\.webp$/i, "");
   }
-  const extMatch = pathname.match(/\.[^/.]+$/);
-  if (!extMatch) return pathname;
-  return pathname.slice(0, -extMatch[0].length);
+  if (/\.webp$/i.test(pathname)) {
+    return pathname.replace(/\.webp$/i, "");
+  }
+  return null;
 };
 
 export const resolveResponsiveImageSource = (value?: string): ResponsiveImageSource | null => {

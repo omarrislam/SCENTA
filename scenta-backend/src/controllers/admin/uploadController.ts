@@ -41,6 +41,20 @@ const createResponsiveVariants = async (sourcePath: string, outputDir: string, f
   };
 };
 
+const createInlineDataUrl = async (sourcePath: string, mimetype: string, transformable: boolean) => {
+  if (transformable) {
+    const optimized = await sharp(sourcePath)
+      .rotate()
+      .resize({ width: 1200, withoutEnlargement: true })
+      .webp({ quality: 80 })
+      .toBuffer();
+    return `data:image/webp;base64,${optimized.toString("base64")}`;
+  }
+  const raw = await fs.promises.readFile(sourcePath);
+  const safeMime = mimetype || "application/octet-stream";
+  return `data:${safeMime};base64,${raw.toString("base64")}`;
+};
+
 export const uploadAdminImage = async (req: UploadRequest, res: Response, next: NextFunction) => {
   const file = req.file;
   if (!file) {
@@ -58,6 +72,18 @@ export const uploadAdminImage = async (req: UploadRequest, res: Response, next: 
 
   const mimetype = file.mimetype ?? "";
   const isTransformableImage = mimetype.startsWith("image/") && !mimetype.includes("svg") && !mimetype.includes("gif");
+  const isVercelRuntime = Boolean(process.env.VERCEL);
+  const useInlineMode = isVercelRuntime && process.env.UPLOAD_MODE !== "disk";
+
+  if (useInlineMode) {
+    try {
+      const url = await createInlineDataUrl(file.path, mimetype, isTransformableImage);
+      await fs.promises.unlink(file.path).catch(() => undefined);
+      return sendSuccess(res, { url, mode: "inline" });
+    } catch (error) {
+      return next(error);
+    }
+  }
 
   if (!isTransformableImage) {
     const url = `/uploads/${path.basename(file.filename)}`;
