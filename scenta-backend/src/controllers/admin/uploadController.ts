@@ -72,8 +72,9 @@ export const uploadAdminImage = async (req: UploadRequest, res: Response, next: 
 
   const mimetype = file.mimetype ?? "";
   const isTransformableImage = mimetype.startsWith("image/") && !mimetype.includes("svg") && !mimetype.includes("gif");
-  const isVercelRuntime = Boolean(process.env.VERCEL);
-  const useInlineMode = isVercelRuntime && process.env.UPLOAD_MODE !== "disk";
+  const isVercelRuntime = Boolean(process.env.VERCEL || process.env.VERCEL_REGION || process.env.VERCEL_URL);
+  const isTmpUpload = Boolean(file.path?.startsWith("/tmp/"));
+  const useInlineMode = process.env.UPLOAD_MODE === "inline" || isVercelRuntime || isTmpUpload;
 
   if (useInlineMode) {
     try {
