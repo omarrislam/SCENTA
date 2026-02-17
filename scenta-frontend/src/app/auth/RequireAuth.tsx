@@ -9,7 +9,7 @@ const RequireAuth = ({ children }: PropsWithChildren) => {
   const token = localStorage.getItem("scenta-token");
 
   if (!user || (hasApi && !token)) {
-    return <Navigate to="/auth/login" state={{ from: location.pathname }} replace />;
+    return <Navigate to="/auth/login" state={{ from: `${location.pathname}${location.search}` }} replace />;
   }
 
   return <>{children}</>;

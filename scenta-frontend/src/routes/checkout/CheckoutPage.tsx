@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
@@ -85,6 +85,7 @@ const CheckoutPage = () => {
   const { items, total, clearCart } = useCart();
   const { pushToast } = useToast();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [step, setStep] = useState(0);
   const [payment, setPayment] = useState("cod");
   const [couponCode, setCouponCode] = useState("");
@@ -107,6 +108,7 @@ const CheckoutPage = () => {
   const hasApi = Boolean(import.meta.env.VITE_API_BASE_URL);
   const canUseStripe = hasApi && Boolean(stripePromise);
   const { data: coupons = [] } = useQuery({ queryKey: ["coupons"], queryFn: listPublicCoupons });
+  const couponFromQuery = searchParams.get("coupon")?.trim().toUpperCase() ?? "";
 
   const stepLabels = [
     t("checkout.steps.address"),
@@ -151,6 +153,19 @@ const CheckoutPage = () => {
     setAppliedCoupon(match);
     pushToast(t("checkout.couponApplied"), "success");
   };
+
+  useEffect(() => {
+    if (!couponFromQuery || !coupons.length) return;
+    if (appliedCoupon?.code?.toUpperCase() === couponFromQuery) return;
+    const match = coupons.find((coupon) => coupon.code.toUpperCase() === couponFromQuery && coupon.status === "active");
+    if (!match) {
+      setCouponError(t("checkout.couponInvalid"));
+      return;
+    }
+    setCouponError("");
+    setCouponCode(match.code);
+    setAppliedCoupon(match);
+  }, [appliedCoupon?.code, couponFromQuery, coupons, t]);
 
   const payloadItems = useMemo<CheckoutItemPayload[]>(
     () =>

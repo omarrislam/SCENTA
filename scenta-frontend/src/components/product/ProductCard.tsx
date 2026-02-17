@@ -64,12 +64,34 @@ const ProductCard = ({ product, onQuickAdd, onQuickView, showStockIndicator = fa
           <span>EGP {price.toLocaleString()}</span>
           <div className="product-card__actions">
             {onQuickView ? (
-              <Button type="button" variant="outline" onClick={() => onQuickView(product)}>
-                {t("shop.quickView")}
+              <Button
+                type="button"
+                variant="outline"
+                className="product-card__quickview"
+                onClick={() => onQuickView(product)}
+              >
+                <span className="product-card__action-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" role="presentation">
+                    <path
+                      d="M12 5c5.5 0 9.5 4.7 10.7 6.4a1 1 0 0 1 0 1.2C21.5 14.3 17.5 19 12 19S2.5 14.3 1.3 12.6a1 1 0 0 1 0-1.2C2.5 9.7 6.5 5 12 5Zm0 2C8 7 4.9 10.1 3.4 12 4.9 13.9 8 17 12 17s7.1-3.1 8.6-5C19.1 10.1 16 7 12 7Zm0 2.2a2.8 2.8 0 1 1 0 5.6 2.8 2.8 0 0 1 0-5.6Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </span>
+                <span className="product-card__quickview-label">{t("shop.quickView")}</span>
               </Button>
             ) : null}
-            <Button className="button--primary" type="button" onClick={() => onQuickAdd?.(product)}>
-              {t("cta.addToCart")}
+            <Button className="button--primary product-card__add" type="button" onClick={() => onQuickAdd?.(product)}>
+              <span className="product-card__action-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" role="presentation">
+                  <path
+                    d="M7 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm10 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM6.2 6h13.2l-1.2 7H7.1L6.2 6Zm13.6-2H5.6L4.9 2H2v2h1.6l2.2 11.2A2 2 0 0 0 7.7 17h9.8a2 2 0 0 0 2-1.6L21 4Z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </span>
+              <span className="product-card__add-label product-card__add-label--long">{t("cta.addToCart")}</span>
+              <span className="product-card__add-label product-card__add-label--short">{t("cta.add")}</span>
             </Button>
           </div>
         </div>

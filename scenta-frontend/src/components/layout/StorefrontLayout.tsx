@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useQueryClient } from "@tanstack/react-query";
 import LocaleToggle from "./LocaleToggle";
+import CartDrawer from "./CartDrawer";
 import { useCart } from "../../storefront/cart/CartContext";
 import { useAuth } from "../../app/auth/AuthContext";
 import { useTheme } from "../../theme/ThemeProvider";
@@ -158,6 +159,7 @@ const StorefrontLayout = ({ children }: PropsWithChildren) => {
               <div className="nav-links__meta">
                 <Link className={navItemClass("/account")} to="/account" onClick={closeMenu}>{t("nav.account")}</Link>
                 <Link className={navItemClass("/cart")} to="/cart" onClick={closeMenu}>{t("nav.cart")} ({items.length})</Link>
+                <Link className={navItemClass("/account/orders")} to="/account/orders" onClick={closeMenu}>{t("nav.trackOrder")}</Link>
                 {user?.role === "admin" && <Link className={navItemClass("/admin")} to="/admin" onClick={closeMenu}>{t("nav.admin")}</Link>}
                 {user ? (
                   <button className="button nav-links__auth-button" type="button" onClick={() => { logout(); closeMenu(); }}>
@@ -202,6 +204,21 @@ const StorefrontLayout = ({ children }: PropsWithChildren) => {
             </div>
           </div>
           <div>
+            <strong>{t("footer.importantLinks")}</strong>
+            <div className="footer__links">
+              <Link to="/account/orders">{t("footer.trackOrder")}</Link>
+              <Link to="/shop">{t("nav.shop")}</Link>
+              <Link to="/collections/amber-signature">{t("nav.collections")}</Link>
+            </div>
+          </div>
+          <div>
+            <strong>{t("footer.contact")}</strong>
+            <div className="footer__links">
+              <a href="mailto:support@scenta.com">{t("footer.customerCare")}</a>
+              <a href="mailto:wholesale@scenta.com">{t("footer.wholesale")}</a>
+            </div>
+          </div>
+          <div>
             <strong>{t("footer.policies")}</strong>
             <div className="footer__links">
               <Link to="/pages/returns">{t("footer.returns")}</Link>
@@ -212,11 +229,13 @@ const StorefrontLayout = ({ children }: PropsWithChildren) => {
           </div>
         </div>
         <div className="footer__bottom">
-          <div className="container">
+          <div className="container footer__bottom-content">
+            <span>{t("footer.trustNote")}</span>
             <span>{t("footer.copyright")}</span>
           </div>
         </div>
       </footer>
+      <CartDrawer />
     </div>
   );
 };

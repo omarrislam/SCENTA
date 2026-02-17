@@ -1,4 +1,4 @@
-﻿import { createContext, PropsWithChildren, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, PropsWithChildren, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Product, ProductVariant } from "../../services/types";
 import { getProduct, listProductsByIds } from "../../services/catalogService";
 
@@ -16,6 +16,9 @@ interface CartState {
   removeItem: (itemId: string) => void;
   clearCart: () => void;
   total: number;
+  isDrawerOpen: boolean;
+  openDrawer: () => void;
+  closeDrawer: () => void;
 }
 
 const CartContext = createContext<CartState | undefined>(undefined);
@@ -30,6 +33,7 @@ export const CartProvider = ({ children }: PropsWithChildren) => {
     const stored = localStorage.getItem(STORAGE_KEY);
     return stored ? (JSON.parse(stored) as CartItem[]) : [];
   });
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const lastSyncSignature = useRef("");
   const lastRequestedSignature = useRef("");
 
@@ -109,6 +113,7 @@ export const CartProvider = ({ children }: PropsWithChildren) => {
     if ((variant?.stock ?? 0) <= 0) {
       return;
     }
+    setIsDrawerOpen(true);
     setItems((prev) => {
       const existing = prev.find((item) => item.variant.id === variant.id);
       if (existing) {
@@ -138,13 +143,33 @@ export const CartProvider = ({ children }: PropsWithChildren) => {
     setItems([]);
   };
 
+  const openDrawer = useCallback(() => {
+    setIsDrawerOpen(true);
+  }, []);
+
+  const closeDrawer = useCallback(() => {
+    setIsDrawerOpen(false);
+  }, []);
+
   const total = useMemo(
     () => items.reduce((sum, item) => sum + item.variant.price * item.quantity, 0),
     [items]
   );
 
   return (
-    <CartContext.Provider value={{ items, addItem, updateQuantity, removeItem, clearCart, total }}>
+    <CartContext.Provider
+      value={{
+        items,
+        addItem,
+        updateQuantity,
+        removeItem,
+        clearCart,
+        total,
+        isDrawerOpen,
+        openDrawer,
+        closeDrawer
+      }}
+    >
       {children}
     </CartContext.Provider>
   );
@@ -157,3 +182,4 @@ export const useCart = () => {
   }
   return context;
 };
+
