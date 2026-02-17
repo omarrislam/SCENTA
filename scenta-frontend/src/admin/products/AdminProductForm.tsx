@@ -12,6 +12,7 @@ import {
 } from "../../services/adminService";
 import { uploadImage } from "../../services/backendApi";
 import { useToast } from "../../components/feedback/ToastContext";
+import { resolveApiAssetUrl } from "../../services/api";
 
 const AdminProductForm = () => {
   const { id } = useParams();
@@ -47,7 +48,11 @@ const AdminProductForm = () => {
     setPrice(String(variant?.price ?? 0));
     setStock(String(variant?.stock ?? 0));
     setSizeMl(String(variant?.sizeMl ?? 50));
-    const incomingImages = data.images?.map((image) => image.url).filter(Boolean) ?? [];
+    const incomingImages =
+      data.images
+        ?.map((image) => resolveApiAssetUrl(image.url) ?? image.url)
+        .filter(Boolean)
+      ?? [];
     setImages(incomingImages.length ? incomingImages : [""]);
     setStatus(data.status ?? "draft");
     setFlags({
@@ -68,10 +73,35 @@ const AdminProductForm = () => {
     mutationFn: (payload: Partial<AdminProduct>) =>
       isEditing && id ? updateAdminProduct(id, payload) : createAdminProduct(payload),
     onSuccess: async () => {
+      if (id) {
+        await queryClient.invalidateQueries({ queryKey: ["admin-product", id] });
+      }
       await queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      await queryClient.invalidateQueries({ queryKey: ["products"], exact: false });
+      await queryClient.invalidateQueries({ queryKey: ["product"], exact: false });
+      localStorage.setItem("scenta-inventory-updated", String(Date.now()));
+      window.dispatchEvent(new Event("inventory-updated"));
+      pushToast("Product saved", "success");
       navigate("/admin/products");
     }
   });
+
+  const normalizeImageForSave = (value: string) => {
+    const trimmed = value.trim();
+    if (!trimmed) return "";
+    if (trimmed.startsWith("/") || trimmed.startsWith("data:")) {
+      return trimmed;
+    }
+    try {
+      const parsed = new URL(trimmed);
+      if (parsed.pathname.startsWith("/uploads/") || parsed.pathname.startsWith("/images/")) {
+        return `${parsed.pathname}${parsed.search}`;
+      }
+      return trimmed;
+    } catch {
+      return trimmed;
+    }
+  };
 
   const handleSubmit = () => {
     const nextErrors: Record<string, string> = {};
@@ -81,7 +111,7 @@ const AdminProductForm = () => {
     if (Number.isNaN(Number(price)) || Number(price) <= 0) nextErrors.price = "Price must be greater than 0.";
     if (Number.isNaN(Number(stock)) || Number(stock) < 0) nextErrors.stock = "Stock cannot be negative.";
     if (Number.isNaN(Number(sizeMl)) || Number(sizeMl) <= 0) nextErrors.sizeMl = "Size must be greater than 0.";
-    const cleanedImages = images.map((url) => url.trim()).filter(Boolean);
+    const cleanedImages = images.map(normalizeImageForSave).filter(Boolean);
     if (!cleanedImages.length) nextErrors.images = "Add at least one image URL or upload.";
     setFormErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) {
@@ -274,7 +304,12 @@ const AdminProductForm = () => {
       </section>
 
       <div className="admin-form-actions">
-        <Button className="button--primary" type="button" onClick={handleSubmit} disabled={mutation.isPending}>
+        <Button
+          className="button--primary"
+          type="button"
+          onClick={handleSubmit}
+          disabled={mutation.isPending || uploadingIndex !== null}
+        >
           {mutation.isPending ? "Saving..." : "Save"}
         </Button>
       </div>
