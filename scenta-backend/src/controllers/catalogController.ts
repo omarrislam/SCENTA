@@ -38,7 +38,7 @@ export const getProductsByIds = async (req: Request, res: Response, next: NextFu
     if (!ids.length) {
       return sendSuccess(res, []);
     }
-    const products = await Product.find({ _id: { $in: ids }, status: "published" });
+    const products = await Product.find({ _id: { $in: ids }, status: "published", deletedAt: null }).lean();
     return sendSuccess(res, products);
   } catch (error) {
     return next(error);
@@ -47,7 +47,7 @@ export const getProductsByIds = async (req: Request, res: Response, next: NextFu
 
 export const listCollections = async (_req: Request, res: Response, next: NextFunction) => {
   try {
-    const collections = await Collection.find();
+    const collections = await Collection.find().lean();
     res.setHeader("Cache-Control", "public, max-age=120");
     return sendSuccess(res, collections);
   } catch (error) {
@@ -57,7 +57,7 @@ export const listCollections = async (_req: Request, res: Response, next: NextFu
 
 export const getCollection = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const collection = await Collection.findOne({ slug: req.params.slug });
+    const collection = await Collection.findOne({ slug: req.params.slug }).lean();
     if (!collection) {
       throw new ApiError(404, "NOT_FOUND", "Collection not found");
     }

@@ -13,6 +13,12 @@ export interface BackendProduct {
   slug: string;
   title: string;
   description?: string;
+  fragranceAttrs?: {
+    notes?: { top?: string[]; middle?: string[]; base?: string[] };
+    gender?: string;
+    concentration?: string;
+  };
+  // Legacy top-level notes still supported during migration
   notes?: { top?: string[]; middle?: string[]; base?: string[] };
   flags?: { isNew?: boolean; isBestSeller?: boolean; isFeatured?: boolean };
   images?: { url: string }[];
@@ -20,15 +26,13 @@ export interface BackendProduct {
   status?: string;
 }
 
-const buildNotes = (notes?: BackendProduct["notes"]) => {
-  const top = notes?.top ?? [];
-  const middle = notes?.middle ?? [];
-  const base = notes?.base ?? [];
+const resolveNotes = (product: BackendProduct) => {
+  const notesSource = product.fragranceAttrs?.notes ?? product.notes;
+  const top = notesSource?.top ?? [];
+  const middle = notesSource?.middle ?? [];
+  const base = notesSource?.base ?? [];
   return [...top, ...middle, ...base].filter(Boolean);
 };
-
-const buildTags = (notes: string[]) =>
-  Array.from(new Set(notes.map((note) => note.toLowerCase()))).slice(0, 8);
 
 const buildVariants = (variants: BackendVariant[]): ProductVariant[] =>
   variants.map((variant) => ({
@@ -39,7 +43,8 @@ const buildVariants = (variants: BackendVariant[]): ProductVariant[] =>
   }));
 
 export const mapProduct = (product: BackendProduct): Product => {
-  const notes = buildNotes(product.notes);
+  const notes = resolveNotes(product);
+  const tags = Array.from(new Set(notes.map((n) => n.toLowerCase()))).slice(0, 8);
   return {
     id: product._id,
     slug: product.slug,
@@ -52,7 +57,7 @@ export const mapProduct = (product: BackendProduct): Product => {
       bestSeller: product.flags?.isBestSeller
     },
     rating: 4.7,
-    tags: buildTags(notes),
+    tags,
     variants: buildVariants(product.variants ?? []),
     images: (product.images ?? []).map((image) => resolveApiAssetUrl(image.url) ?? image.url)
   };

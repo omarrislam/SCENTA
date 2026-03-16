@@ -29,6 +29,7 @@ const AdminCollections = () => {
   const [image, setImage] = useState("");
   const [productIds, setProductIds] = useState<string[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const mutation = useMutation({
     mutationFn: () =>
@@ -68,11 +69,15 @@ const AdminCollections = () => {
 
   const handleImageUpload = async (file: File) => {
     try {
+      setIsUploading(true);
       const url = await uploadImage(file);
       setImage(url);
+      pushToast("Image uploaded", "success");
     } catch (error) {
       const message = error instanceof Error ? error.message : "Upload failed";
       pushToast(message, "error");
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -110,12 +115,14 @@ const AdminCollections = () => {
           className="input"
           type="file"
           accept="image/*"
+          disabled={isUploading}
           onChange={(event) => {
             const file = event.target.files?.[0];
             if (file) void handleImageUpload(file);
           }}
         />
-        <TextInput value={image} readOnly placeholder="Image preview URL" />
+        {isUploading && <small style={{ color: "var(--color-muted)" }}>Uploading image...</small>}
+        <TextInput value={image} readOnly placeholder="Image URL (set by upload)" />
         <div className="grid">
           <strong>Assign products</strong>
           <div className="grid">
@@ -140,6 +147,7 @@ const AdminCollections = () => {
             className="button--primary"
             type="button"
             onClick={() => (editingId ? updateMutation.mutate() : mutation.mutate())}
+          disabled={isUploading || mutation.isPending || updateMutation.isPending}
           >
             Save
           </Button>

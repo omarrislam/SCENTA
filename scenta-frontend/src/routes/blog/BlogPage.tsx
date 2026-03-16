@@ -4,12 +4,10 @@ import { useTranslation } from "react-i18next";
 import { getBlogPost, listBlogPosts } from "../../services/contentService";
 import { resolveResponsiveImageSource } from "../../services/api";
 import useMeta from "../../app/seo/useMeta";
-import { pickLocalized, resolveLocale } from "../../utils/localize";
 import Spinner from "../../components/feedback/Spinner";
 
 const BlogPage = () => {
-  const { t, i18n } = useTranslation();
-  const locale = resolveLocale(i18n.language);
+  const { t } = useTranslation();
   const { slug } = useParams();
 
   const { data: posts = [], isLoading } = useQuery({
@@ -23,7 +21,7 @@ const BlogPage = () => {
     enabled: Boolean(slug)
   });
 
-  const title = post ? pickLocalized(post.title, post.titleAr, locale) : t("nav.blog");
+  const title = post ? post.title : t("nav.blog");
   useMeta(title);
 
   if (isLoading) {
@@ -34,7 +32,7 @@ const BlogPage = () => {
     return (
       <div className="card">
         <h1 className="section-title">{title}</h1>
-        <p>{pickLocalized(post.body, post.bodyAr, locale)}</p>
+        <p>{post.body}</p>
       </div>
     );
   }
@@ -62,8 +60,8 @@ const BlogPage = () => {
                 </div>
                 );
               })()}
-              <strong>{pickLocalized(item.title, item.titleAr, locale)}</strong>
-              <p>{pickLocalized(item.excerpt, item.excerptAr, locale)}</p>
+              <strong>{item.title}</strong>
+              <p>{item.excerpt}</p>
             </Link>
           ))}
         </div>

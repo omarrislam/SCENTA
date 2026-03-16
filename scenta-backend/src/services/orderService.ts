@@ -1,4 +1,5 @@
 import { randomUUID } from "crypto";
+import mongoose from "mongoose";
 import { Order } from "../models/Order";
 import { Product } from "../models/Product";
 import { ApiError } from "../utils/ApiError";
@@ -39,16 +40,27 @@ interface OrderInput {
     code: string;
     type: string;
     value: number;
+    discountTotal: number;
   };
 }
 
-export const createOrder = async (input: OrderInput, statusOverride?: string) => {
+export const createOrder = async (
+  input: OrderInput,
+  statusOverride?: string,
+  session?: mongoose.ClientSession
+) => {
   const orderSuffix = randomUUID().replace(/-/g, "").slice(0, 6).toUpperCase();
-  return Order.create({
-    ...input,
-    orderNumber: `SCN-${orderSuffix}`,
-    status: statusOverride ?? (input.payment.method === "cod" ? "placed" : "pending")
-  });
+  const [order] = await Order.create(
+    [
+      {
+        ...input,
+        orderNumber: `SCN-${orderSuffix}`,
+        status: statusOverride ?? (input.payment.method === "cod" ? "placed" : "pending")
+      }
+    ],
+    session ? { session } : undefined
+  );
+  return order;
 };
 
 export const finalizeStripeOrder = async (paymentIntentId: string) => {
@@ -60,6 +72,7 @@ export const finalizeStripeOrder = async (paymentIntentId: string) => {
     return order;
   }
 
+  // Decrement stock on confirmed Stripe payment
   for (const item of order.items) {
     const qty = Math.max(0, item.qty ?? 0);
     if (!qty) continue;
@@ -69,15 +82,14 @@ export const finalizeStripeOrder = async (paymentIntentId: string) => {
         "variants.key": item.variantKey,
         "variants.stock": { $gte: qty }
       },
-      {
-        $inc: { "variants.$.stock": -qty }
-      }
+      { $inc: { "variants.$.stock": -qty } }
     );
   }
 
   order.status = "paid";
-  order.payment = order.payment ?? { method: "stripe" };
-  order.payment.stripeStatus = "succeeded";
+  if (order.payment) {
+    order.payment.stripeStatus = "succeeded";
+  }
   await order.save();
 
   return order;

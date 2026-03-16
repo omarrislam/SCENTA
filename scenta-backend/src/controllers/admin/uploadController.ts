@@ -4,9 +4,11 @@ import path from "path";
 import sharp from "sharp";
 import { ApiError } from "../../utils/ApiError";
 import { sendSuccess } from "../../utils/response";
+import { env } from "../../config/env";
+import { uploadToCloudinary } from "../../services/storageService";
 
 type UploadRequest = Request & {
-  file?: { filename?: string; path?: string; mimetype?: string };
+  file?: { filename?: string; path?: string; mimetype?: string; buffer?: Buffer };
 };
 
 const buildVariantName = (filename: string, suffix: "sm" | "md" | "lg") => {
@@ -15,7 +17,7 @@ const buildVariantName = (filename: string, suffix: "sm" | "md" | "lg") => {
   return `${base}-${suffix}.webp`;
 };
 
-const createResponsiveVariants = async (sourcePath: string, outputDir: string, filename: string) => {
+const createDiskVariants = async (sourcePath: string, outputDir: string, filename: string) => {
   const smName = buildVariantName(filename, "sm");
   const mdName = buildVariantName(filename, "md");
   const lgName = buildVariantName(filename, "lg");
@@ -27,32 +29,17 @@ const createResponsiveVariants = async (sourcePath: string, outputDir: string, f
   await Promise.all([
     sharp(sourcePath).rotate().resize({ width: 480, withoutEnlargement: true }).webp({ quality: 78 }).toFile(smPath),
     sharp(sourcePath).rotate().resize({ width: 960, withoutEnlargement: true }).webp({ quality: 80 }).toFile(mdPath),
-    sharp(sourcePath)
-      .rotate()
-      .resize({ width: 1440, withoutEnlargement: true })
-      .webp({ quality: 82 })
-      .toFile(lgPath)
+    sharp(sourcePath).rotate().resize({ width: 1440, withoutEnlargement: true }).webp({ quality: 82 }).toFile(lgPath)
   ]);
 
   return {
-    sm: `/uploads/${smName}`,
-    md: `/uploads/${mdName}`,
-    lg: `/uploads/${lgName}`
+    url: `/uploads/${lgName}`,
+    variants: {
+      sm: `/uploads/${smName}`,
+      md: `/uploads/${mdName}`,
+      lg: `/uploads/${lgName}`
+    }
   };
-};
-
-const createInlineDataUrl = async (sourcePath: string, mimetype: string, transformable: boolean) => {
-  if (transformable) {
-    const optimized = await sharp(sourcePath)
-      .rotate()
-      .resize({ width: 1200, withoutEnlargement: true })
-      .webp({ quality: 80 })
-      .toBuffer();
-    return `data:image/webp;base64,${optimized.toString("base64")}`;
-  }
-  const raw = await fs.promises.readFile(sourcePath);
-  const safeMime = mimetype || "application/octet-stream";
-  return `data:${safeMime};base64,${raw.toString("base64")}`;
 };
 
 export const uploadAdminImage = async (req: UploadRequest, res: Response, next: NextFunction) => {
@@ -61,6 +48,27 @@ export const uploadAdminImage = async (req: UploadRequest, res: Response, next: 
     return next(new ApiError(400, "BAD_REQUEST", "No file uploaded"));
   }
 
+  const mimetype = file.mimetype ?? "";
+  const isTransformable = mimetype.startsWith("image/") && !mimetype.includes("svg") && !mimetype.includes("gif");
+
+  if (env.UPLOAD_PROVIDER === "cloudinary") {
+    if (!file.buffer) {
+      return next(new ApiError(400, "BAD_REQUEST", "Upload buffer missing"));
+    }
+    try {
+      const baseName = `uploads/${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+      if (!isTransformable) {
+        const result = await uploadToCloudinary(file.buffer, baseName);
+        return sendSuccess(res, { url: result.url });
+      }
+      const result = await uploadToCloudinary(file.buffer, baseName);
+      return sendSuccess(res, result);
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  // Disk storage path
   if (!file.filename || !file.path) {
     return next(new ApiError(400, "BAD_REQUEST", "Upload failed"));
   }
@@ -70,28 +78,13 @@ export const uploadAdminImage = async (req: UploadRequest, res: Response, next: 
     fs.mkdirSync(uploadDir, { recursive: true });
   }
 
-  const mimetype = file.mimetype ?? "";
-  const isTransformableImage = mimetype.startsWith("image/") && !mimetype.includes("svg") && !mimetype.includes("gif");
-  const useInlineMode = process.env.UPLOAD_MODE !== "disk";
-
-  if (useInlineMode) {
-    try {
-      const url = await createInlineDataUrl(file.path, mimetype, isTransformableImage);
-      await fs.promises.unlink(file.path).catch(() => undefined);
-      return sendSuccess(res, { url, mode: "inline" });
-    } catch (error) {
-      return next(error);
-    }
-  }
-
-  if (!isTransformableImage) {
-    const url = `/uploads/${path.basename(file.filename)}`;
-    return sendSuccess(res, { url });
+  if (!isTransformable) {
+    return sendSuccess(res, { url: `/uploads/${path.basename(file.filename)}` });
   }
 
   try {
-    const variants = await createResponsiveVariants(file.path, uploadDir, file.filename);
-    return sendSuccess(res, { url: variants.lg, variants });
+    const result = await createDiskVariants(file.path, uploadDir, file.filename);
+    return sendSuccess(res, result);
   } catch (error) {
     return next(error);
   }

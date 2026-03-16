@@ -1,94 +1,59 @@
 import { fetchApi, resolveApiAssetUrl } from "./api";
-import {
-  getBlogPost as getMockBlogPost,
-  getStaticPage as getMockStaticPage,
-  listBlogPosts as listMockBlogPosts
-} from "./mockApi";
 import { BlogPost, StaticPage } from "./types";
 
-const hasApi = Boolean(import.meta.env.VITE_API_BASE_URL);
-
 interface BackendBlogPost {
-  _id: string;
+  id: string;
   slug: string;
   title: string;
-  titleAr?: string;
   excerpt?: string;
-  excerptAr?: string;
   body?: string;
-  bodyAr?: string;
   cover?: string;
-  content?: string;
   featuredImage?: string;
 }
 
 interface BackendPage {
-  _id: string;
+  id: string;
   slug: string;
   title: string;
-  titleAr?: string;
   body?: string;
-  bodyAr?: string;
-  content?: string;
 }
 
 const mapBlogPost = (post: BackendBlogPost): BlogPost => ({
-  id: post._id,
+  id: post.id,
   slug: post.slug,
   title: post.title,
-  titleAr: post.titleAr,
   excerpt: post.excerpt ?? "",
-  excerptAr: post.excerptAr,
-  body: post.body ?? post.content ?? "",
-  bodyAr: post.bodyAr,
+  body: post.body ?? "",
   cover: resolveApiAssetUrl(post.cover ?? post.featuredImage ?? "") ?? ""
 });
 
 const mapPage = (page: BackendPage): StaticPage => ({
-  id: page._id,
+  id: page.id,
   slug: page.slug,
   title: page.title,
-  titleAr: page.titleAr,
-  body: page.body ?? page.content ?? "",
-  bodyAr: page.bodyAr
+  body: page.body ?? ""
 });
 
+const localeParam = () => {
+  // Reads the current i18n language if available, falls back to "en"
+  const lang =
+    typeof document !== "undefined"
+      ? (document.documentElement.lang ?? "en")
+      : "en";
+  return lang.startsWith("ar") ? "ar" : "en";
+};
+
 export const listBlogPosts = async (): Promise<BlogPost[]> => {
-  if (!hasApi) {
-    return listMockBlogPosts();
-  }
-  try {
-    const posts = await fetchApi<BackendBlogPost[]>("/content/blog");
-    if (!posts.length) {
-      return listMockBlogPosts();
-    }
-    return posts.map(mapBlogPost);
-  } catch {
-    return listMockBlogPosts();
-  }
+  const posts = await fetchApi<BackendBlogPost[]>(`/content/blog?locale=${localeParam()}`);
+  return posts.map(mapBlogPost);
 };
 
 export const getBlogPost = async (slug: string): Promise<BlogPost> => {
-  if (!hasApi) {
-    return getMockBlogPost(slug);
-  }
-  try {
-    const post = await fetchApi<BackendBlogPost>(`/content/blog/${slug}`);
-    return post ? mapBlogPost(post) : getMockBlogPost(slug);
-  } catch {
-    return getMockBlogPost(slug);
-  }
+  const post = await fetchApi<BackendBlogPost>(`/content/blog/${slug}?locale=${localeParam()}`);
+  return mapBlogPost(post);
 };
 
 export const getStaticPage = async (slug: string): Promise<StaticPage> => {
-  if (!hasApi) {
-    return getMockStaticPage(slug);
-  }
-  try {
-    const page = await fetchApi<BackendPage>(`/content/pages/${slug}`);
-    return page ? mapPage(page) : getMockStaticPage(slug);
-  } catch {
-    return getMockStaticPage(slug);
-  }
+  const page = await fetchApi<BackendPage>(`/content/pages/${slug}?locale=${localeParam()}`);
+  return mapPage(page);
 };
-

@@ -10,8 +10,7 @@ import ReviewsList from "../../storefront/reviews/ReviewsList";
 import useMeta from "../../app/seo/useMeta";
 import { useToast } from "../../components/feedback/ToastContext";
 import { useWishlist } from "../../storefront/wishlist/WishlistContext";
-import { pickLocalized, pickLocalizedArray, resolveLocale } from "../../utils/localize";
-import NoteBadges from "../../components/product/NoteBadges";
+import NoteBadges from "../../domain/fragrance/NoteBadges";
 import Spinner from "../../components/feedback/Spinner";
 import StockIndicator from "../../components/product/StockIndicator";
 
@@ -25,8 +24,7 @@ const tabFallbackLabels: Record<(typeof tabs)[number], string> = {
 };
 
 const ProductPage = () => {
-  const { t, i18n } = useTranslation();
-  const locale = resolveLocale(i18n.language);
+  const { t } = useTranslation();
   const { slug } = useParams();
   const { addItem } = useCart();
   const { pushToast } = useToast();
@@ -45,9 +43,9 @@ const ProductPage = () => {
     return product.variants.find((item) => item.id === variantId) ?? product.variants[0];
   }, [product, variantId]);
 
-  const localizedName = product ? pickLocalized(product.name, product.nameAr, locale) : "";
-  const localizedDescription = product ? pickLocalized(product.description, product.descriptionAr, locale) : "";
-  const localizedNotes = product ? pickLocalizedArray(product.notes, product.notesAr, locale) : [];
+  const localizedName = product?.name ?? "";
+  const localizedDescription = product?.description ?? "";
+  const localizedNotes = product?.notes ?? [];
   const isWishlisted = product ? wishlistItems.some((entry) => entry.product.id === product.id) : false;
 
   useMeta(product ? `${localizedName} - SCENTA` : "SCENTA Product");

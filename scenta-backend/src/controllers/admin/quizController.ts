@@ -3,9 +3,10 @@ import { QuizQuestion } from "../../models/Quiz";
 import { quizDefaults } from "../../data/quizDefaults";
 import { sendSuccess } from "../../utils/response";
 
+// Admin returns full question documents (all translations)
 export const listAdminQuiz = async (_req: Request, res: Response, next: NextFunction) => {
   try {
-    const questions = await QuizQuestion.find().sort({ position: 1, createdAt: 1 });
+    const questions = await QuizQuestion.find().sort({ position: 1, createdAt: 1 }).lean();
     if (!questions.length) {
       return sendSuccess(res, quizDefaults);
     }

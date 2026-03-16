@@ -34,11 +34,11 @@
   --font-display: "Poppins", "Helvetica Neue", sans-serif;
   --color-ink: #111111;
   --color-muted: #6b6b6b;
-  --color-cream: #f7f6f1;
-  --color-sand: #f1efe9;
-  --color-gold: #111111;
-  --color-ember: #111111;
-  --color-rose: #e8e6e0;
+  --color-bg-subtle: #f7f6f1;
+  --color-bg-tint: #f1efe9;
+  --color-accent: #111111;
+  --color-accent-dark: #111111;
+  --color-accent-soft: #e8e6e0;
   --color-bg-start: #ffffff;
   --color-bg-mid: #ffffff;
   --color-bg-end: #ffffff;
@@ -85,14 +85,14 @@ body,
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-gold);
+  outline: 2px solid var(--color-accent);
   outline-offset: 3px;
 }
 
 html,
 body {
   margin: 0;
-  background: var(--color-cream);
+  background: var(--color-bg-subtle);
   color: var(--color-ink);
   font-family: "Poppins", "Helvetica Neue", sans-serif;
   line-height: 1.6;
@@ -390,10 +390,10 @@ main {
 }
 
 .button {
-  --button-bg: var(--color-ember);
+  --button-bg: var(--color-accent-dark);
   --button-text: #ffffff;
-  --button-outline: var(--color-ember);
-  --button-hover-bg: var(--color-ember);
+  --button-outline: var(--color-accent-dark);
+  --button-hover-bg: var(--color-accent-dark);
   --button-hover-text: #ffffff;
   display: inline-flex;
   align-items: center;
@@ -414,10 +414,10 @@ main {
 }
 
 .button--primary {
-  --button-bg: var(--color-ember);
+  --button-bg: var(--color-accent-dark);
   --button-text: #ffffff;
-  --button-outline: var(--color-ember);
-  --button-hover-bg: var(--color-ember);
+  --button-outline: var(--color-accent-dark);
+  --button-hover-bg: var(--color-accent-dark);
   --button-hover-text: #ffffff;
 }
 
@@ -425,7 +425,7 @@ main {
   --button-bg: transparent;
   --button-text: var(--color-ink);
   --button-outline: var(--border-soft);
-  --button-hover-bg: var(--color-ember);
+  --button-hover-bg: var(--color-accent-dark);
   --button-hover-text: #ffffff;
 }
 
@@ -433,7 +433,7 @@ main {
   background-position: left center, right center;
   background-size: 0 101%, 101% 101%;
   color: var(--button-hover-text);
-  border-color: var(--color-ember);
+  border-color: var(--color-accent-dark);
 }
 
 .button--primary:hover {
@@ -555,7 +555,7 @@ main {
   margin-right: auto;
 }
 
-.home-stack > .section-block:not(.section-block--hero) .siwa-section-header,
+.home-stack > .section-block:not(.section-block--hero) .section-intro,
 .home-stack > .section-block:not(.section-block--hero) .tabs,
 .home-stack > .section-block:not(.section-block--hero) .product-grid,
 .home-stack > .section-block:not(.section-block--hero) .product-carousel {
@@ -873,7 +873,7 @@ main {
   justify-content: center;
   background: transparent;
   border: 1px solid var(--border-soft);
-  color: var(--color-ember);
+  color: var(--color-accent-dark);
 }
 
 .shipping-item__icon svg {
@@ -919,10 +919,10 @@ main {
   right: 0;
   bottom: -6px;
   height: 1px;
-  background: var(--color-ember);
+  background: var(--color-accent-dark);
 }
 
-.siwa-section-header {
+.section-intro {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
@@ -930,13 +930,13 @@ main {
   flex-wrap: wrap;
 }
 
-.siwa-section-header__meta {
+.section-intro__meta {
   max-width: 520px;
   color: var(--color-muted);
   font-size: 0.9rem;
 }
 
-.siwa-eyebrow {
+.eyebrow {
   text-transform: uppercase;
   letter-spacing: 0.22em;
   font-size: 0.7rem;
@@ -944,13 +944,13 @@ main {
   margin: 0 0 8px;
 }
 
-.siwa-divider {
+.divider {
   height: 1px;
   background: var(--border-soft);
   margin: 18px 0;
 }
 
-.siwa-offer {
+.offer-banner {
   border: 1px solid var(--border-soft);
   background: linear-gradient(135deg, #f6f3ed, #ffffff);
   padding: clamp(28px, 4vw, 48px);
@@ -960,26 +960,26 @@ main {
   align-items: center;
 }
 
-.siwa-offer__media {
+.offer-banner__media {
   height: clamp(220px, 36vw, 320px);
   border: 1px solid var(--border-soft);
   overflow: hidden;
 }
 
-.siwa-offer__image {
+.offer-banner__image {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
-.siwa-feature-grid {
+.feature-grid {
   display: grid;
   gap: 16px;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
-.siwa-feature-card {
+.feature-card {
   border: 1px solid var(--border-soft);
   padding: 24px;
   display: grid;
@@ -987,14 +987,14 @@ main {
   background: #ffffff;
 }
 
-.siwa-feature-card__title {
+.feature-card__title {
   text-transform: uppercase;
   letter-spacing: 0.2em;
   font-size: 0.8rem;
   margin: 0;
 }
 
-.siwa-feature-card__link {
+.feature-card__link {
   font-size: 0.7rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -1629,7 +1629,7 @@ main {
 .spinner__ring {
   border-radius: 50%;
   border: 3px solid rgba(27, 27, 27, 0.15);
-  border-top-color: var(--color-gold);
+  border-top-color: var(--color-accent);
   animation: spin 700ms linear infinite;
 }
 
@@ -1867,7 +1867,7 @@ main {
 .badge {
   padding: 4px 10px;
   border-radius: 999px;
-  background: var(--color-ember);
+  background: var(--color-accent-dark);
   color: #fff;
   font-size: 0.65rem;
   letter-spacing: 0.08em;
@@ -1960,8 +1960,8 @@ main {
 }
 
 .pill.button--primary {
-  background: var(--color-ember);
-  border-color: var(--color-ember);
+  background: var(--color-accent-dark);
+  border-color: var(--color-accent-dark);
   color: #fff;
 }
 
@@ -2151,7 +2151,7 @@ main {
   --button-bg: transparent;
   --button-text: var(--color-ink);
   --button-outline: rgba(27, 27, 27, 0.2);
-  --button-hover-bg: var(--color-ember);
+  --button-hover-bg: var(--color-accent-dark);
   --button-hover-text: #ffffff;
   box-shadow: none;
 }
@@ -2534,11 +2534,11 @@ main {
     padding: 20px;
   }
 
-  .siwa-section-header {
+  .section-intro {
     gap: 12px;
   }
 
-  .section-block .siwa-section-header,
+  .section-block .section-intro,
   .section-block .tabs {
     padding: 0 16px;
   }
@@ -2551,7 +2551,7 @@ main {
 
   .collection-strip,
   .shipping-strip,
-  .siwa-feature-grid {
+  .feature-grid {
     padding: 0 16px;
   }
 
@@ -2567,7 +2567,7 @@ main {
     margin-right: calc(50% - 50vw);
   }
 
-  .siwa-section-header__meta {
+  .section-intro__meta {
     font-size: 0.85rem;
   }
 
@@ -2589,12 +2589,12 @@ main {
     max-width: 100%;
   }
 
-  .siwa-offer {
+  .offer-banner {
     margin: 0 16px;
     padding: 24px;
   }
 
-  .siwa-feature-grid {
+  .feature-grid {
   }
 
   .tabs {
@@ -2619,7 +2619,7 @@ main {
     padding-inline: 12px;
   }
 
-  .section-block--accent .siwa-section-header,
+  .section-block--accent .section-intro,
   .section-block--accent .tabs,
   .section-block--accent .product-grid {
     padding-left: 0;
@@ -3449,7 +3449,7 @@ textarea {
   --button-bg: transparent;
   --button-text: var(--color-ink);
   --button-outline: rgba(17, 17, 17, 0.24);
-  --button-hover-bg: var(--color-ember);
+  --button-hover-bg: var(--color-accent-dark);
   --button-hover-text: #ffffff;
 }
 

@@ -1,5 +1,4 @@
 import { ThemeConfig } from "../services/backendApi";
-import { themeSections } from "../services/mockData";
 
 export const lightThemePreset = {
   mode: "light" as const,
@@ -41,10 +40,20 @@ export const darkThemePreset = {
   }
 };
 
+const defaultSections = [
+  { id: "hero", label: "Hero Banner", isVisible: true },
+  { id: "promo", label: "Promo Bar", isVisible: true },
+  { id: "featured", label: "Featured Products", isVisible: true },
+  { id: "collections", label: "Collections", isVisible: true },
+  { id: "bestsellers", label: "Best Sellers", isVisible: true },
+  { id: "quiz", label: "Scent Quiz", isVisible: true },
+  { id: "shipping", label: "Shipping Info", isVisible: true }
+];
+
 export const defaultThemeConfig: ThemeConfig = {
   locale: "en",
   mode: lightThemePreset.mode,
-  homeSections: themeSections,
+  homeSections: defaultSections,
   colors: lightThemePreset.colors,
   radius: lightThemePreset.radius,
   home: {

@@ -1,4 +1,4 @@
-﻿export type Locale = "ar" | "en";
+export type Locale = "ar" | "en";
 
 export interface ProductVariant {
   id: string;
@@ -11,11 +11,8 @@ export interface Product {
   id: string;
   slug: string;
   name: string;
-  nameAr?: string;
   description: string;
-  descriptionAr?: string;
   notes: string[];
-  notesAr?: string[];
   flags: { new?: boolean; featured?: boolean; bestSeller?: boolean };
   rating: number;
   tags: string[];
@@ -27,9 +24,7 @@ export interface Collection {
   id: string;
   slug: string;
   title: string;
-  titleAr?: string;
   description: string;
-  descriptionAr?: string;
   tags?: string[];
   productIds?: string[];
   image?: string;
@@ -50,11 +45,8 @@ export interface BlogPost {
   id: string;
   slug: string;
   title: string;
-  titleAr?: string;
   excerpt: string;
-  excerptAr?: string;
   body: string;
-  bodyAr?: string;
   cover: string;
 }
 
@@ -62,15 +54,13 @@ export interface StaticPage {
   id: string;
   slug: string;
   title: string;
-  titleAr?: string;
   body: string;
-  bodyAr?: string;
 }
 
 export interface Order {
   id: string;
   orderNumber: string;
-  status: "pending" | "placed" | "paid" | "fulfilled" | "completed" | "cancelled";
+  status: "pending" | "placed" | "paid" | "processing" | "fulfilled" | "completed" | "cancelled";
   total: number;
   createdAt: string;
 }
@@ -100,6 +90,8 @@ export interface ThemeSection {
   isVisible: boolean;
 }
 
+// Quiz types keep promptAr/labelAr for the admin editor UI only.
+// The public quiz endpoint returns locale-resolved prompts/labels.
 export interface QuizQuestion {
   id: string;
   prompt: string;

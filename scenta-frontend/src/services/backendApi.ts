@@ -10,9 +10,9 @@ export interface AuthUser {
 }
 
 export interface AuthPayload {
-  token: string;
   user: AuthUser;
 }
+
 
 export const loginUser = async (email: string, password: string) =>
   fetchApi<AuthPayload>("/auth/login", {
@@ -25,6 +25,9 @@ export const registerUser = async (name: string, email: string, password: string
     method: "POST",
     body: JSON.stringify({ name, email, password })
   });
+
+export const logoutUser = async () =>
+  fetchApi<{ status: string }>("/auth/logout", { method: "POST" });
 
 export const fetchMe = async () => fetchApi<AuthUser>("/auth/me");
 
@@ -109,9 +112,6 @@ export interface ThemeConfig {
   };
 }
 
-const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
-const hasApi = Boolean(baseUrl);
-const THEME_STORAGE_KEY = "scenta-theme";
 const MAX_IMAGE_EDGE = 1200;
 const TARGET_UPLOAD_BYTES = 220 * 1024;
 
@@ -130,9 +130,7 @@ const optimizeImageForUpload = async (file: File): Promise<File> => {
   }
 
   const bitmap = await loadImageBitmap(file);
-  if (!bitmap) {
-    return file;
-  }
+  if (!bitmap) return file;
 
   const largestEdge = Math.max(bitmap.width, bitmap.height);
   const scale = largestEdge > MAX_IMAGE_EDGE ? MAX_IMAGE_EDGE / largestEdge : 1;
@@ -150,14 +148,13 @@ const optimizeImageForUpload = async (file: File): Promise<File> => {
   ctx.drawImage(bitmap, 0, 0, width, height);
   bitmap.close();
 
-  const outputType = "image/webp";
   let quality = 0.86;
   let candidate: Blob | null = null;
 
   for (let i = 0; i < 6; i += 1) {
     // eslint-disable-next-line no-await-in-loop
     const blob = await new Promise<Blob | null>((resolve) =>
-      canvas.toBlob(resolve, outputType, quality)
+      canvas.toBlob(resolve, "image/webp", quality)
     );
     if (!blob) continue;
     candidate = blob;
@@ -166,145 +163,50 @@ const optimizeImageForUpload = async (file: File): Promise<File> => {
     if (quality < 0.3) break;
   }
 
-  if (!candidate) {
-    return file;
-  }
-  if (candidate.size >= file.size) {
-    return file;
-  }
+  if (!candidate || candidate.size >= file.size) return file;
 
   const nextName = file.name.replace(/\.[^.]+$/, "") || "upload";
-  return new File([candidate], `${nextName}.webp`, {
-    type: outputType,
-    lastModified: Date.now()
-  });
+  return new File([candidate], `${nextName}.webp`, { type: "image/webp", lastModified: Date.now() });
 };
 
-const blobToDataUrl = (blob: Blob): Promise<string> =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === "string") {
-        resolve(reader.result);
-        return;
-      }
-      reject(new Error("Failed to encode image"));
-    };
-    reader.onerror = () => reject(new Error("Failed to encode image"));
-    reader.readAsDataURL(blob);
-  });
-
-const getStoredTheme = (locale: Locale): ThemeConfig | null => {
-  const stored = localStorage.getItem(THEME_STORAGE_KEY);
-  if (!stored) return null;
+export const getTheme = async (locale: Locale) => {
   try {
-    const parsed = JSON.parse(stored) as Record<string, ThemeConfig>;
-    return parsed[locale] ?? null;
+    return await fetchApi<ThemeConfig | null>(`/theme?locale=${locale}`);
   } catch {
     return null;
   }
 };
 
-const saveStoredTheme = (payload: ThemeConfig) => {
-  const stored = localStorage.getItem(THEME_STORAGE_KEY);
-  const parsed = stored ? (JSON.parse(stored) as Record<string, ThemeConfig>) : {};
-  parsed[payload.locale] = payload;
-  localStorage.setItem(THEME_STORAGE_KEY, JSON.stringify(parsed));
-};
-
-export const getTheme = async (locale: Locale) => {
-  if (!hasApi) {
-    return getStoredTheme(locale);
-  }
-  try {
-    return await fetchApi<ThemeConfig | null>(`/admin/theme?locale=${locale}`);
-  } catch {
-    return getStoredTheme(locale);
-  }
-};
-
 export const updateTheme = async (payload: ThemeConfig) => {
-  if (!hasApi) {
-    const merged = {
-      ...defaultThemeConfig,
-      ...payload,
-      colors: { ...defaultThemeConfig.colors, ...payload.colors },
-      radius: { ...defaultThemeConfig.radius, ...payload.radius },
-      home: { ...defaultThemeConfig.home, ...payload.home }
-    };
-    saveStoredTheme(merged);
-    return merged;
-  }
-  try {
-    return await fetchApi<ThemeConfig>("/admin/theme", {
-      method: "PATCH",
-      body: JSON.stringify(payload)
-    });
-  } catch {
-    const merged = {
-      ...defaultThemeConfig,
-      ...payload,
-      colors: { ...defaultThemeConfig.colors, ...payload.colors },
-      radius: { ...defaultThemeConfig.radius, ...payload.radius },
-      home: { ...defaultThemeConfig.home, ...payload.home }
-    };
-    saveStoredTheme(merged);
-    return merged;
-  }
+  return fetchApi<ThemeConfig>("/admin/theme", {
+    method: "PATCH",
+    body: JSON.stringify(payload)
+  });
 };
 
 export const getPublicTheme = async (locale: Locale) => {
-  if (!hasApi) {
-    return getStoredTheme(locale);
-  }
   try {
     return await fetchApi<ThemeConfig | null>(`/theme?locale=${locale}`);
   } catch {
-    return getStoredTheme(locale);
+    return null;
   }
 };
 
 export const uploadImage = async (file: File): Promise<string> => {
   const optimizedFile = await optimizeImageForUpload(file);
-  if (!hasApi) {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(typeof reader.result === "string" ? reader.result : "");
-      reader.readAsDataURL(optimizedFile);
-    });
-  }
-  const token = localStorage.getItem("scenta-token");
   const formData = new FormData();
   formData.append("file", optimizedFile);
-  const response = await fetch(`${baseUrl}/admin/uploads`, {
-    method: "POST",
-    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-    body: formData
-  });
-  if (!response.ok) {
-    throw new Error("Upload failed");
-  }
-  const payload = (await response.json()) as { url?: string; data?: { url?: string } };
-  const url = payload?.url ?? payload?.data?.url;
-  if (!url) {
-    throw new Error("Upload failed");
-  }
-  const resolvedUrl = url.startsWith("/") && baseUrl
-    ? `${baseUrl.replace(/\/api\/?$/, "")}${url}`
-    : url;
-  if (/\/uploads\//.test(resolvedUrl) && !resolvedUrl.startsWith("data:")) {
-    try {
-      const uploaded = await fetch(resolvedUrl);
-      if (uploaded.ok) {
-        const blob = await uploaded.blob();
-        return await blobToDataUrl(blob);
-      }
-    } catch {
-      // Ignore fallback conversion failure and return the source URL.
-    }
-  }
-  return resolvedUrl;
+
+  const data = await fetchApi<{ url: string; variants?: { sm: string; md: string; lg: string } }>(
+    "/admin/uploads",
+    { method: "POST", body: formData }
+  );
+
+  return data.url;
 };
+
+// Theme defaults fallback
+export { defaultThemeConfig };
 
 export const listAdminCoupons = async () => fetchApi<Coupon[]>("/admin/coupons");
 
@@ -321,23 +223,29 @@ export const updateAdminCoupon = async (id: string, payload: Partial<Coupon>) =>
   });
 
 export const deleteAdminCoupon = async (id: string) =>
-  fetchApi<{ status: string }>(`/admin/coupons/${id}`, {
-    method: "DELETE"
-  });
+  fetchApi<{ status: string }>(`/admin/coupons/${id}`, { method: "DELETE" });
 
 interface BackendQuizQuestion {
   _id?: string;
   id?: string;
-  prompt: string;
-  promptAr?: string;
-  options: { label: string; labelAr?: string; score: number; note: string }[];
+  translations?: { en?: { prompt?: string }; ar?: { prompt?: string } };
+  options: {
+    translations?: { en?: { label?: string }; ar?: { label?: string } };
+    score: number;
+    note: string;
+  }[];
 }
 
 const mapQuizQuestion = (question: BackendQuizQuestion, index: number): QuizQuestion => ({
   id: question._id ?? question.id ?? `quiz-${index}`,
-  prompt: question.prompt,
-  promptAr: question.promptAr,
-  options: question.options ?? []
+  prompt: question.translations?.en?.prompt ?? "",
+  promptAr: question.translations?.ar?.prompt,
+  options: (question.options ?? []).map((opt) => ({
+    label: opt.translations?.en?.label ?? "",
+    labelAr: opt.translations?.ar?.label,
+    score: opt.score,
+    note: opt.note
+  }))
 });
 
 export const listAdminQuiz = async (): Promise<QuizQuestion[]> => {
@@ -349,10 +257,19 @@ export const updateAdminQuiz = async (questions: QuizQuestion[]) =>
   fetchApi<BackendQuizQuestion[]>("/admin/quiz", {
     method: "PUT",
     body: JSON.stringify({
-      questions: questions.map((question) => ({
-        prompt: question.prompt,
-        promptAr: question.promptAr,
-        options: question.options
+      questions: questions.map((q) => ({
+        translations: {
+          en: { prompt: q.prompt },
+          ar: { prompt: q.promptAr }
+        },
+        options: q.options.map((opt) => ({
+          translations: {
+            en: { label: opt.label },
+            ar: { label: opt.labelAr }
+          },
+          score: opt.score,
+          note: opt.note
+        }))
       }))
     })
   });

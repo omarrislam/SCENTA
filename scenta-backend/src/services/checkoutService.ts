@@ -20,7 +20,7 @@ export const validateCheckout = async (items: CheckoutItem[], couponCode?: strin
 
   let subtotal = 0;
   let discountTotal = 0;
-  let coupon: { code: string; type: string; value: number } | undefined;
+  let coupon: { code: string; type: string; value: number; discountTotal: number } | undefined;
 
   for (const item of items) {
     const productId = item.productId;
@@ -91,7 +91,8 @@ export const validateCheckout = async (items: CheckoutItem[], couponCode?: strin
     coupon = {
       code: match.code ?? normalized,
       type: couponType || "percent",
-      value: couponValue
+      value: couponValue,
+      discountTotal
     };
   }
 

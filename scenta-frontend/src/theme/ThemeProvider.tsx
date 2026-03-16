@@ -30,6 +30,29 @@ const fallbackRadius = { sm: 10, md: 18, lg: 28 };
 type ResolvedColors = typeof fallbackColors;
 type ResolvedRadius = typeof fallbackRadius;
 
+const CACHE_KEY = "theme_v1";
+const CACHE_TTL = 1000 * 60 * 10; // 10 minutes
+
+const loadCachedTheme = (locale: string): ThemeConfig | undefined => {
+  try {
+    const raw = localStorage.getItem(`${CACHE_KEY}_${locale}`);
+    if (!raw) return undefined;
+    const { data, ts } = JSON.parse(raw) as { data: ThemeConfig; ts: number };
+    if (Date.now() - ts > CACHE_TTL) return undefined;
+    return data;
+  } catch {
+    return undefined;
+  }
+};
+
+const saveCachedTheme = (locale: string, data: ThemeConfig) => {
+  try {
+    localStorage.setItem(`${CACHE_KEY}_${locale}`, JSON.stringify({ data, ts: Date.now() }));
+  } catch {
+    // localStorage unavailable (private browsing, storage full) — silently skip
+  }
+};
+
 const normalizeThemeAssets = (config: ThemeConfig): ThemeConfig => {
   const sectionSettings = config.home?.sectionSettings;
   const normalizedSectionSettings = sectionSettings
@@ -66,15 +89,26 @@ const normalizeThemeAssets = (config: ThemeConfig): ThemeConfig => {
 export const ThemeProvider = ({ children }: PropsWithChildren) => {
   const { i18n } = useTranslation();
   const locale = resolveLocale(i18n.language);
+
   const { data, isLoading } = useQuery({
     queryKey: ["theme", locale],
-    queryFn: () => getPublicTheme(locale)
+    queryFn: () => getPublicTheme(locale),
+    placeholderData: () => loadCachedTheme(locale)
   });
   const { data: fallbackData } = useQuery({
     queryKey: ["theme", "en"],
     queryFn: () => getPublicTheme("en"),
-    enabled: locale !== "en"
+    enabled: locale !== "en",
+    placeholderData: () => loadCachedTheme("en")
   });
+
+  // Persist to localStorage whenever fresh API data arrives
+  useEffect(() => {
+    if (data) saveCachedTheme(locale, data);
+  }, [data, locale]);
+  useEffect(() => {
+    if (fallbackData) saveCachedTheme("en", fallbackData);
+  }, [fallbackData]);
 
   const theme = useMemo<ThemeConfig>(() => {
     const base = data ?? fallbackData;
@@ -121,9 +155,9 @@ export const ThemeProvider = ({ children }: PropsWithChildren) => {
     root.style.setProperty("--color-surface", colors.surface);
     root.style.setProperty("--color-ink", colors.text);
     root.style.setProperty("--color-muted", colors.muted);
-    root.style.setProperty("--color-gold", colors.accent);
-    root.style.setProperty("--color-ember", colors.accentDark);
-    root.style.setProperty("--color-rose", colors.accentSoft);
+    root.style.setProperty("--color-accent", colors.accent);
+    root.style.setProperty("--color-accent-dark", colors.accentDark);
+    root.style.setProperty("--color-accent-soft", colors.accentSoft);
     root.style.setProperty("--radius-sm", `${radius.sm}px`);
     root.style.setProperty("--radius-md", `${radius.md}px`);
     root.style.setProperty("--radius-lg", `${radius.lg}px`);

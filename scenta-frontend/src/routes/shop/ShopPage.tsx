@@ -8,13 +8,11 @@ import TextInput from "../../components/ui/TextInput";
 import Select from "../../components/ui/Select";
 import { useCart } from "../../storefront/cart/CartContext";
 import { useToast } from "../../components/feedback/ToastContext";
-import { pickLocalized, resolveLocale } from "../../utils/localize";
 import { Product } from "../../services/types";
 import { resolveResponsiveImageSource } from "../../services/api";
 
 const ShopPage = () => {
-  const { t, i18n } = useTranslation();
-  const locale = resolveLocale(i18n.language);
+  const { t } = useTranslation();
   const { slug } = useParams();
   const [params, setParams] = useSearchParams();
   const search = params.get("q") ?? "";
@@ -60,9 +58,7 @@ const ShopPage = () => {
     const normalizedSearch = search.trim().toLowerCase();
     if (normalizedSearch) {
       items = items.filter((product) => {
-        const name = product.name.toLowerCase();
-        const nameAr = product.nameAr?.toLowerCase() ?? "";
-        return name.includes(normalizedSearch) || nameAr.includes(normalizedSearch);
+        return product.name.toLowerCase().includes(normalizedSearch);
       });
     }
     if (tag) {
@@ -138,18 +134,12 @@ const ShopPage = () => {
     pushToast(t("cta.addedCart"), "success");
   };
 
-  const heading = activeCollection
-    ? pickLocalized(activeCollection.title, activeCollection.titleAr, locale)
-    : t("shop.title");
+  const heading = activeCollection?.title ?? t("shop.title");
 
   const tags = useMemo(() => ["warm", "fresh", "bold"], []);
   const hasFilters = Boolean(search || tag || sort !== "featured");
-  const quickViewName = quickViewProduct
-    ? pickLocalized(quickViewProduct.name, quickViewProduct.nameAr, locale)
-    : "";
-  const quickViewDescription = quickViewProduct
-    ? pickLocalized(quickViewProduct.description, quickViewProduct.descriptionAr, locale)
-    : "";
+  const quickViewName = quickViewProduct?.name ?? "";
+  const quickViewDescription = quickViewProduct?.description ?? "";
   const quickViewPrice = quickViewProduct?.variants[0]?.price ?? 0;
   const quickViewStock = quickViewProduct?.variants[0]?.stock ?? 0;
   const quickViewImage = resolveResponsiveImageSource(quickViewProduct?.images?.[0]);

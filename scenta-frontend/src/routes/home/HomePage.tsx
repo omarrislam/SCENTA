@@ -4,22 +4,19 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { listCollections, listProducts } from "../../services/catalogService";
 import { resolveApiAssetUrl, resolveResponsiveImageSource } from "../../services/api";
-import { themeSections } from "../../services/mockData";
 import ProductCard from "../../components/product/ProductCard";
 import { useCart } from "../../storefront/cart/CartContext";
 import useMeta from "../../app/seo/useMeta";
 import { useToast } from "../../components/feedback/ToastContext";
 import { useTheme } from "../../theme/ThemeProvider";
 import Spinner from "../../components/feedback/Spinner";
-import { pickLocalized, resolveLocale } from "../../utils/localize";
 
 const HomePage = () => {
-  const { t, i18n } = useTranslation();
-  const locale = resolveLocale(i18n.language);
+  const { t } = useTranslation();
   useMeta("SCENTA | Signature Fragrance");
   const { addItem } = useCart();
   const { pushToast } = useToast();
-  const { theme, isLoading: isThemeLoading } = useTheme();
+  const { theme } = useTheme();
   const { data, isLoading } = useQuery({
     queryKey: ["products", "home"],
     queryFn: () => listProducts({ limit: 12 }),
@@ -33,7 +30,7 @@ const HomePage = () => {
   const products = useMemo(() => data?.items ?? [], [data?.items]);
   const bestSellers = useMemo(() => products.filter((item) => item.flags.bestSeller), [products]);
   const newArrivals = useMemo(() => products.filter((item) => item.flags.new), [products]);
-  const sections = theme?.homeSections?.length ? theme.homeSections : themeSections;
+  const sections = theme?.homeSections ?? [];
   const sectionSettings = theme?.home?.sectionSettings ?? {};
 
   const getSectionSetting = (id: string) => sectionSettings[id] ?? {};
@@ -235,7 +232,7 @@ const HomePage = () => {
     pushToast(t("cta.addedCart"), "success");
   };
 
-  if (isLoading || isThemeLoading) {
+  if (isLoading) {
     return <Spinner />;
   }
 
@@ -319,11 +316,11 @@ const HomePage = () => {
                       : undefined
                   }
                 >
-                  <div className="siwa-section-header">
+                  <div className="section-intro">
                     <div>
-                      <p className="siwa-eyebrow">Our best sellers</p>
+                      <p className="eyebrow">Our best sellers</p>
                       <h2 className="section-title">{bestSetting.title ?? "Our best sellers"}</h2>
-                      {bestSetting.subtitle && <p className="siwa-section-header__meta">{bestSetting.subtitle}</p>}
+                      {bestSetting.subtitle && <p className="section-intro__meta">{bestSetting.subtitle}</p>}
                     </div>
                     <Link className="button button--outline" to="/shop">
                       View collection
@@ -467,8 +464,7 @@ const HomePage = () => {
                         .map((item) => {
                           const collection = collections.find((entry) => entry.slug === item.slug);
                           if (!collection) return null;
-                          const title = pickLocalized(collection.title, collection.titleAr, locale);
-                          const resolvedTitle = item.title ?? title;
+                          const resolvedTitle = item.title ?? collection.title;
                           const cardImage = resolveCollectionCardImage(collection.slug, item.image ?? collection.image);
                           const cardImageSource = resolveResponsiveImageSource(cardImage);
                           return (
@@ -499,11 +495,11 @@ const HomePage = () => {
           if (section.id === "newin") {
             return (
               <section key={section.id} className="section-block section-block--support section-transition" data-reveal>
-                <div className="siwa-section-header">
+                <div className="section-intro">
                   <div>
-                    <p className="siwa-eyebrow">New in</p>
+                    <p className="eyebrow">New in</p>
                     <h2 className="section-title">New in</h2>
-                    <p className="siwa-section-header__meta">
+                    <p className="section-intro__meta">
                       Fresh arrivals curated for luminous layering.
                     </p>
                   </div>
@@ -534,11 +530,11 @@ const HomePage = () => {
           if (section.id === "offers") {
             return (
               <section key={section.id} className="section-block section-block--support section-transition" data-reveal>
-                <div className="siwa-offer">
+                <div className="offer-banner">
                   <div>
-                    <p className="siwa-eyebrow">Offers &amp; discounts</p>
+                    <p className="eyebrow">Offers &amp; discounts</p>
                     <h2 className="section-title">Our bundles</h2>
-                    <p className="siwa-section-header__meta">
+                    <p className="section-intro__meta">
                       Discover layered sets and limited drops curated for gifting and ritual.
                     </p>
                     <Link className="button button--primary" to="/shop">
@@ -546,12 +542,12 @@ const HomePage = () => {
                     </Link>
                   </div>
                   <div
-                    className="siwa-offer__media"
+                    className="offer-banner__media"
                     role="presentation"
                     aria-hidden="true"
                   >
                     <img
-                      className="siwa-offer__image"
+                      className="offer-banner__image"
                       src={offerImageSource?.src ?? offerImage}
                       srcSet={offerImageSource?.srcSet}
                       alt=""
@@ -567,21 +563,21 @@ const HomePage = () => {
           if (section.id === "signature") {
             return (
               <section key={section.id} className="section-block section-block--support section-transition" data-reveal>
-                <div className="siwa-section-header">
+                <div className="section-intro">
                   <div>
-                    <p className="siwa-eyebrow">Signature luxury</p>
+                    <p className="eyebrow">Signature luxury</p>
                     <h2 className="section-title">Signature luxury</h2>
                   </div>
-                  <p className="siwa-section-header__meta">
+                  <p className="section-intro__meta">
                     Uncover hidden gems crafted for a modern fragrance wardrobe.
                   </p>
                 </div>
-                <div className="siwa-feature-grid">
+                <div className="feature-grid">
                   {signatureFeatures.map((feature) => (
-                    <div key={feature.title} className="siwa-feature-card">
-                      <h3 className="siwa-feature-card__title">{feature.title}</h3>
+                    <div key={feature.title} className="feature-card">
+                      <h3 className="feature-card__title">{feature.title}</h3>
                       <p>{feature.body}</p>
-                      <Link className="siwa-feature-card__link" to={feature.link.to}>
+                      <Link className="feature-card__link" to={feature.link.to}>
                         {feature.link.label}
                       </Link>
                     </div>

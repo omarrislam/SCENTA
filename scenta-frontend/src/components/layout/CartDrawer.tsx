@@ -1,21 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useQuery } from "@tanstack/react-query";
 import { useCart } from "../../storefront/cart/CartContext";
-import { listPublicCoupons } from "../../services/couponService";
+import { getCoupon } from "../../services/couponService";
 import { resolveResponsiveImageSource } from "../../services/api";
-import { pickLocalized, resolveLocale } from "../../utils/localize";
+import { Coupon } from "../../services/types";
 import Button from "../ui/Button";
 
 const CartDrawer = () => {
-  const { t, i18n } = useTranslation();
-  const locale = resolveLocale(i18n.language);
+  const { t } = useTranslation();
   const location = useLocation();
-  const { data: coupons = [] } = useQuery({ queryKey: ["coupons"], queryFn: listPublicCoupons });
   const { items, total, isDrawerOpen, closeDrawer, updateQuantity, removeItem } = useCart();
   const [couponCode, setCouponCode] = useState("");
-  const [appliedCouponCode, setAppliedCouponCode] = useState<string | null>(null);
+  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
   const [couponError, setCouponError] = useState("");
 
   useEffect(() => {
@@ -36,34 +33,32 @@ const CartDrawer = () => {
   }, [isDrawerOpen, closeDrawer]);
 
   const discount = useMemo(() => {
-    if (!appliedCouponCode) return 0;
-    const match = coupons.find((coupon) => coupon.code.toUpperCase() === appliedCouponCode && coupon.status === "active");
-    if (!match) return 0;
-    if (match.type === "percent") {
-      return (total * match.value) / 100;
+    if (!appliedCoupon) return 0;
+    if (appliedCoupon.type === "percent") {
+      return (total * appliedCoupon.value) / 100;
     }
-    return Math.min(total, match.value);
-  }, [appliedCouponCode, coupons, total]);
+    return Math.min(total, appliedCoupon.value);
+  }, [appliedCoupon, total]);
 
-  const checkoutTarget = appliedCouponCode
-    ? `/checkout?coupon=${encodeURIComponent(appliedCouponCode)}`
+  const checkoutTarget = appliedCoupon
+    ? `/checkout?coupon=${encodeURIComponent(appliedCoupon.code)}`
     : "/checkout";
 
-  const applyCoupon = () => {
+  const applyCoupon = async () => {
     const normalized = couponCode.trim().toUpperCase();
     if (!normalized) {
-      setAppliedCouponCode(null);
+      setAppliedCoupon(null);
       setCouponError("");
       return;
     }
-    const match = coupons.find((coupon) => coupon.code.toUpperCase() === normalized && coupon.status === "active");
-    if (!match) {
-      setAppliedCouponCode(null);
+    const match = await getCoupon(normalized);
+    if (!match || match.status !== "active") {
+      setAppliedCoupon(null);
       setCouponError(t("checkout.couponInvalid"));
       return;
     }
     setCouponError("");
-    setAppliedCouponCode(normalized);
+    setAppliedCoupon(match);
   };
 
   return (
@@ -99,7 +94,7 @@ const CartDrawer = () => {
                       {imageSource?.src ? <img src={imageSource.src} srcSet={imageSource.srcSet} alt="" /> : null}
                     </div>
                     <div className="cart-drawer__item-body">
-                      <strong>{pickLocalized(item.product.name, item.product.nameAr, locale)}</strong>
+                      <strong>{item.product.name}</strong>
                       <span>{item.variant.size}</span>
                       <span>EGP {(item.variant.price * item.quantity).toLocaleString()}</span>
                       <div className="cart-drawer__qty">
@@ -129,7 +124,7 @@ const CartDrawer = () => {
                   value={couponCode}
                   onChange={(event) => setCouponCode(event.target.value)}
                 />
-                <Button type="button" onClick={applyCoupon}>
+                <Button type="button" onClick={() => void applyCoupon()}>
                   {t("checkout.applyCoupon")}
                 </Button>
               </div>

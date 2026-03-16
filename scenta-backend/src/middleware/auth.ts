@@ -1,4 +1,4 @@
-﻿import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { env } from "../config/env";
 import { ApiError } from "../utils/ApiError";
@@ -7,13 +7,22 @@ export interface AuthRequest extends Request {
   user?: { id: string; role: "customer" | "admin" };
 }
 
-export const requireAuth = (req: AuthRequest, _res: Response, next: NextFunction) => {
+const extractToken = (req: Request): string | null => {
+  // Prefer httpOnly cookie
+  const cookieToken = (req.cookies as Record<string, string> | undefined)?.["auth_token"];
+  if (cookieToken) return cookieToken;
+  // Fall back to Bearer header (for API clients / mobile)
   const header = req.headers.authorization;
-  if (!header?.startsWith("Bearer ")) {
+  if (header?.startsWith("Bearer ")) return header.replace("Bearer ", "");
+  return null;
+};
+
+export const requireAuth = (req: AuthRequest, _res: Response, next: NextFunction) => {
+  const token = extractToken(req);
+  if (!token) {
     return next(new ApiError(401, "UNAUTHORIZED", "Missing token"));
   }
   try {
-    const token = header.replace("Bearer ", "");
     const payload = jwt.verify(token, env.JWT_SECRET) as { id: string; role: "customer" | "admin" };
     req.user = payload;
     return next();

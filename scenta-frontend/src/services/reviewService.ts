@@ -1,8 +1,5 @@
 import { fetchApi } from "./api";
-import { listReviews as listMockReviews } from "./mockApi";
 import { Review } from "./types";
-
-const hasApi = Boolean(import.meta.env.VITE_API_BASE_URL);
 
 interface BackendReview {
   _id: string;
@@ -24,15 +21,8 @@ const mapReview = (review: BackendReview): Review => ({
 });
 
 export const listReviews = async (productId: string): Promise<Review[]> => {
-  if (!hasApi) {
-    return listMockReviews(productId);
-  }
-  try {
-    const reviews = await fetchApi<BackendReview[]>(`/products/${productId}/reviews`);
-    return reviews.map(mapReview);
-  } catch {
-    return listMockReviews(productId);
-  }
+  const reviews = await fetchApi<BackendReview[]>(`/products/${productId}/reviews`);
+  return reviews.map(mapReview);
 };
 
 export const createReview = async (

@@ -5,7 +5,7 @@ import { sendSuccess } from "../../utils/response";
 
 export const listAdminOrders = async (_req: Request, res: Response, next: NextFunction) => {
   try {
-    const orders = await Order.find();
+    const orders = await Order.find().sort({ createdAt: -1 }).lean();
     return sendSuccess(res, orders);
   } catch (error) {
     return next(error);
@@ -14,10 +14,8 @@ export const listAdminOrders = async (_req: Request, res: Response, next: NextFu
 
 export const getAdminOrder = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const order = await Order.findById(req.params.id);
-    if (!order) {
-      throw new ApiError(404, "NOT_FOUND", "Order not found");
-    }
+    const order = await Order.findById(req.params.id).lean();
+    if (!order) throw new ApiError(404, "NOT_FOUND", "Order not found");
     return sendSuccess(res, order);
   } catch (error) {
     return next(error);
@@ -26,7 +24,12 @@ export const getAdminOrder = async (req: Request, res: Response, next: NextFunct
 
 export const updateOrderStatus = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const order = await Order.findByIdAndUpdate(req.params.id, { status: req.body.status }, { new: true });
+    const order = await Order.findByIdAndUpdate(
+      req.params.id,
+      { status: req.body.status },
+      { new: true }
+    ).lean();
+    if (!order) throw new ApiError(404, "NOT_FOUND", "Order not found");
     return sendSuccess(res, order);
   } catch (error) {
     return next(error);

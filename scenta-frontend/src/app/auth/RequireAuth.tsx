@@ -1,14 +1,15 @@
-﻿import { PropsWithChildren } from "react";
+import { PropsWithChildren } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 
 const RequireAuth = ({ children }: PropsWithChildren) => {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
   const location = useLocation();
-  const hasApi = Boolean(import.meta.env.VITE_API_BASE_URL);
-  const token = localStorage.getItem("scenta-token");
 
-  if (!user || (hasApi && !token)) {
+  // While the session cookie is being validated, don't redirect yet
+  if (isLoading) return null;
+
+  if (!user) {
     return <Navigate to="/auth/login" state={{ from: `${location.pathname}${location.search}` }} replace />;
   }
 

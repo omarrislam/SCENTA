@@ -10,7 +10,7 @@ import Select from "../../components/ui/Select";
 import { useCart } from "../../storefront/cart/CartContext";
 import { useToast } from "../../components/feedback/ToastContext";
 import PaymentOptions from "../../storefront/payments/PaymentOptions";
-import { listPublicCoupons } from "../../services/couponService";
+import { getCoupon } from "../../services/couponService";
 import { Coupon } from "../../services/types";
 import {
   CheckoutItemPayload,
@@ -19,7 +19,6 @@ import {
   validateCheckout,
   ShippingAddressPayload
 } from "../../services/orderService";
-import { pickLocalized, resolveLocale } from "../../utils/localize";
 import { getProduct } from "../../services/catalogService";
 
 const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY as string | undefined;
@@ -80,8 +79,7 @@ const StripePaymentForm = ({
 };
 
 const CheckoutPage = () => {
-  const { t, i18n } = useTranslation();
-  const locale = resolveLocale(i18n.language);
+  const { t } = useTranslation();
   const { items, total, clearCart } = useCart();
   const { pushToast } = useToast();
   const navigate = useNavigate();
@@ -107,7 +105,6 @@ const CheckoutPage = () => {
 
   const hasApi = Boolean(import.meta.env.VITE_API_BASE_URL);
   const canUseStripe = hasApi && Boolean(stripePromise);
-  const { data: coupons = [] } = useQuery({ queryKey: ["coupons"], queryFn: listPublicCoupons });
   const couponFromQuery = searchParams.get("coupon")?.trim().toUpperCase() ?? "";
 
   const stepLabels = [
@@ -140,11 +137,11 @@ const CheckoutPage = () => {
   };
   const back = () => setStep((prev) => Math.max(prev - 1, 0));
 
-  const applyCoupon = () => {
+  const applyCoupon = async () => {
     const code = couponCode.trim().toUpperCase();
     if (!code) return;
-    const match = coupons.find((coupon) => coupon.code.toUpperCase() === code && coupon.status === "active");
-    if (!match) {
+    const match = await getCoupon(code);
+    if (!match || match.status !== "active") {
       setCouponError(t("checkout.couponInvalid"));
       setAppliedCoupon(null);
       return;
@@ -155,17 +152,18 @@ const CheckoutPage = () => {
   };
 
   useEffect(() => {
-    if (!couponFromQuery || !coupons.length) return;
-    if (appliedCoupon?.code?.toUpperCase() === couponFromQuery) return;
-    const match = coupons.find((coupon) => coupon.code.toUpperCase() === couponFromQuery && coupon.status === "active");
-    if (!match) {
-      setCouponError(t("checkout.couponInvalid"));
-      return;
-    }
-    setCouponError("");
-    setCouponCode(match.code);
-    setAppliedCoupon(match);
-  }, [appliedCoupon?.code, couponFromQuery, coupons, t]);
+    if (!couponFromQuery || appliedCoupon?.code?.toUpperCase() === couponFromQuery) return;
+    void getCoupon(couponFromQuery).then((match) => {
+      if (!match || match.status !== "active") {
+        setCouponError(t("checkout.couponInvalid"));
+        return;
+      }
+      setCouponError("");
+      setCouponCode(match.code);
+      setAppliedCoupon(match);
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [couponFromQuery]);
 
   const payloadItems = useMemo<CheckoutItemPayload[]>(
     () =>
@@ -443,7 +441,7 @@ const CheckoutPage = () => {
                       {items.map((item) => (
                         <div key={item.id} className="receipt-row">
                           <span>
-                            {pickLocalized(item.product.name, item.product.nameAr, locale)} - {item.variant.size} x {item.quantity}
+                            {item.product.name} - {item.variant.size} x {item.quantity}
                           </span>
                           <span>EGP {(item.variant.price * item.quantity).toLocaleString()}</span>
                         </div>
@@ -458,7 +456,7 @@ const CheckoutPage = () => {
                           value={couponCode}
                           onChange={(event) => setCouponCode(event.target.value)}
                         />
-                        <Button type="button" onClick={applyCoupon}>
+                        <Button type="button" onClick={() => void applyCoupon()}>
                           {t("checkout.applyCoupon")}
                         </Button>
                       </div>

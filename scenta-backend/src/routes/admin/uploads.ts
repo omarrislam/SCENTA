@@ -5,32 +5,37 @@ import multer from "multer";
 import { uploadAdminImage } from "../../controllers/admin/uploadController";
 import { requireAuth, requireRole } from "../../middleware/auth";
 import { auditLog } from "../../middleware/auditLog";
+import { env } from "../../config/env";
 
 const router = Router();
-const isVercelRuntime = Boolean(process.env.VERCEL);
-const uploadDir = isVercelRuntime ? path.join("/tmp", "uploads") : path.join(process.cwd(), "uploads");
 
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => {
-    try {
-      if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir, { recursive: true });
-      }
-      cb(null, uploadDir);
-    } catch (error) {
-      cb(error as Error, uploadDir);
-    }
-  },
-  filename: (_req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    const safeExt = ext && ext.length <= 10 ? ext : "";
-    const name = `${Date.now()}-${Math.round(Math.random() * 1e9)}${safeExt}`;
-    cb(null, name);
+const buildStorage = () => {
+  if (env.UPLOAD_PROVIDER === "cloudinary") {
+    return multer.memoryStorage();
   }
-});
+  const isVercel = Boolean(process.env.VERCEL);
+  const uploadDir = isVercel ? path.join("/tmp", "uploads") : path.join(process.cwd(), "uploads");
+  return multer.diskStorage({
+    destination: (_req, _file, cb) => {
+      try {
+        if (!fs.existsSync(uploadDir)) {
+          fs.mkdirSync(uploadDir, { recursive: true });
+        }
+        cb(null, uploadDir);
+      } catch (error) {
+        cb(error as Error, uploadDir);
+      }
+    },
+    filename: (_req, file, cb) => {
+      const ext = path.extname(file.originalname);
+      const safeExt = ext && ext.length <= 10 ? ext : "";
+      cb(null, `${Date.now()}-${Math.round(Math.random() * 1e9)}${safeExt}`);
+    }
+  });
+};
 
 const upload = multer({
-  storage,
+  storage: buildStorage(),
   limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     cb(null, file.mimetype.startsWith("image/"));

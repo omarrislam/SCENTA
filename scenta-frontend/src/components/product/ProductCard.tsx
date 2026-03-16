@@ -2,10 +2,9 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Product } from "../../services/types";
 import { resolveResponsiveImageSource } from "../../services/api";
-import { pickLocalized, pickLocalizedArray, resolveLocale } from "../../utils/localize";
 import Button from "../ui/Button";
 import Badge from "../ui/Badge";
-import NoteBadges from "./NoteBadges";
+import NoteBadges from "../../domain/fragrance/NoteBadges";
 import StockIndicator from "./StockIndicator";
 import { useTheme } from "../../theme/ThemeProvider";
 
@@ -17,14 +16,13 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product, onQuickAdd, onQuickView, showStockIndicator = false }: ProductCardProps) => {
-  const { t, i18n } = useTranslation();
-  const locale = resolveLocale(i18n.language);
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const price = product.variants[0]?.price ?? 0;
   const stock = product.variants[0]?.stock ?? 0;
   const imageSource = resolveResponsiveImageSource(product.images?.[0]);
-  const name = pickLocalized(product.name, product.nameAr, locale);
-  const notes = pickLocalizedArray(product.notes, product.notesAr, locale);
+  const name = product.name;
+  const notes = product.notes;
   const badgeSettings = theme.home?.badges;
   const badgeStyle = badgeSettings
     ? { background: badgeSettings.backgroundColor, color: badgeSettings.textColor }

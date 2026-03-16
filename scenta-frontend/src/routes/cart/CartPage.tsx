@@ -3,12 +3,10 @@ import { useTranslation } from "react-i18next";
 import { useCart } from "../../storefront/cart/CartContext";
 import Button from "../../components/ui/Button";
 import { resolveResponsiveImageSource } from "../../services/api";
-import { pickLocalized, resolveLocale } from "../../utils/localize";
 import StockIndicator from "../../components/product/StockIndicator";
 
 const CartPage = () => {
-  const { t, i18n } = useTranslation();
-  const locale = resolveLocale(i18n.language);
+  const { t } = useTranslation();
   const { items, total, updateQuantity, removeItem } = useCart();
 
   return (
@@ -49,7 +47,7 @@ const CartPage = () => {
                 )}
               </div>
               <div className="cart-item__body">
-                <strong>{pickLocalized(item.product.name, item.product.nameAr, locale)}</strong>
+                <strong>{item.product.name}</strong>
                 <p>{item.variant.size}</p>
                 <StockIndicator stock={item.variant.stock ?? 0} />
                 {item.quantity > item.variant.stock && (

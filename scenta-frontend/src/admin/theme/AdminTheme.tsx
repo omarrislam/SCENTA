@@ -2,7 +2,15 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { getTheme, updateTheme, uploadImage, ThemeConfig } from "../../services/backendApi";
-import { themeSections } from "../../services/mockData";
+const defaultSections: ThemeSection[] = [
+  { id: "hero", label: "Hero Banner", isVisible: true },
+  { id: "promo", label: "Promo Bar", isVisible: true },
+  { id: "featured", label: "Featured Products", isVisible: true },
+  { id: "collections", label: "Collections", isVisible: true },
+  { id: "bestsellers", label: "Best Sellers", isVisible: true },
+  { id: "quiz", label: "Scent Quiz", isVisible: true },
+  { id: "shipping", label: "Shipping Info", isVisible: true }
+];
 import { listCollections } from "../../services/catalogService";
 import Button from "../../components/ui/Button";
 import { ThemeSection } from "../../services/types";
@@ -162,7 +170,7 @@ const AdminTheme = () => {
     if (data?.homeSections?.length) {
       setSections(data.homeSections);
     } else {
-      setSections(themeSections);
+      setSections(defaultSections);
     }
     if (data?.mode) {
       setMode(data.mode);

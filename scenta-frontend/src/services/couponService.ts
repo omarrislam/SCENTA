@@ -1,16 +1,10 @@
 import { fetchApi } from "./api";
-import { listCoupons as listMockCoupons } from "./mockApi";
 import { Coupon } from "./types";
 
-const hasApi = Boolean(import.meta.env.VITE_API_BASE_URL);
-
-export const listPublicCoupons = async (): Promise<Coupon[]> => {
-  if (!hasApi) {
-    return listMockCoupons();
-  }
+export const getCoupon = async (code: string): Promise<Coupon | null> => {
   try {
-    return await fetchApi<Coupon[]>("/coupons");
+    return await fetchApi<Coupon>(`/coupons/${code}`);
   } catch {
-    return listMockCoupons();
+    return null;
   }
 };

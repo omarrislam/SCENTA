@@ -41,4 +41,3 @@ const NoteBadges = ({ notes, labels }: { notes: string[]; labels?: string[] }) =
 };
 
 export default NoteBadges;
-

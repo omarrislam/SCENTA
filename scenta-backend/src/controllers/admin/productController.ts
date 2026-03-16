@@ -1,11 +1,11 @@
-﻿import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from "express";
 import { Product } from "../../models/Product";
 import { ApiError } from "../../utils/ApiError";
 import { sendSuccess } from "../../utils/response";
 
 export const listAdminProducts = async (_req: Request, res: Response, next: NextFunction) => {
   try {
-    const products = await Product.find();
+    const products = await Product.find({ deletedAt: null }).lean();
     return sendSuccess(res, products);
   } catch (error) {
     return next(error);
@@ -14,10 +14,8 @@ export const listAdminProducts = async (_req: Request, res: Response, next: Next
 
 export const getAdminProduct = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const product = await Product.findById(req.params.id);
-    if (!product) {
-      throw new ApiError(404, "NOT_FOUND", "Product not found");
-    }
+    const product = await Product.findOne({ _id: req.params.id, deletedAt: null }).lean();
+    if (!product) throw new ApiError(404, "NOT_FOUND", "Product not found");
     return sendSuccess(res, product);
   } catch (error) {
     return next(error);
@@ -35,7 +33,12 @@ export const createAdminProduct = async (req: Request, res: Response, next: Next
 
 export const updateAdminProduct = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const product = await Product.findOneAndUpdate(
+      { _id: req.params.id, deletedAt: null },
+      req.body,
+      { new: true }
+    ).lean();
+    if (!product) throw new ApiError(404, "NOT_FOUND", "Product not found");
     return sendSuccess(res, product);
   } catch (error) {
     return next(error);
@@ -44,8 +47,13 @@ export const updateAdminProduct = async (req: Request, res: Response, next: Next
 
 export const deleteAdminProduct = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    await Product.findByIdAndDelete(req.params.id);
-    return sendSuccess(res, { status: "deleted" }, 204);
+    const result = await Product.findOneAndUpdate(
+      { _id: req.params.id, deletedAt: null },
+      { deletedAt: new Date() },
+      { new: true }
+    );
+    if (!result) throw new ApiError(404, "NOT_FOUND", "Product not found");
+    return sendSuccess(res, { status: "deleted" });
   } catch (error) {
     return next(error);
   }

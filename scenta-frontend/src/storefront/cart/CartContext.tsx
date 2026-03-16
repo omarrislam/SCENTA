@@ -24,7 +24,6 @@ interface CartState {
 const CartContext = createContext<CartState | undefined>(undefined);
 
 const STORAGE_KEY = "scenta-cart";
-const hasApi = Boolean(import.meta.env.VITE_API_BASE_URL);
 
 const isMongoId = (value: string) => /^[a-f0-9]{24}$/i.test(value);
 
@@ -58,7 +57,7 @@ export const CartProvider = ({ children }: PropsWithChildren) => {
   );
 
   useEffect(() => {
-    if (!hasApi || items.length === 0) return;
+    if (items.length === 0) return;
     if (cartSignature === lastRequestedSignature.current) return;
     let isActive = true;
     lastRequestedSignature.current = cartSignature;

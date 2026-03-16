@@ -15,6 +15,7 @@ export default defineConfig({
         manualChunks: {
           react: ["react", "react-dom", "react-router-dom"],
           query: ["@tanstack/react-query"],
+          i18n: ["i18next", "react-i18next"],
           stripe: ["@stripe/react-stripe-js", "@stripe/stripe-js"]
         }
       }

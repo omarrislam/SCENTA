@@ -1,6 +1,7 @@
 import express from "express";
 import path from "path";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import compression from "compression";
 import { env } from "./config/env";
@@ -51,13 +52,15 @@ export const createApp = () => {
         return;
       }
       cb(new Error("Origin not allowed by CORS"));
-    }
+    },
+    credentials: true
   };
 
   app.disable("x-powered-by");
   app.set("trust proxy", env.NODE_ENV === "production" ? 1 : 0);
   app.use(requestId);
   app.use(cors(corsOptions));
+  app.use(cookieParser(env.COOKIE_SECRET));
   app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
   app.use(compression());
   app.use("/api/payments/stripe/webhook", express.raw({ type: "application/json" }));
@@ -90,16 +93,18 @@ export const createApp = () => {
   app.use("/api/admin/reports", adminReportsRoutes);
   app.use("/api/admin/uploads", adminUploadRoutes);
 
-  app.use(
-    "/uploads",
-    express.static(uploadStaticDir, {
-      maxAge: "30d",
-      immutable: true,
-      setHeaders: (res) => {
-        res.setHeader("Cache-Control", "public, max-age=2592000, immutable");
-      }
-    })
-  );
+  if (env.UPLOAD_PROVIDER === "disk") {
+    app.use(
+      "/uploads",
+      express.static(uploadStaticDir, {
+        maxAge: "30d",
+        immutable: true,
+        setHeaders: (res) => {
+          res.setHeader("Cache-Control", "public, max-age=2592000, immutable");
+        }
+      })
+    );
+  }
 
   app.use(errorHandler);
 

@@ -1,12 +1,10 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useWishlist } from "../../storefront/wishlist/WishlistContext";
-import { pickLocalized, resolveLocale } from "../../utils/localize";
 import StockIndicator from "../../components/product/StockIndicator";
 
 const WishlistPage = () => {
-  const { t, i18n } = useTranslation();
-  const locale = resolveLocale(i18n.language);
+  const { t } = useTranslation();
   const { items } = useWishlist();
 
   return (
@@ -30,7 +28,7 @@ const WishlistPage = () => {
         <div className="grid">
           {items.map((item) => (
             <div key={`${item.product.id}-${item.variantKey ?? "default"}`} className="card">
-              <strong>{pickLocalized(item.product.name, item.product.nameAr, locale)}</strong>
+              <strong>{item.product.name}</strong>
               <StockIndicator stock={item.product.variants?.[0]?.stock ?? 0} />
             </div>
           ))}

@@ -18,4 +18,7 @@ const UserSchema = new Schema(
   { timestamps: true }
 );
 
+// Automatically remove expired reset tokens (background index, not TTL on document)
+UserSchema.index({ resetPasswordExpires: 1 }, { expireAfterSeconds: 0, sparse: true });
+
 export const User = mongoose.model("User", UserSchema);
