@@ -1255,8 +1255,8 @@ main {
 
   .nav-toggle {
     display: inline-flex;
-    width: 42px;
-    height: 42px;
+    width: 44px;
+    height: 44px;
     justify-content: center;
     padding: 0;
     justify-self: start;
@@ -1735,8 +1735,11 @@ main {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid rgba(17, 17, 17, 0.2);
   background: rgba(255, 255, 255, 0.85);
   cursor: pointer;
@@ -1772,7 +1775,7 @@ main {
 .product-gallery__thumb {
   width: 48px;
   height: 48px;
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   border: 1px solid rgba(27, 27, 27, 0.15);
   background: #ffffff;
   padding: 4px;
@@ -2462,7 +2465,7 @@ main {
 
   .shop-layout .product-card__actions .button {
     justify-content: center;
-    min-height: 34px;
+    min-height: 44px;
     font-size: 0.58rem;
     letter-spacing: 0.1em;
     padding: 6px 8px;
@@ -2488,6 +2491,10 @@ main {
 }
 
 @media (max-width: 600px) {
+  main {
+    padding-inline: 16px;
+  }
+
   .section-block {
     padding: 48px 0;
   }
@@ -2693,6 +2700,31 @@ main {
   .pagination-controls .button {
     min-width: 72px;
     justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .product-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .hero--slider,
+  .hero__media {
+    min-height: 360px;
+    height: 360px;
+  }
+
+  .checkout-progress {
+    grid-template-columns: 1fr;
+  }
+
+  .section-block {
+    padding: 36px 0;
+  }
+
+  .product-gallery__main {
+    height: 260px;
   }
 }
 
@@ -3630,8 +3662,11 @@ textarea {
   position: absolute;
   top: 12px;
   right: 12px;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid rgba(17, 17, 17, 0.18);
   background: rgba(255, 255, 255, 0.92);
   cursor: pointer;
