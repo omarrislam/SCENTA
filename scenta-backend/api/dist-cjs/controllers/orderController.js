@@ -13,6 +13,52 @@ const ApiError_1 = require("../utils/ApiError");
 const Product_1 = require("../models/Product");
 const Order_1 = require("../models/Order");
 const emailService_1 = require("../services/emailService");
+const buildOrderItems = async (items, session) => {
+    const orderItems = [];
+    for (const item of items) {
+        const product = mongoose_1.default.Types.ObjectId.isValid(item.productId ?? "")
+            ? await Product_1.Product.findOne({ _id: item.productId, deletedAt: null }).session(session)
+            : await Product_1.Product.findOne({ slug: item.productSlug, deletedAt: null }).session(session);
+        if (!product) {
+            throw new ApiError_1.ApiError(404, "PRODUCT_NOT_FOUND", "Product not found", {
+                productId: item.productId,
+                productSlug: item.productSlug
+            });
+        }
+        const variant = product.variants.find((v) => v.key === item.variantKey);
+        if (!variant) {
+            throw new ApiError_1.ApiError(404, "VARIANT_NOT_FOUND", "Variant not found");
+        }
+        orderItems.push({
+            productId: product.id,
+            productTitleSnapshot: product.title,
+            productSlugSnapshot: product.slug,
+            variantKey: item.variantKey,
+            sizeMl: variant.sizeMl ?? 0,
+            unitPrice: variant.price ?? 0,
+            qty: item.qty,
+            imageSnapshot: product.images[0]?.url ?? undefined
+        });
+    }
+    return orderItems;
+};
+const decrementStock = async (orderItems, rawItems, session) => {
+    for (let i = 0; i < orderItems.length; i++) {
+        const orderItem = orderItems[i];
+        const rawItem = rawItems[i];
+        const updateResult = await Product_1.Product.updateOne({
+            _id: orderItem.productId,
+            "variants.key": rawItem.variantKey,
+            "variants.stock": { $gte: rawItem.qty }
+        }, { $inc: { "variants.$.stock": -rawItem.qty } }, { session });
+        if (!updateResult.modifiedCount) {
+            throw new ApiError_1.ApiError(409, "OUT_OF_STOCK", "Insufficient stock", {
+                productId: orderItem.productId,
+                variantKey: rawItem.variantKey
+            });
+        }
+    }
+};
 const validateCheckoutHandler = async (req, res, next) => {
     try {
         const { items, couponCode } = req.body;
@@ -25,52 +71,15 @@ const validateCheckoutHandler = async (req, res, next) => {
 };
 exports.validateCheckoutHandler = validateCheckoutHandler;
 const createCodOrder = async (req, res, next) => {
+    if (!req.user)
+        return next(new ApiError_1.ApiError(401, "UNAUTHORIZED", "Missing token"));
+    const session = await mongoose_1.default.startSession();
     try {
-        if (!req.user) {
-            throw new ApiError_1.ApiError(401, "UNAUTHORIZED", "Missing token");
-        }
+        session.startTransaction();
         const { items, shippingAddress, couponCode } = req.body;
         const totals = await (0, checkoutService_1.validateCheckout)(items, couponCode);
-        const orderItems = [];
-        for (const item of items) {
-            const productId = item.productId;
-            const product = mongoose_1.default.Types.ObjectId.isValid(productId)
-                ? await Product_1.Product.findById(productId)
-                : await Product_1.Product.findOne({ slug: item.productSlug });
-            if (!product) {
-                throw new ApiError_1.ApiError(404, "PRODUCT_NOT_FOUND", "Product not found", {
-                    productId: item.productId,
-                    productSlug: item.productSlug
-                });
-            }
-            const variant = product.variants.find((v) => v.key === item.variantKey);
-            if (!variant) {
-                throw new ApiError_1.ApiError(404, "VARIANT_NOT_FOUND", "Variant not found");
-            }
-            orderItems.push({
-                productId: product.id,
-                productTitleSnapshot: product.title,
-                productSlugSnapshot: product.slug,
-                variantKey: item.variantKey,
-                sizeMl: variant.sizeMl ?? 0,
-                unitPrice: variant.price ?? 0,
-                qty: item.qty,
-                imageSnapshot: product.images[0]?.url ?? undefined
-            });
-            const updateResult = await Product_1.Product.updateOne({
-                _id: product.id,
-                "variants.key": item.variantKey,
-                "variants.stock": { $gte: item.qty }
-            }, {
-                $inc: { "variants.$.stock": -item.qty }
-            });
-            if (!updateResult.modifiedCount) {
-                throw new ApiError_1.ApiError(409, "OUT_OF_STOCK", "Insufficient stock", {
-                    productId: product.id,
-                    variantKey: item.variantKey
-                });
-            }
-        }
+        const orderItems = await buildOrderItems(items, session);
+        await decrementStock(orderItems, items, session);
         const order = await (0, orderService_1.createOrder)({
             userId: req.user.id,
             items: orderItems,
@@ -83,7 +92,8 @@ const createCodOrder = async (req, res, next) => {
                 grandTotal: totals.grandTotal
             },
             coupon: totals.coupon
-        });
+        }, "placed", session);
+        await session.commitTransaction();
         try {
             await (0, emailService_1.sendEmail)({
                 to: req.body.email ?? "customer@example.com",
@@ -91,51 +101,30 @@ const createCodOrder = async (req, res, next) => {
                 text: "Thanks for your order. We are preparing your shipment."
             });
         }
-        catch (error) {
+        catch (emailError) {
             // eslint-disable-next-line no-console
-            console.error("Order confirmation email failed", error);
+            console.error("Order confirmation email failed", emailError);
         }
         return (0, response_1.sendSuccess)(res, order, 201);
     }
     catch (error) {
+        await session.abortTransaction();
         return next(error);
+    }
+    finally {
+        await session.endSession();
     }
 };
 exports.createCodOrder = createCodOrder;
 const createStripeIntent = async (req, res, next) => {
+    if (!req.user)
+        return next(new ApiError_1.ApiError(401, "UNAUTHORIZED", "Missing token"));
+    const session = await mongoose_1.default.startSession();
     try {
-        if (!req.user) {
-            throw new ApiError_1.ApiError(401, "UNAUTHORIZED", "Missing token");
-        }
+        session.startTransaction();
         const { items, shippingAddress, couponCode } = req.body;
         const totals = await (0, checkoutService_1.validateCheckout)(items, couponCode);
-        const orderItems = [];
-        for (const item of items) {
-            const productId = item.productId;
-            const product = mongoose_1.default.Types.ObjectId.isValid(productId)
-                ? await Product_1.Product.findById(productId)
-                : await Product_1.Product.findOne({ slug: item.productSlug });
-            if (!product) {
-                throw new ApiError_1.ApiError(404, "PRODUCT_NOT_FOUND", "Product not found", {
-                    productId: item.productId,
-                    productSlug: item.productSlug
-                });
-            }
-            const variant = product.variants.find((v) => v.key === item.variantKey);
-            if (!variant) {
-                throw new ApiError_1.ApiError(404, "VARIANT_NOT_FOUND", "Variant not found");
-            }
-            orderItems.push({
-                productId: product.id,
-                productTitleSnapshot: product.title,
-                productSlugSnapshot: product.slug,
-                variantKey: item.variantKey,
-                sizeMl: variant.sizeMl ?? 0,
-                unitPrice: variant.price ?? 0,
-                qty: item.qty,
-                imageSnapshot: product.images[0]?.url ?? undefined
-            });
-        }
+        const orderItems = await buildOrderItems(items, session);
         const intent = await (0, paymentService_1.createPaymentIntent)(totals.grandTotal * 100, {
             userId: req.user.id,
             orderSource: "scenta"
@@ -156,20 +145,24 @@ const createStripeIntent = async (req, res, next) => {
                 grandTotal: totals.grandTotal
             },
             coupon: totals.coupon
-        }, "pending");
+        }, "pending", session);
+        await session.commitTransaction();
         return (0, response_1.sendSuccess)(res, { clientSecret: intent.client_secret, orderId: order.id });
     }
     catch (error) {
+        await session.abortTransaction();
         return next(error);
+    }
+    finally {
+        await session.endSession();
     }
 };
 exports.createStripeIntent = createStripeIntent;
 const listMyOrders = async (req, res, next) => {
     try {
-        if (!req.user) {
-            throw new ApiError_1.ApiError(401, "UNAUTHORIZED", "Missing token");
-        }
-        const orders = await Order_1.Order.find({ userId: req.user.id });
+        if (!req.user)
+            return next(new ApiError_1.ApiError(401, "UNAUTHORIZED", "Missing token"));
+        const orders = await Order_1.Order.find({ userId: req.user.id }).sort({ createdAt: -1 }).lean();
         return (0, response_1.sendSuccess)(res, orders);
     }
     catch (error) {
@@ -179,13 +172,11 @@ const listMyOrders = async (req, res, next) => {
 exports.listMyOrders = listMyOrders;
 const getMyOrder = async (req, res, next) => {
     try {
-        if (!req.user) {
-            throw new ApiError_1.ApiError(401, "UNAUTHORIZED", "Missing token");
-        }
-        const order = await Order_1.Order.findOne({ userId: req.user.id, _id: req.params.orderId });
-        if (!order) {
+        if (!req.user)
+            return next(new ApiError_1.ApiError(401, "UNAUTHORIZED", "Missing token"));
+        const order = await Order_1.Order.findOne({ userId: req.user.id, _id: req.params.orderId }).lean();
+        if (!order)
             throw new ApiError_1.ApiError(404, "NOT_FOUND", "Order not found");
-        }
         return (0, response_1.sendSuccess)(res, order);
     }
     catch (error) {
@@ -210,9 +201,9 @@ const stripeWebhook = async (req, res, next) => {
                     text: "Your payment was confirmed and your order is processing."
                 });
             }
-            catch (error) {
+            catch (emailError) {
                 // eslint-disable-next-line no-console
-                console.error("Stripe confirmation email failed", error);
+                console.error("Stripe confirmation email failed", emailError);
             }
         }
         return (0, response_1.sendSuccess)(res, { status: "received" });

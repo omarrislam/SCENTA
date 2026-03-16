@@ -7,13 +7,23 @@ exports.requireRole = exports.requireAuth = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const env_1 = require("../config/env");
 const ApiError_1 = require("../utils/ApiError");
-const requireAuth = (req, _res, next) => {
+const extractToken = (req) => {
+    // Prefer httpOnly cookie
+    const cookieToken = req.cookies?.["auth_token"];
+    if (cookieToken)
+        return cookieToken;
+    // Fall back to Bearer header (for API clients / mobile)
     const header = req.headers.authorization;
-    if (!header?.startsWith("Bearer ")) {
+    if (header?.startsWith("Bearer "))
+        return header.replace("Bearer ", "");
+    return null;
+};
+const requireAuth = (req, _res, next) => {
+    const token = extractToken(req);
+    if (!token) {
         return next(new ApiError_1.ApiError(401, "UNAUTHORIZED", "Missing token"));
     }
     try {
-        const token = header.replace("Bearer ", "");
         const payload = jsonwebtoken_1.default.verify(token, env_1.env.JWT_SECRET);
         req.user = payload;
         return next();

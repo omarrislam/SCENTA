@@ -35,10 +35,68 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ThemeConfig = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
+const HomeSectionSchema = new mongoose_1.Schema({
+    id: { type: String, required: true },
+    label: String,
+    isVisible: { type: Boolean, default: true },
+    settings: {
+        title: String,
+        subtitle: String,
+        ctaLabel: String,
+        ctaLink: String,
+        backgroundImage: String,
+        layout: { type: String, enum: ["grid", "carousel"] },
+        maxItems: Number
+    }
+}, { _id: false });
+const HeroSlideSchema = new mongoose_1.Schema({
+    title: String,
+    subtitle: String,
+    image: String,
+    primaryLabel: String,
+    primaryLink: String,
+    secondaryLabel: String,
+    secondaryLink: String
+}, { _id: false });
+const ShippingItemSchema = new mongoose_1.Schema({
+    title: String,
+    body: String,
+    icon: { type: String, enum: ["truck", "cash", "gift"] },
+    enabled: { type: Boolean, default: true }
+}, { _id: false });
+const HomeConfigSchema = new mongoose_1.Schema({
+    heroHeight: Number,
+    heroAlignment: { type: String, enum: ["left", "center", "right"] },
+    heroOverlayStrength: Number,
+    heroAutoplayMs: Number,
+    heroPauseOnHover: Boolean,
+    promoEnabled: Boolean,
+    promoMessages: [String],
+    promoShowIcon: Boolean,
+    promoSpeedSeconds: Number,
+    heroSlides: [HeroSlideSchema],
+    shippingItems: [ShippingItemSchema],
+    collectionItems: [
+        new mongoose_1.Schema({
+            slug: String,
+            title: String,
+            description: String,
+            image: String,
+            enabled: { type: Boolean, default: true }
+        }, { _id: false })
+    ],
+    badges: {
+        bestLabel: String,
+        newLabel: String,
+        textColor: String,
+        backgroundColor: String,
+        position: { type: String, enum: ["top-left", "top-right"] }
+    }
+}, { _id: false });
 const ThemeConfigSchema = new mongoose_1.Schema({
     locale: { type: String, enum: ["ar", "en"], required: true },
-    home: mongoose_1.Schema.Types.Mixed,
-    homeSections: [mongoose_1.Schema.Types.Mixed],
+    home: { type: HomeConfigSchema, default: undefined },
+    homeSections: { type: [HomeSectionSchema], default: [] },
     mode: { type: String, enum: ["light", "dark"], default: "light" },
     colors: {
         bgStart: String,
@@ -56,8 +114,6 @@ const ThemeConfigSchema = new mongoose_1.Schema({
         md: Number,
         lg: Number
     }
-}, {
-    timestamps: true,
-    strict: false
-});
+}, { timestamps: true });
+ThemeConfigSchema.index({ locale: 1 }, { unique: true });
 exports.ThemeConfig = mongoose_1.default.model("ThemeConfig", ThemeConfigSchema);

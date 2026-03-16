@@ -5,13 +5,16 @@ const crypto_1 = require("crypto");
 const Order_1 = require("../models/Order");
 const Product_1 = require("../models/Product");
 const ApiError_1 = require("../utils/ApiError");
-const createOrder = async (input, statusOverride) => {
+const createOrder = async (input, statusOverride, session) => {
     const orderSuffix = (0, crypto_1.randomUUID)().replace(/-/g, "").slice(0, 6).toUpperCase();
-    return Order_1.Order.create({
-        ...input,
-        orderNumber: `SCN-${orderSuffix}`,
-        status: statusOverride ?? (input.payment.method === "cod" ? "placed" : "pending")
-    });
+    const [order] = await Order_1.Order.create([
+        {
+            ...input,
+            orderNumber: `SCN-${orderSuffix}`,
+            status: statusOverride ?? (input.payment.method === "cod" ? "placed" : "pending")
+        }
+    ], session ? { session } : undefined);
+    return order;
 };
 exports.createOrder = createOrder;
 const finalizeStripeOrder = async (paymentIntentId) => {
@@ -22,6 +25,7 @@ const finalizeStripeOrder = async (paymentIntentId) => {
     if (order.status === "paid") {
         return order;
     }
+    // Decrement stock on confirmed Stripe payment
     for (const item of order.items) {
         const qty = Math.max(0, item.qty ?? 0);
         if (!qty)
@@ -30,13 +34,12 @@ const finalizeStripeOrder = async (paymentIntentId) => {
             _id: item.productId,
             "variants.key": item.variantKey,
             "variants.stock": { $gte: qty }
-        }, {
-            $inc: { "variants.$.stock": -qty }
-        });
+        }, { $inc: { "variants.$.stock": -qty } });
     }
     order.status = "paid";
-    order.payment = order.payment ?? { method: "stripe" };
-    order.payment.stripeStatus = "succeeded";
+    if (order.payment) {
+        order.payment.stripeStatus = "succeeded";
+    }
     await order.save();
     return order;
 };

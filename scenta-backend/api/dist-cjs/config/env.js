@@ -12,12 +12,19 @@ const envSchema = zod_1.z.object({
     PORT: zod_1.z.string().default("4000"),
     MONGO_URI: zod_1.z.string().min(1),
     JWT_SECRET: zod_1.z.string().min(1),
-    JWT_EXPIRES_IN: zod_1.z.string().default("7d"),
+    JWT_EXPIRES_IN: zod_1.z.string().default("15m"),
+    COOKIE_SECRET: zod_1.z.string().min(1).default("cookie_secret_change_me"),
+    COOKIE_DOMAIN: zod_1.z.string().optional(),
     STRIPE_SECRET_KEY: zod_1.z.string().min(1),
     STRIPE_WEBHOOK_SECRET: zod_1.z.string().min(1),
     EMAIL_PROVIDER: zod_1.z.string().default("console"),
     SENDGRID_API_KEY: zod_1.z.string().optional(),
     SENDGRID_FROM: zod_1.z.string().optional(),
+    PASSWORD_RESET_TTL_MS: zod_1.z.string().default("3600000"),
+    UPLOAD_PROVIDER: zod_1.z.enum(["disk", "cloudinary"]).default("disk"),
+    CLOUDINARY_CLOUD_NAME: zod_1.z.string().optional(),
+    CLOUDINARY_API_KEY: zod_1.z.string().optional(),
+    CLOUDINARY_API_SECRET: zod_1.z.string().optional(),
     FRONTEND_URL: zod_1.z.string().min(1).default("http://localhost:5173,http://localhost:3000")
 }).superRefine((value, ctx) => {
     const origins = value.FRONTEND_URL.split(",").map((origin) => origin.trim()).filter(Boolean);
@@ -38,6 +45,17 @@ const envSchema = zod_1.z.object({
             ctx.addIssue({ code: "custom", message: "SENDGRID_FROM required" });
         }
     }
+    if (value.UPLOAD_PROVIDER === "cloudinary") {
+        if (!value.CLOUDINARY_CLOUD_NAME) {
+            ctx.addIssue({ code: "custom", message: "CLOUDINARY_CLOUD_NAME required when UPLOAD_PROVIDER=cloudinary" });
+        }
+        if (!value.CLOUDINARY_API_KEY) {
+            ctx.addIssue({ code: "custom", message: "CLOUDINARY_API_KEY required when UPLOAD_PROVIDER=cloudinary" });
+        }
+        if (!value.CLOUDINARY_API_SECRET) {
+            ctx.addIssue({ code: "custom", message: "CLOUDINARY_API_SECRET required when UPLOAD_PROVIDER=cloudinary" });
+        }
+    }
 });
 exports.env = envSchema.parse({
     NODE_ENV: process.env.NODE_ENV,
@@ -45,10 +63,17 @@ exports.env = envSchema.parse({
     MONGO_URI: process.env.MONGO_URI,
     JWT_SECRET: process.env.JWT_SECRET,
     JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN,
+    COOKIE_SECRET: process.env.COOKIE_SECRET,
+    COOKIE_DOMAIN: process.env.COOKIE_DOMAIN,
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
     STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
     EMAIL_PROVIDER: process.env.EMAIL_PROVIDER,
     SENDGRID_API_KEY: process.env.SENDGRID_API_KEY,
     SENDGRID_FROM: process.env.SENDGRID_FROM,
+    PASSWORD_RESET_TTL_MS: process.env.PASSWORD_RESET_TTL_MS,
+    UPLOAD_PROVIDER: process.env.UPLOAD_PROVIDER,
+    CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
+    CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
+    CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
     FRONTEND_URL: process.env.FRONTEND_URL
 });

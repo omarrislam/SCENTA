@@ -11,6 +11,7 @@ router.post("/register", rateLimit_1.authLimiter, (0, validate_1.validate)(auth_
 router.post("/login", rateLimit_1.authLimiter, (0, validate_1.validate)(auth_1.loginSchema), authController_1.login);
 router.post("/forgot-password", rateLimit_1.authLimiter, authController_1.forgotPassword);
 router.post("/reset-password", rateLimit_1.authLimiter, authController_1.resetPassword);
+router.post("/logout", authController_1.logout);
 router.get("/me", auth_2.requireAuth, authController_1.me);
 router.post("/change-password", auth_2.requireAuth, (0, validate_1.validate)(auth_1.changePasswordSchema), authController_1.changePassword);
 exports.default = router;

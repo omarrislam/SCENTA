@@ -35,13 +35,14 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Product = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
+const fragranceSchema_1 = require("../domain/fragrance/fragranceSchema");
 const VariantSchema = new mongoose_1.Schema({
     key: { type: String, required: true },
     sizeMl: Number,
     price: Number,
     compareAtPrice: Number,
     sku: String,
-    stock: Number,
+    stock: { type: Number, default: 0 },
     isActive: { type: Boolean, default: true }
 });
 const ImageSchema = new mongoose_1.Schema({
@@ -53,18 +54,6 @@ const ProductSchema = new mongoose_1.Schema({
     slug: { type: String, unique: true, required: true },
     title: { type: String, required: true },
     description: String,
-    gender: { type: String, enum: ["men", "women", "unisex"] },
-    concentration: { type: String, default: "extrait" },
-    bottleType: { type: String, default: "spray" },
-    notes: {
-        top: [String],
-        middle: [String],
-        base: [String]
-    },
-    season: [String],
-    occasion: [String],
-    longevity: String,
-    sillage: String,
     flags: {
         isNew: Boolean,
         isBestSeller: Boolean,
@@ -72,19 +61,23 @@ const ProductSchema = new mongoose_1.Schema({
     },
     images: [ImageSchema],
     variants: [VariantSchema],
+    fragranceAttrs: { type: fragranceSchema_1.FragranceAttrsSchema, default: undefined },
     seo: {
         metaTitle: String,
         metaDescription: String
     },
-    status: { type: String, enum: ["draft", "published"], default: "draft" }
+    status: { type: String, enum: ["draft", "published"], default: "draft" },
+    deletedAt: { type: Date, default: null, index: true }
 }, { timestamps: true });
 ProductSchema.index({ "flags.isNew": 1 });
 ProductSchema.index({ "flags.isBestSeller": 1 });
 ProductSchema.index({ "flags.isFeatured": 1 });
-ProductSchema.index({ gender: 1 });
+ProductSchema.index({ "fragranceAttrs.gender": 1 });
 ProductSchema.index({ "variants.price": 1 });
 ProductSchema.index({ "variants.stock": 1 });
-ProductSchema.index({ "notes.top": 1 });
-ProductSchema.index({ "notes.middle": 1 });
-ProductSchema.index({ "notes.base": 1 });
+ProductSchema.index({ "fragranceAttrs.notes.top": 1 });
+ProductSchema.index({ "fragranceAttrs.notes.middle": 1 });
+ProductSchema.index({ "fragranceAttrs.notes.base": 1 });
+// Partial index: only index non-deleted products for catalog queries
+ProductSchema.index({ status: 1, deletedAt: 1 });
 exports.Product = mongoose_1.default.model("Product", ProductSchema);

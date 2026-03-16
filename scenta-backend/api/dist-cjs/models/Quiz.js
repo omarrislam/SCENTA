@@ -35,15 +35,23 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.QuizQuestion = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
+const OptionTranslationSchema = new mongoose_1.Schema({ label: String }, { _id: false });
 const QuizOptionSchema = new mongoose_1.Schema({
-    label: { type: String, required: true },
-    labelAr: String,
+    translations: {
+        type: Map,
+        of: OptionTranslationSchema,
+        default: {}
+    },
     score: { type: Number, required: true },
     note: { type: String, required: true }
 }, { _id: false });
+const QuestionTranslationSchema = new mongoose_1.Schema({ prompt: String }, { _id: false });
 const QuizQuestionSchema = new mongoose_1.Schema({
-    prompt: { type: String, required: true },
-    promptAr: String,
+    translations: {
+        type: Map,
+        of: QuestionTranslationSchema,
+        default: {}
+    },
     options: { type: [QuizOptionSchema], default: [] },
     position: { type: Number, default: 0 }
 }, { timestamps: true });

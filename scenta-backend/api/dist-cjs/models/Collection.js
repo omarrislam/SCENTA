@@ -35,12 +35,18 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Collection = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
+// Smart collection rule: filter products by a field matching a value
+const SmartRuleSchema = new mongoose_1.Schema({
+    field: { type: String, required: true }, // e.g. "fragranceAttrs.gender"
+    operator: { type: String, enum: ["eq", "in", "gt", "lt"], required: true },
+    value: mongoose_1.Schema.Types.Mixed // the value to match against
+}, { _id: false });
 const CollectionSchema = new mongoose_1.Schema({
     slug: { type: String, unique: true, required: true },
     title: { type: String, required: true },
     description: String,
     type: { type: String, enum: ["manual", "smart"], default: "manual" },
-    rules: mongoose_1.Schema.Types.Mixed,
+    rules: { type: [SmartRuleSchema], default: undefined },
     productIds: [{ type: mongoose_1.Schema.Types.ObjectId, ref: "Product" }],
     image: String
 }, { timestamps: true });

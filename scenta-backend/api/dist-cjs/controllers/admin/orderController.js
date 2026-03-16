@@ -6,7 +6,7 @@ const ApiError_1 = require("../../utils/ApiError");
 const response_1 = require("../../utils/response");
 const listAdminOrders = async (_req, res, next) => {
     try {
-        const orders = await Order_1.Order.find();
+        const orders = await Order_1.Order.find().sort({ createdAt: -1 }).lean();
         return (0, response_1.sendSuccess)(res, orders);
     }
     catch (error) {
@@ -16,10 +16,9 @@ const listAdminOrders = async (_req, res, next) => {
 exports.listAdminOrders = listAdminOrders;
 const getAdminOrder = async (req, res, next) => {
     try {
-        const order = await Order_1.Order.findById(req.params.id);
-        if (!order) {
+        const order = await Order_1.Order.findById(req.params.id).lean();
+        if (!order)
             throw new ApiError_1.ApiError(404, "NOT_FOUND", "Order not found");
-        }
         return (0, response_1.sendSuccess)(res, order);
     }
     catch (error) {
@@ -29,7 +28,9 @@ const getAdminOrder = async (req, res, next) => {
 exports.getAdminOrder = getAdminOrder;
 const updateOrderStatus = async (req, res, next) => {
     try {
-        const order = await Order_1.Order.findByIdAndUpdate(req.params.id, { status: req.body.status }, { new: true });
+        const order = await Order_1.Order.findByIdAndUpdate(req.params.id, { status: req.body.status }, { new: true }).lean();
+        if (!order)
+            throw new ApiError_1.ApiError(404, "NOT_FOUND", "Order not found");
         return (0, response_1.sendSuccess)(res, order);
     }
     catch (error) {

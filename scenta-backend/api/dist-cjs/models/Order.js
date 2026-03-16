@@ -45,10 +45,20 @@ const OrderItemSchema = new mongoose_1.Schema({
     qty: Number,
     imageSnapshot: String
 });
+const AppliedCouponSchema = new mongoose_1.Schema({
+    code: { type: String, required: true },
+    type: { type: String, enum: ["percent", "bxgy"], required: true },
+    value: { type: Number, required: true },
+    discountTotal: { type: Number, required: true }
+}, { _id: false });
 const OrderSchema = new mongoose_1.Schema({
     orderNumber: String,
     userId: { type: mongoose_1.Schema.Types.ObjectId, ref: "User" },
-    status: { type: String, default: "pending" },
+    status: {
+        type: String,
+        enum: ["pending", "placed", "paid", "processing", "fulfilled", "completed", "cancelled"],
+        default: "pending"
+    },
     items: [OrderItemSchema],
     shippingAddress: {
         fullName: String,
@@ -74,6 +84,9 @@ const OrderSchema = new mongoose_1.Schema({
         shippingFee: Number,
         grandTotal: Number
     },
-    coupon: mongoose_1.Schema.Types.Mixed
+    coupon: { type: AppliedCouponSchema, default: undefined }
 }, { timestamps: true });
+OrderSchema.index({ userId: 1 });
+OrderSchema.index({ status: 1 });
+OrderSchema.index({ orderNumber: 1 }, { unique: true, sparse: true });
 exports.Order = mongoose_1.default.model("Order", OrderSchema);

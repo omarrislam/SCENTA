@@ -87,7 +87,8 @@ const validateCheckout = async (items, couponCode) => {
         coupon = {
             code: match.code ?? normalized,
             type: couponType || "percent",
-            value: couponValue
+            value: couponValue,
+            discountTotal
         };
     }
     subtotal = roundMoney(subtotal);

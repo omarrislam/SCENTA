@@ -35,35 +35,46 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Page = exports.BlogPost = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
+// Translations are stored as a Map keyed by locale (e.g. "en", "ar").
+// This pattern scales to any number of languages without schema changes.
+const TranslationSchema = new mongoose_1.Schema({
+    title: String,
+    excerpt: String,
+    body: String
+}, { _id: false });
 const BlogPostSchema = new mongoose_1.Schema({
     slug: { type: String, unique: true },
-    title: String,
-    titleAr: String,
-    excerpt: String,
-    excerptAr: String,
-    body: String,
-    bodyAr: String,
+    translations: {
+        type: Map,
+        of: TranslationSchema,
+        default: {}
+    },
     cover: String,
-    content: String,
-    status: { type: String, default: "draft" },
+    status: { type: String, enum: ["draft", "published"], default: "draft" },
     seo: {
         metaTitle: String,
         metaDescription: String
     },
     featuredImage: String
 }, { timestamps: true });
+const PageTranslationSchema = new mongoose_1.Schema({
+    title: String,
+    body: String
+}, { _id: false });
 const PageSchema = new mongoose_1.Schema({
     slug: { type: String, unique: true },
-    title: String,
-    titleAr: String,
-    body: String,
-    bodyAr: String,
-    content: String,
-    status: { type: String, default: "draft" },
+    translations: {
+        type: Map,
+        of: PageTranslationSchema,
+        default: {}
+    },
+    status: { type: String, enum: ["draft", "published"], default: "draft" },
     seo: {
         metaTitle: String,
         metaDescription: String
     }
 }, { timestamps: true });
+BlogPostSchema.index({ status: 1 });
+PageSchema.index({ status: 1 });
 exports.BlogPost = mongoose_1.default.model("BlogPost", BlogPostSchema);
 exports.Page = mongoose_1.default.model("Page", PageSchema);
