@@ -10,10 +10,11 @@ import { AuthRequest } from "../middleware/auth";
 import { sendEmail } from "../services/emailService";
 
 const COOKIE_NAME = "auth_token";
+const isSecureEnv = env.NODE_ENV === "production" || !!process.env.VERCEL;
 const COOKIE_OPTIONS = {
   httpOnly: true,
-  secure: env.NODE_ENV === "production",
-  sameSite: (env.NODE_ENV === "production" ? "none" : "lax") as "none" | "lax",
+  secure: isSecureEnv,
+  sameSite: (isSecureEnv ? "none" : "lax") as "none" | "lax",
   domain: env.COOKIE_DOMAIN,
   maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days in ms
 };
@@ -28,8 +29,8 @@ const setAuthCookie = (res: Response, token: string) => {
 const clearAuthCookie = (res: Response) => {
   res.clearCookie(COOKIE_NAME, {
     httpOnly: true,
-    secure: env.NODE_ENV === "production",
-    sameSite: (env.NODE_ENV === "production" ? "none" : "lax") as "none" | "lax",
+    secure: isSecureEnv,
+    sameSite: (isSecureEnv ? "none" : "lax") as "none" | "lax",
     domain: env.COOKIE_DOMAIN
   });
 };

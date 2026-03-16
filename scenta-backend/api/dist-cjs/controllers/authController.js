@@ -13,10 +13,11 @@ const env_1 = require("../config/env");
 const response_1 = require("../utils/response");
 const emailService_1 = require("../services/emailService");
 const COOKIE_NAME = "auth_token";
+const isSecureEnv = env_1.env.NODE_ENV === "production" || !!process.env.VERCEL;
 const COOKIE_OPTIONS = {
     httpOnly: true,
-    secure: env_1.env.NODE_ENV === "production",
-    sameSite: (env_1.env.NODE_ENV === "production" ? "none" : "lax"),
+    secure: isSecureEnv,
+    sameSite: (isSecureEnv ? "none" : "lax"),
     domain: env_1.env.COOKIE_DOMAIN,
     maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days in ms
 };
@@ -27,8 +28,8 @@ const setAuthCookie = (res, token) => {
 const clearAuthCookie = (res) => {
     res.clearCookie(COOKIE_NAME, {
         httpOnly: true,
-        secure: env_1.env.NODE_ENV === "production",
-        sameSite: (env_1.env.NODE_ENV === "production" ? "none" : "lax"),
+        secure: isSecureEnv,
+        sameSite: (isSecureEnv ? "none" : "lax"),
         domain: env_1.env.COOKIE_DOMAIN
     });
 };
