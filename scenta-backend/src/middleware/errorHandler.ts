@@ -14,6 +14,11 @@ export const errorHandler = (
     return sendError(res, 413, "PAYLOAD_TOO_LARGE", "Request payload is too large");
   }
 
+  const mongooseError = err as Error & { name?: string; kind?: string };
+  if (mongooseError.name === "CastError" && mongooseError.kind === "ObjectId") {
+    return sendError(res, 400, "INVALID_ID", "Invalid ID format");
+  }
+
   if (err instanceof ApiError) {
     // eslint-disable-next-line no-console
     console.error("API_ERROR", {

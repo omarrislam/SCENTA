@@ -9,6 +9,10 @@ const errorHandler = (err, req, res, _next) => {
     if (expressError.type === "entity.too.large" || expressError.status === 413 || expressError.statusCode === 413) {
         return (0, response_1.sendError)(res, 413, "PAYLOAD_TOO_LARGE", "Request payload is too large");
     }
+    const mongooseError = err;
+    if (mongooseError.name === "CastError" && mongooseError.kind === "ObjectId") {
+        return (0, response_1.sendError)(res, 400, "INVALID_ID", "Invalid ID format");
+    }
     if (err instanceof ApiError_1.ApiError) {
         // eslint-disable-next-line no-console
         console.error("API_ERROR", {
