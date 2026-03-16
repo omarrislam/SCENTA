@@ -72,8 +72,9 @@ const AdminBlog = () => {
       const imageUrl = await uploadImage(file);
       setForm((prev) => ({ ...prev, cover: imageUrl }));
       pushToast("Cover image uploaded", "success");
-    } catch {
-      pushToast("Image upload failed", "error");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Upload failed";
+      pushToast(message, "error");
     } finally {
       setIsUploading(false);
     }
@@ -100,7 +101,14 @@ const AdminBlog = () => {
         />
         <label className="input-label">
           Cover image
-          <input type="file" accept="image/*" onChange={(event) => void handleCoverUpload(event.target.files?.[0])} />
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(event) => {
+              void handleCoverUpload(event.target.files?.[0]);
+              event.target.value = "";
+            }}
+          />
           <TextInput
             placeholder="Cover image URL"
             value={form.cover}

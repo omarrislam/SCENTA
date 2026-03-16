@@ -150,8 +150,9 @@ const AdminProductForm = () => {
       const imageUrl = await uploadImage(file);
       handleImageChange(index, imageUrl);
       pushToast("Image uploaded", "success");
-    } catch {
-      pushToast("Image upload failed", "error");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Upload failed";
+      pushToast(message, "error");
     } finally {
       setUploadingIndex(null);
     }
@@ -240,7 +241,10 @@ const AdminProductForm = () => {
               <input
                 type="file"
                 accept="image/*"
-                onChange={(event) => void handleUploadImage(index, event.target.files?.[0])}
+                onChange={(event) => {
+                  void handleUploadImage(index, event.target.files?.[0]);
+                  event.target.value = "";
+                }}
               />
               <TextInput
                 placeholder={`Image URL ${index + 1}`}

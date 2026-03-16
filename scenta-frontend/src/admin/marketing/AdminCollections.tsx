@@ -119,6 +119,7 @@ const AdminCollections = () => {
           onChange={(event) => {
             const file = event.target.files?.[0];
             if (file) void handleImageUpload(file);
+            event.target.value = "";
           }}
         />
         {isUploading && <small style={{ color: "var(--color-muted)" }}>Uploading image...</small>}

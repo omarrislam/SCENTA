@@ -609,6 +609,7 @@ const AdminTheme = () => {
                       onChange={(event) => {
                         const file = event.target.files?.[0];
                         if (file) void handleImageUpload(file, (value) => updateHeroSlide(index, { image: value }));
+                        event.target.value = "";
                       }}
                     />
                     <TextInput
@@ -722,6 +723,7 @@ const AdminTheme = () => {
                       onChange={(event) => {
                         const file = event.target.files?.[0];
                         if (file) void handleImageUpload(file, (value) => updateSectionSetting(id, { backgroundImage: value }));
+                        event.target.value = "";
                       }}
                     />
                   <TextInput value={sectionSettings[id]?.backgroundImage ?? ""} readOnly placeholder="Background image" />
@@ -807,6 +809,7 @@ const AdminTheme = () => {
                       onChange={(event) => {
                         const file = event.target.files?.[0];
                         if (file) void handleImageUpload(file, (value) => updateCollectionItem(index, { image: value }));
+                        event.target.value = "";
                       }}
                     />
                   <TextInput value={item.image ?? ""} readOnly placeholder="Image override" />
