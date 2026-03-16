@@ -4,6 +4,7 @@ import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getCollection, listProducts, listProductsByIds } from "../../services/catalogService";
 import ProductCard from "../../components/product/ProductCard";
+import Button from "../../components/ui/Button";
 import TextInput from "../../components/ui/TextInput";
 import Select from "../../components/ui/Select";
 import { useCart } from "../../storefront/cart/CartContext";
@@ -169,8 +170,8 @@ const ShopPage = () => {
               placeholder={t("shop.searchPlaceholder")}
             />
             {searchValue && (
-              <button
-                className="button button--ghost"
+              <Button
+                variant="ghost"
                 type="button"
                 onClick={() => {
                   setSearchValue("");
@@ -178,7 +179,7 @@ const ShopPage = () => {
                 }}
               >
                 {t("shop.clear")}
-              </button>
+              </Button>
             )}
           </div>
         </div>
@@ -213,13 +214,13 @@ const ShopPage = () => {
         </aside>
         <section>
           <div className="shop-mobile-toolbar">
-            <button
-              className={`button ${isMobileFiltersOpen ? "button--primary" : "button--outline"}`}
+            <Button
+              variant={isMobileFiltersOpen ? "primary" : "outline"}
               type="button"
               onClick={() => setIsMobileFiltersOpen((prev) => !prev)}
             >
               {isMobileFiltersOpen ? t("shop.hideFilters") : t("shop.showFilters")}
-            </button>
+            </Button>
             <Select value={sort} onChange={(event) => updateParam("sort", event.target.value)}>
               <option value="featured">{t("shop.sortFeatured")}</option>
               <option value="price-asc">{t("shop.sortPriceAsc")}</option>
@@ -255,21 +256,21 @@ const ShopPage = () => {
                 ))}
           </div>
           <div className="pagination-controls">
-            <button
-              className="button"
+            <Button
+              variant="outline"
               type="button"
               onClick={() => updateParam("page", String(Math.max(1, page - 1)))}
             >
               {t("shop.prev")}
-            </button>
+            </Button>
             <span>{t("shop.pageOf", { current: page, total: totalPages })}</span>
-            <button
-              className="button"
+            <Button
+              variant="outline"
               type="button"
               onClick={() => updateParam("page", String(Math.min(totalPages, page + 1)))}
             >
               {t("shop.next")}
-            </button>
+            </Button>
           </div>
         </section>
       </div>
@@ -301,9 +302,9 @@ const ShopPage = () => {
                 {quickViewStock > 0 ? t("stock.ok", { count: quickViewStock }) : t("stock.out")}
               </p>
               <div className="quick-view-modal__actions">
-                <button className="button button--primary" type="button" onClick={handleQuickViewAdd}>
+                <Button variant="primary" type="button" onClick={handleQuickViewAdd}>
                   {t("cta.addToCart")}
-                </button>
+                </Button>
                 <Link className="button button--outline" to={`/product/${quickViewProduct.slug}`} onClick={() => setQuickViewProduct(null)}>
                   {t("cta.view")}
                 </Link>

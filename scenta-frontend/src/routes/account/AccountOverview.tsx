@@ -65,7 +65,7 @@ const AccountOverview = () => {
               value={confirmPassword}
               onChange={(event) => setConfirmPassword(event.target.value)}
             />
-            <Button type="button" className="button--primary" onClick={() => void handleChangePassword()}>
+            <Button type="button" variant="primary" onClick={() => void handleChangePassword()}>
               {t("account.updatePassword")}
             </Button>
           </div>

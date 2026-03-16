@@ -79,7 +79,7 @@ const ProductCard = ({ product, onQuickAdd, onQuickView, showStockIndicator = fa
                 <span className="product-card__quickview-label">{t("shop.quickView")}</span>
               </Button>
             ) : null}
-            <Button className="button--primary product-card__add" type="button" onClick={() => onQuickAdd?.(product)}>
+            <Button variant="primary" className="product-card__add" type="button" onClick={() => onQuickAdd?.(product)}>
               <span className="product-card__action-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" role="presentation">
                   <path

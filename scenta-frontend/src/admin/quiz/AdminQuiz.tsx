@@ -79,7 +79,7 @@ const AdminQuiz = () => {
     <div className="admin-grid">
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
         <h1 className="section-title">Quiz Builder</h1>
-        <Button className="button--primary" type="button" onClick={() => mutation.mutate(questions)}>
+        <Button variant="primary" type="button" onClick={() => mutation.mutate(questions)}>
           Save Quiz
         </Button>
       </div>

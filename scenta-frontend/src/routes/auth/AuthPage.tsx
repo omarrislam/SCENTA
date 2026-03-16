@@ -48,7 +48,7 @@ const AuthPage = () => {
         <h1 className="section-title">{t("auth.forgotTitle")}</h1>
         <div className="card auth-form">
           <TextInput placeholder={t("auth.email")} />
-          <Button className="button--primary" type="button">
+          <Button variant="primary" type="button">
             {t("auth.sendReset")}
           </Button>
         </div>
@@ -63,7 +63,7 @@ const AuthPage = () => {
         <h1 className="section-title">{t("auth.resetTitle")}</h1>
         <div className="card auth-form">
           <TextInput placeholder={t("auth.password")} type="password" />
-          <Button className="button--primary" type="button">
+          <Button variant="primary" type="button">
             {t("auth.savePassword")}
           </Button>
         </div>
@@ -95,7 +95,7 @@ const AuthPage = () => {
           onChange={(event) => setPassword(event.target.value)}
         />
         {error && <p>{error}</p>}
-        <Button className="button--primary" type="button" onClick={submit}>
+        <Button variant="primary" type="button" onClick={submit}>
           {t("auth.continue")}
         </Button>
       </div>

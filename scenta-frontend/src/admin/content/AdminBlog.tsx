@@ -119,7 +119,7 @@ const AdminBlog = () => {
         <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
           {editingId ? (
             <>
-              <Button className="button--primary" type="button" onClick={() => updateMutation.mutate()}>
+              <Button variant="primary" type="button" onClick={() => updateMutation.mutate()}>
                 Save changes
               </Button>
               <Button
@@ -133,7 +133,7 @@ const AdminBlog = () => {
               </Button>
             </>
           ) : (
-            <Button className="button--primary" type="button" onClick={() => createMutation.mutate()}>
+            <Button variant="primary" type="button" onClick={() => createMutation.mutate()}>
               Publish post
             </Button>
           )}

@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { listCollections, listProducts } from "../../services/catalogService";
 import { resolveApiAssetUrl, resolveResponsiveImageSource } from "../../services/api";
 import ProductCard from "../../components/product/ProductCard";
+import Button from "../../components/ui/Button";
 import { useCart } from "../../storefront/cart/CartContext";
 import useMeta from "../../app/seo/useMeta";
 import { useToast } from "../../components/feedback/ToastContext";
@@ -628,9 +629,9 @@ const HomePage = () => {
               >
                 <h2 className="section-title">{newsletterSetting.title ?? t("home.newsletterTitle")}</h2>
                 <p>{newsletterSetting.subtitle ?? t("home.newsletterBody")}</p>
-                <button className="button button--primary" type="button">
+                <Button variant="primary" type="button">
                   {newsletterSetting.ctaLabel ?? t("home.newsletterCta")}
-                </button>
+                </Button>
               </section>
             );
           }

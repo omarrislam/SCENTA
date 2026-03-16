@@ -95,7 +95,7 @@ const ProductPage = () => {
           ))}
         </div>
         <div className="product-detail__actions">
-          <Button className="button--primary" type="button" onClick={handleAddToCart} disabled={isOut}>
+          <Button variant="primary" type="button" onClick={handleAddToCart} disabled={isOut}>
             {t("cta.addToCart")}
           </Button>
           <button
@@ -153,7 +153,7 @@ const ProductPage = () => {
           <strong>{t("cta.addToCart")}</strong>
           <span>EGP {selectedVariant.price.toLocaleString()}</span>
         </div>
-        <Button className="button--primary" type="button" onClick={handleAddToCart} disabled={isOut}>
+        <Button variant="primary" type="button" onClick={handleAddToCart} disabled={isOut}>
           {t("cta.addToCart")}
         </Button>
       </div>

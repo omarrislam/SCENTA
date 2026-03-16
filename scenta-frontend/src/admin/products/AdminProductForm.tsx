@@ -305,7 +305,7 @@ const AdminProductForm = () => {
 
       <div className="admin-form-actions">
         <Button
-          className="button--primary"
+          variant="primary"
           type="button"
           onClick={handleSubmit}
           disabled={mutation.isPending || uploadingIndex !== null}

@@ -57,7 +57,7 @@ const AdminOrderDetail = () => {
           </Select>
           <Button
             type="button"
-            className="button--primary"
+            variant="primary"
             onClick={() => mutation.mutate(status)}
             disabled={mutation.isPending || status === data.status}
           >

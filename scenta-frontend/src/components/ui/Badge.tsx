@@ -5,9 +5,9 @@ import { cn } from "@/lib/utils";
 const badgeVariants = cva("badge", {
   variants: {
     variant: {
-      default: "",
-      secondary: "",
-      outline: ""
+      default: "badge--default",
+      secondary: "badge--secondary",
+      outline: "badge--outline"
     }
   },
   defaultVariants: {

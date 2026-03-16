@@ -122,7 +122,7 @@ const AdminCoupons = () => {
           <option value="draft">Draft</option>
           <option value="expired">Expired</option>
         </Select>
-        <Button type="button" className="button--primary" onClick={submit}>
+        <Button type="button" variant="primary" onClick={submit}>
           {editingId ? "Update" : "Create"}
         </Button>
       </div>

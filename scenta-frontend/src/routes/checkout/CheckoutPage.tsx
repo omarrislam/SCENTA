@@ -71,7 +71,7 @@ const StripePaymentForm = ({
     <div className="card grid">
       <strong>Card payment</strong>
       <PaymentElement />
-      <Button type="button" className="button--primary" onClick={() => void confirm()} disabled={isConfirming}>
+      <Button type="button" variant="primary" onClick={() => void confirm()} disabled={isConfirming}>
         {isConfirming ? "Confirming..." : "Confirm payment"}
       </Button>
     </div>
@@ -503,13 +503,13 @@ const CheckoutPage = () => {
                 {t("checkout.back")}
               </Button>
               {step < stepLabels.length - 1 ? (
-                <Button type="button" className="button--primary" onClick={next}>
+                <Button type="button" variant="primary" onClick={next}>
                   {t("checkout.continue")}
                 </Button>
               ) : (
                 <Button
                   type="button"
-                  className="button--primary"
+                  variant="primary"
                   onClick={() => void placeOrder()}
                   disabled={isPlacing || (payment === "stripe" && Boolean(stripeClientSecret))}
                 >

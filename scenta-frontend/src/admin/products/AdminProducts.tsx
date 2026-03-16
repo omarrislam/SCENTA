@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { deleteAdminProduct, listAdminProducts } from "../../services/adminService";
+import Button from "../../components/ui/Button";
 
 const AdminProducts = () => {
   const queryClient = useQueryClient();
@@ -46,13 +47,13 @@ const AdminProducts = () => {
                   <Link className="button button--ghost button--sm" to={`/admin/products/${product._id}/edit`}>
                     Edit
                   </Link>
-                  <button
-                    className="button button--sm"
+                  <Button
+                    size="sm"
                     type="button"
                     onClick={() => deleteMutation.mutate(product._id)}
                   >
                     Delete
-                  </button>
+                  </Button>
                 </td>
               </tr>
             ))}

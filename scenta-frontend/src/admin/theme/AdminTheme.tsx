@@ -433,7 +433,7 @@ const AdminTheme = () => {
     <div className="card grid admin-theme admin-theme-editor">
       <div className="admin-theme__header">
         <h1 className="section-title">Theme Editor</h1>
-        <Button type="button" className="button--primary" onClick={handleSaveTheme}>
+        <Button type="button" variant="primary" onClick={handleSaveTheme}>
           {t("cta.save")}
         </Button>
       </div>

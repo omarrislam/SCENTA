@@ -144,7 +144,7 @@ const AdminCollections = () => {
         </div>
         <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
           <Button
-            className="button--primary"
+            variant="primary"
             type="button"
             onClick={() => (editingId ? updateMutation.mutate() : mutation.mutate())}
           disabled={isUploading || mutation.isPending || updateMutation.isPending}
