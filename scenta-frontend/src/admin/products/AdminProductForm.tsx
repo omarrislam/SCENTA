@@ -50,7 +50,8 @@ const AdminProductForm = () => {
     setSizeMl(String(variant?.sizeMl ?? 50));
     const incomingImages =
       data.images
-        ?.map((image) => resolveApiAssetUrl(image.url) ?? image.url)
+        ?.filter((image) => image.url && !image.url.startsWith("data:"))
+        .map((image) => resolveApiAssetUrl(image.url) ?? image.url)
         .filter(Boolean)
       ?? [];
     setImages(incomingImages.length ? incomingImages : [""]);
@@ -83,13 +84,17 @@ const AdminProductForm = () => {
       window.dispatchEvent(new Event("inventory-updated"));
       pushToast("Product saved", "success");
       navigate("/admin/products");
+    },
+    onError: (error) => {
+      const message = error instanceof Error ? error.message : "Failed to save product";
+      pushToast(message, "error");
     }
   });
 
   const normalizeImageForSave = (value: string) => {
     const trimmed = value.trim();
-    if (!trimmed) return "";
-    if (trimmed.startsWith("/") || trimmed.startsWith("data:")) {
+    if (!trimmed || trimmed.startsWith("data:")) return "";
+    if (trimmed.startsWith("/")) {
       return trimmed;
     }
     try {

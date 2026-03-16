@@ -59,6 +59,8 @@ export const mapProduct = (product: BackendProduct): Product => {
     rating: 4.7,
     tags,
     variants: buildVariants(product.variants ?? []),
-    images: (product.images ?? []).map((image) => resolveApiAssetUrl(image.url) ?? image.url)
+    images: (product.images ?? [])
+      .filter((image) => image.url && !image.url.startsWith("data:"))
+      .map((image) => resolveApiAssetUrl(image.url) ?? image.url)
   };
 };
