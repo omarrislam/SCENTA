@@ -1,0 +1,5 @@
+# Ignore all uploaded files — they are runtime artifacts.
+# The directory itself is kept via .gitkeep.
+*
+!.gitignore
+!.gitkeep
