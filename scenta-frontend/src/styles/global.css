@@ -533,7 +533,7 @@ main {
 }
 
 .grid--3 {
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
 }
 
 .home-stack {
@@ -753,7 +753,7 @@ main {
 .collection-grid {
   display: grid;
   gap: 16px;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
 }
 
 .collection-carousel {
@@ -844,7 +844,7 @@ main {
   margin-top: 28px;
   display: grid;
   gap: 16px;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
   max-width: var(--max-width);
   margin-left: auto;
   margin-right: auto;
@@ -952,7 +952,7 @@ main {
   padding: clamp(28px, 4vw, 48px);
   display: grid;
   gap: 18px;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
   align-items: center;
 }
 
@@ -972,7 +972,7 @@ main {
 .feature-grid {
   display: grid;
   gap: 16px;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
 }
 
 .feature-card {
@@ -1559,6 +1559,10 @@ main {
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 .note-badges {
@@ -1829,6 +1833,7 @@ main {
   display: flex;
   gap: 12px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .product-trust-row {
@@ -1926,7 +1931,7 @@ main {
 .checkout-form {
   display: grid;
   gap: 14px;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
 }
 
 .checkout-notes {
@@ -1986,11 +1991,12 @@ main {
 
 .toast-stack {
   position: fixed;
-  bottom: 24px;
-  right: 24px;
+  bottom: max(24px, env(safe-area-inset-bottom));
+  right: max(24px, env(safe-area-inset-right));
   display: grid;
   gap: 10px;
   z-index: 100;
+  max-width: calc(100vw - 48px);
 }
 
 .toast {
@@ -2380,9 +2386,9 @@ main {
 
   .product-sticky-cta {
     position: fixed;
-    left: 12px;
-    right: 12px;
-    bottom: max(12px, env(safe-area-inset-bottom));
+    left: max(12px, env(safe-area-inset-left));
+    right: max(12px, env(safe-area-inset-right));
+    bottom: max(16px, env(safe-area-inset-bottom));
     z-index: 40;
     display: flex;
     gap: 10px;
@@ -2466,7 +2472,7 @@ main {
   .shop-layout .product-card__actions .button {
     justify-content: center;
     min-height: 44px;
-    font-size: 0.58rem;
+    font-size: 0.68rem;
     letter-spacing: 0.1em;
     padding: 6px 8px;
   }
@@ -2533,11 +2539,19 @@ main {
   }
 
   .hero__title {
-    font-size: clamp(1.4rem, 1.1rem + 2.5vw, 2.1rem);
+    font-size: clamp(1.3rem, 1rem + 2.8vw, 2rem);
   }
 
   .hero__content {
-    padding: 20px;
+    padding: 16px 20px 24px;
+    gap: 10px;
+  }
+
+  .hero__content .button,
+  .hero__content a.button {
+    min-height: 40px;
+    padding: 10px 16px;
+    font-size: 0.62rem;
   }
 
   .nav-links {
@@ -2705,8 +2719,8 @@ main {
 
 @media (max-width: 480px) {
   .product-grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
   }
 
   .hero--slider,
@@ -2716,7 +2730,7 @@ main {
   }
 
   .checkout-progress {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .section-block {
@@ -2725,6 +2739,12 @@ main {
 
   .product-gallery__main {
     height: 260px;
+  }
+}
+
+@media (max-width: 360px) {
+  .product-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -2763,6 +2783,7 @@ main {
   left: 0;
   width: min(420px, 92vw);
   height: 100vh;
+  height: 100dvh;
   z-index: 45;
   background: #ffffff;
   border-right: 1px solid rgba(17, 17, 17, 0.14);
@@ -2983,7 +3004,7 @@ main {
 }
 
 .grid--2 {
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
 }
 
 .account-layout {
@@ -3226,12 +3247,23 @@ p {
 
 @media (max-width: 600px) {
   .footer {
-    padding-top: 36px;
+    padding-top: 32px;
   }
 
   .footer__grid {
-    gap: 20px;
-    padding-bottom: 24px;
+    gap: 24px;
+    padding: 0 16px 24px;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .footer__brand {
+    grid-column: 1 / -1;
+  }
+
+  .footer__bottom-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 6px;
   }
 
   .admin-header-row .button {
@@ -3717,7 +3749,7 @@ textarea {
 @media (max-width: 900px) {
   .shop-mobile-toolbar {
     position: sticky;
-    top: calc(var(--announcement-height) + var(--space-2));
+    top: calc(var(--announcement-height) + var(--nav-height) + var(--space-2));
     z-index: 18;
     display: grid;
     grid-template-columns: auto 1fr;
@@ -4183,3 +4215,191 @@ textarea {
   }
 }
 
+/* ─── mobile polish: catch-all fixes for narrow viewports ─── */
+@media (max-width: 600px) {
+  /* Nav: tighter inner spacing */
+  .navbar__inner {
+    padding: 8px 12px;
+  }
+
+  /* Announcement: tighter gap on mobile */
+  .announcement__track {
+    gap: 24px;
+  }
+
+  /* Hero: ensure no overflow */
+  .hero__media {
+    width: 100%;
+  }
+
+  /* Product detail: smaller trust row font */
+  .product-trust-row__item {
+    font-size: 0.68rem;
+    padding: 8px 10px;
+  }
+
+  /* Product gallery: use more height on mobile */
+  .product-gallery__main {
+    height: min(300px, 75vw);
+  }
+
+  /* Product detail: stack add-to-cart button full width */
+  .product-detail__actions .button {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  /* Cart page: smaller item image */
+  .cart-item__media {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+  }
+
+  /* Cart item: keep side-by-side on mobile */
+  .cart-item {
+    grid-template-columns: 80px 1fr;
+  }
+
+  /* Blog card: smaller image */
+  .blog-card__media {
+    height: 120px;
+  }
+
+  /* Auth form: full width on mobile */
+  .auth-form {
+    max-width: 100%;
+  }
+
+  /* Section intro: stack on mobile */
+  .section-intro {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  /* Tabs: scrollable on small screens */
+  .tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Tab: min touch target */
+  .tab {
+    flex-shrink: 0;
+    padding: 8px 0;
+  }
+
+  /* Quick view overlay: tighter on mobile */
+  .quick-view-overlay {
+    padding: 8px;
+    align-items: flex-end;
+  }
+
+  .quick-view-modal {
+    max-height: 88vh;
+    border-radius: 12px 12px 0 0;
+  }
+
+  /* Home stack: tighter gap */
+  .home-stack {
+    gap: 32px;
+  }
+
+  /* Cards: less padding */
+  .card {
+    padding: 16px;
+  }
+
+  /* Empty state: smaller */
+  .empty-state {
+    min-height: 200px;
+    padding: 24px 16px;
+  }
+
+  /* Checkout progress labels: smaller */
+  .checkout-progress__label {
+    font-size: 0.6rem;
+  }
+
+  /* Checkout: full-width actions */
+  .checkout-actions {
+    gap: 8px;
+  }
+
+  /* Product carousel: narrower cards */
+  .product-carousel {
+    grid-auto-columns: minmax(180px, 260px);
+  }
+
+  /* Collection carousel: narrower cards */
+  .collection-carousel {
+    grid-auto-columns: minmax(160px, 240px);
+  }
+}
+
+@media (max-width: 480px) {
+  /* Even tighter spacing */
+  main {
+    padding-inline: 12px;
+  }
+
+  /* Hero: shorter on very small phones */
+  .hero--slider,
+  .hero__media {
+    min-height: 320px;
+    height: 320px;
+  }
+
+  /* Section title: smaller */
+  .section-title {
+    font-size: clamp(1.2rem, 0.9rem + 2.5vw, 1.6rem);
+    margin-bottom: 12px;
+  }
+
+  /* Toast: full width on very small */
+  .toast-stack {
+    left: 12px;
+    right: 12px;
+    max-width: none;
+  }
+
+  /* Quick view: full-screen-ish */
+  .quick-view-modal__body {
+    padding: 16px;
+    gap: 8px;
+  }
+
+  /* Cart drawer actions: full width buttons */
+  .cart-drawer__actions {
+    grid-template-columns: 1fr;
+  }
+
+  /* Filters toggle pill text */
+  .shop-mobile-toolbar .button {
+    font-size: 0.62rem;
+    padding: 8px 10px;
+  }
+
+  /* Footer: single column */
+  .footer__grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Product card: even less padding */
+  .product-card__body {
+    padding: 10px 10px 0;
+    gap: 6px;
+  }
+
+  .product-card__footer {
+    padding: 0 10px 10px;
+    gap: 8px;
+  }
+
+  .product-card__body h3 {
+    font-size: 0.8rem;
+  }
+}
