@@ -2746,6 +2746,10 @@ main {
   .product-grid {
     grid-template-columns: 1fr;
   }
+
+  .admin-links {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 600px) {
@@ -3293,6 +3297,31 @@ p {
 
   .admin-links a {
     text-align: left;
+  }
+
+  .admin-coupons-form {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-grid > .admin-table thead,
+  .admin-grid > .admin-table tbody {
+    min-width: 420px;
+  }
+
+  .admin-theme__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .account-nav {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+  }
+
+  .account-nav a {
+    flex-shrink: 0;
   }
 }
 
@@ -4401,5 +4430,19 @@ textarea {
 
   .product-card__body h3 {
     font-size: 0.8rem;
+  }
+
+  .cart-drawer__item {
+    grid-template-columns: 60px 1fr;
+  }
+
+  .cart-drawer__item-media {
+    width: 60px;
+    height: 72px;
+  }
+
+  .admin-grid > .admin-table thead,
+  .admin-grid > .admin-table tbody {
+    min-width: 340px;
   }
 }
