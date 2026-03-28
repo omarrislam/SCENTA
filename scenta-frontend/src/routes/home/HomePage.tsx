@@ -209,8 +209,8 @@ const HomePage = () => {
   ];
   const collectionFallbackImage = (slug: string) => {
     const fallbackBySlug: Record<string, string> = {
-      "amber-signature": "/images/silk-amber.png",
-      "floral-veil": "/images/rose-veil.png"
+      "amber-signature": "/images/silk-amber.webp",
+      "floral-veil": "/images/rose-veil.webp"
     };
     return fallbackBySlug[slug] ?? "/images/amber-1.svg";
   };
