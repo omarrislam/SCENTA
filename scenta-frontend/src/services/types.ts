@@ -38,7 +38,7 @@ export interface Review {
   body: string;
   title?: string;
   createdAt?: string;
-  isHidden?: boolean;
+  isVerifiedPurchase?: boolean;
 }
 
 export interface BlogPost {
