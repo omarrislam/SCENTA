@@ -154,27 +154,27 @@ const ReviewForm = ({
 
   return (
     <form className="review-form" onSubmit={handleSubmit} noValidate>
-      <h3 className="review-form__title">{t("reviews.write") || "Write a Review"}</h3>
+      <h3 className="review-form__title">{t("reviews.write")}</h3>
 
       <label className="input-label">
-        {t("reviews.rating") || "Rating"}
+        {t("reviews.rating")}
         <StarPicker value={rating} onChange={setRating} />
       </label>
 
       <label className="input-label">
-        {t("reviews.titleLabel") || "Title (optional)"}
+        {t("reviews.titleLabel")}
         <input
           className="input"
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           maxLength={120}
-          placeholder={t("reviews.titlePlaceholder") || "Summarise your experience"}
+          placeholder={t("reviews.titlePlaceholder")}
         />
       </label>
 
       <label className="input-label">
-        {t("reviews.comment") || "Comment"}
+        {t("reviews.comment")}
         <textarea
           className="input review-form__textarea"
           value={body}
@@ -182,7 +182,7 @@ const ReviewForm = ({
           required
           rows={4}
           maxLength={1000}
-          placeholder={t("reviews.commentPlaceholder") || "Tell others what you think…"}
+          placeholder={t("reviews.commentPlaceholder")}
         />
       </label>
 
@@ -193,9 +193,7 @@ const ReviewForm = ({
         className="button button--primary"
         disabled={mutation.isPending}
       >
-        {mutation.isPending
-          ? (t("reviews.submitting") || "Submitting…")
-          : (t("reviews.submit") || "Submit Review")}
+        {mutation.isPending ? t("reviews.submitting") : t("reviews.submit")}
       </button>
     </form>
   );
@@ -241,7 +239,7 @@ const ReviewsList = ({ productId }: { productId: string }) => {
     : false;
 
   if (isLoading) {
-    return <div className="review-loading">{t("reviews.loading") || "Loading reviews…"}</div>;
+    return <div className="review-loading">{t("reviews.loading")}</div>;
   }
 
   return (
@@ -252,7 +250,7 @@ const ReviewsList = ({ productId }: { productId: string }) => {
         {!user && (
           <p className="review-prompt">
             <Link to="/auth" className="review-prompt__link">
-              {t("reviews.signInPrompt") || "Sign in to write a review"}
+              {t("reviews.signInPrompt")}
             </Link>
           </p>
         )}
@@ -262,7 +260,7 @@ const ReviewsList = ({ productId }: { productId: string }) => {
             className="button"
             onClick={() => setShowForm(true)}
           >
-            {t("reviews.write") || "Write a Review"}
+            {t("reviews.write")}
           </button>
         )}
       </div>
@@ -281,7 +279,7 @@ const ReviewsList = ({ productId }: { productId: string }) => {
           ))}
         </div>
       ) : (
-        <p className="review-empty">{t("reviews.empty") || "No reviews yet. Be the first!"}</p>
+        <p className="review-empty">{t("reviews.empty")}</p>
       )}
     </div>
   );

@@ -249,6 +249,19 @@
     "trustNote": "Trusted online fragrance store with secure checkout.",
     "copyright": "© 2026 SCENTA. All rights reserved."
   },
+  "reviews": {
+    "write": "Write a Review",
+    "rating": "Your Rating",
+    "titleLabel": "Title (optional)",
+    "titlePlaceholder": "Summarise your experience",
+    "comment": "Comment",
+    "commentPlaceholder": "Tell others what you think…",
+    "submit": "Submit Review",
+    "submitting": "Submitting…",
+    "empty": "No reviews yet. Be the first!",
+    "loading": "Loading reviews…",
+    "signInPrompt": "Sign in to write a review"
+  },
   "page": {
     "loading": "Loading..."
   }
