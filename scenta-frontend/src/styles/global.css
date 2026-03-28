@@ -1067,12 +1067,6 @@ main {
   color: #ffffff;
 }
 
-.layout--home .navbar:hover {
-  background: #ffffff;
-  color: var(--color-ink);
-  border-bottom: 1px solid rgba(17, 17, 17, 0.12);
-}
-
 .layout--home .nav-links {
   color: #ffffff;
 }
@@ -1085,16 +1079,26 @@ main {
   background: rgba(255, 255, 255, 0.12);
 }
 
-.layout--home .navbar:hover .nav-links {
-  color: var(--color-ink);
-}
+/* Only reveal white nav on hover for pointer devices — prevents mobile touch from
+   triggering :hover and permanently sticking the navbar white */
+@media (hover: hover) {
+  .layout--home .navbar:hover {
+    background: #ffffff;
+    color: var(--color-ink);
+    border-bottom: 1px solid rgba(17, 17, 17, 0.12);
+  }
 
-.layout--home .navbar:hover .nav-icon,
-.layout--home .navbar:hover .locale-toggle,
-.layout--home .navbar:hover .nav-toggle {
-  border-color: rgba(17, 17, 17, 0.2);
-  background: rgba(255, 255, 255, 0.7);
-  color: var(--color-ink);
+  .layout--home .navbar:hover .nav-links {
+    color: var(--color-ink);
+  }
+
+  .layout--home .navbar:hover .nav-icon,
+  .layout--home .navbar:hover .locale-toggle,
+  .layout--home .navbar:hover .nav-toggle {
+    border-color: rgba(17, 17, 17, 0.2);
+    background: rgba(255, 255, 255, 0.7);
+    color: var(--color-ink);
+  }
 }
 
 .layout--home .hero__content {
@@ -2881,7 +2885,18 @@ main {
 
 @media (max-width: 600px) {
   .layout--home .navbar {
-    background: linear-gradient(180deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0));
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.42) 0%, rgba(0, 0, 0, 0.1) 60%, rgba(0, 0, 0, 0) 100%);
+  }
+
+  /* Mobile home nav icons: dark-hero-friendly */
+  .layout--home .nav-toggle,
+  .layout--home .nav-icon,
+  .layout--home .locale-toggle {
+    background: rgba(0, 0, 0, 0.18);
+    border-color: rgba(255, 255, 255, 0.35);
+    color: #ffffff;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
   }
 }
 
