@@ -82,6 +82,17 @@ const StorefrontLayout = ({ children }: PropsWithChildren) => {
     return () => observer.disconnect();
   }, [location.pathname]);
 
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
   const isHome = location.pathname === "/";
 
   return (

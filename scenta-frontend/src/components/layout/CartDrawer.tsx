@@ -73,7 +73,7 @@ const CartDrawer = () => {
         <div className="cart-drawer__header">
           <h2>{t("cart.title")}</h2>
           <button type="button" className="icon-button" onClick={closeDrawer} aria-label={t("shop.close")}>
-            x
+            ×
           </button>
         </div>
         {!items.length ? (

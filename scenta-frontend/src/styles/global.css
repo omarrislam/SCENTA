@@ -57,6 +57,11 @@
 
 * {
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+a, button, [role="button"] {
+  touch-action: manipulation;
 }
 
 body,
@@ -1330,21 +1335,23 @@ main {
     position: fixed;
     top: var(--announcement-height);
     left: 0;
-    width: min(86vw, 340px);
-    height: calc(100vh - var(--announcement-height));
+    width: min(88vw, 340px);
+    height: calc(100dvh - var(--announcement-height));
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     background: #ffffff;
-    padding: 22px 16px 18px;
+    padding: 24px 20px 24px;
     border-right: 1px solid rgba(17, 17, 17, 0.14);
     transform: translateX(-100%);
-    opacity: 0.9;
+    opacity: 0;
     visibility: hidden;
-    transition: transform 300ms cubic-bezier(0.2, 0.7, 0.2, 1), opacity 220ms ease, visibility 220ms ease;
+    transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1), opacity 260ms ease, visibility 0ms 320ms;
     z-index: 15;
     overflow-y: auto;
-    box-shadow: 12px 0 28px rgba(17, 17, 17, 0.12);
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    box-shadow: 12px 0 32px rgba(17, 17, 17, 0.14);
     will-change: transform, opacity;
   }
 
@@ -1356,6 +1363,7 @@ main {
     transform: translateX(0);
     opacity: 1;
     visibility: visible;
+    transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1), opacity 260ms ease, visibility 0ms;
   }
 
   .nav-links__header {
@@ -1403,15 +1411,16 @@ main {
     display: flex;
     align-items: center;
     width: 100%;
-    padding: 12px 2px;
+    padding: 14px 2px;
     border: 0;
-    border-bottom: 1px solid rgba(17, 17, 17, 0.1);
+    border-bottom: 1px solid rgba(17, 17, 17, 0.08);
     background: transparent;
     letter-spacing: 0.14em;
-    font-size: 0.68rem;
+    font-size: 0.72rem;
     color: #111111;
     text-transform: uppercase;
     position: relative;
+    min-height: 48px;
   }
 
   .nav-links__group {
@@ -2739,6 +2748,35 @@ main {
   .product-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     padding: 0 16px;
+    gap: 12px;
+  }
+
+  /* Home grid: show full-width add button, hide quick view */
+  .product-grid .product-card__actions {
+    width: 100%;
+    display: flex;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .product-grid .product-card__add {
+    flex: 1;
+    justify-content: center;
+    min-height: 40px;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+  }
+
+  .product-grid .product-card__quickview {
+    display: none;
+  }
+
+  .product-grid .product-card__add-label--long {
+    display: none;
+  }
+
+  .product-grid .product-card__add-label--short {
+    display: inline;
   }
 
   .section-block--accent {
@@ -3005,6 +3043,7 @@ main {
 
 
 .footer__grid {
+  display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 24px;
   padding-bottom: 32px;
@@ -4518,10 +4557,10 @@ textarea {
     grid-template-columns: 1fr;
   }
 
-  /* Product card: even less padding */
+  /* Product card: compact but usable on small screens */
   .product-card__body {
     padding: 10px 10px 0;
-    gap: 6px;
+    gap: 5px;
   }
 
   .product-card__footer {
@@ -4530,7 +4569,36 @@ textarea {
   }
 
   .product-card__body h3 {
-    font-size: 0.8rem;
+    font-size: 0.78rem;
+  }
+
+  /* Home grid product cards: full-width add button, always visible */
+  .product-grid .product-card__actions {
+    width: 100%;
+    display: flex;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .product-grid .product-card__add {
+    flex: 1;
+    justify-content: center;
+    min-height: 40px;
+    font-size: 0.6rem;
+    padding: 8px 6px;
+    letter-spacing: 0.1em;
+  }
+
+  .product-grid .product-card__add-label--long {
+    display: none;
+  }
+
+  .product-grid .product-card__add-label--short {
+    display: inline;
+  }
+
+  .product-grid .product-card__quickview {
+    display: none;
   }
 
   .cart-drawer__item {
@@ -4772,4 +4840,182 @@ textarea {
   color: var(--color-ink);
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+
+/* ── Mobile UX enhancements ──────────────────────────────────────────────── */
+
+/* Prevent content shift when scrollbar appears/disappears */
+html {
+  scrollbar-gutter: stable;
+}
+
+/* Smooth scrolling for anchor links */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Safe-area padding for bottom sticky elements */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .product-sticky-cta {
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-width: 768px) {
+  /* Better button sizing for touch throughout */
+  .button--sm {
+    min-height: 36px;
+  }
+
+  /* Nav scrim: make it cover the announcement bar too */
+  .nav-scrim {
+    inset: 0;
+  }
+
+  /* Improve cart drawer qty controls touch targets */
+  .cart-drawer__qty .button {
+    min-width: 36px;
+    min-height: 36px;
+    padding: 6px;
+  }
+
+  /* Product page sticky CTA - full-width button */
+  .product-sticky-cta .button {
+    flex: 1;
+    justify-content: center;
+  }
+
+  /* Hero: better content sizing for tablets */
+  .hero__eyebrow {
+    font-size: 0.7rem;
+  }
+
+  /* Note badges: hide on mobile product cards on home grid to save space */
+  .product-grid .note-badges {
+    display: none;
+  }
+
+  /* Collection card overlay: bigger text on mobile */
+  .collection-card__overlay .section-title {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  /* Better main top padding accounting for both bars */
+  main {
+    padding-top: calc(var(--nav-height) + 4px);
+    padding-bottom: 64px;
+  }
+
+  /* Hero: taller on mobile for visual impact */
+  .hero--slider,
+  .hero__media {
+    min-height: 420px;
+    height: 420px;
+  }
+
+  /* Hero notes: hide on mobile to declutter */
+  .hero__notes {
+    display: none;
+  }
+
+  /* Section padding: tighter on mobile */
+  .section-block {
+    padding: 40px 0;
+  }
+
+  /* Shipping strip: single column on small mobile */
+  .shipping-strip {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    text-align: center;
+  }
+
+  .shipping-item {
+    gap: 6px;
+  }
+
+  .shipping-item__icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .shipping-strip p {
+    font-size: 0.72rem;
+  }
+
+  /* Footer links: bigger tap targets */
+  .footer__links a {
+    padding: 4px 0;
+    display: block;
+  }
+
+  /* Cart drawer header: tighter */
+  .cart-drawer__header {
+    padding: 12px 14px;
+  }
+
+  /* Product gallery thumbnails: tighter on mobile */
+  .product-gallery__thumb {
+    width: 52px;
+    height: 52px;
+  }
+
+  /* Quick view: slide up from bottom on mobile */
+  .quick-view-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .quick-view-modal {
+    border-radius: 16px 16px 0 0;
+    max-height: 90dvh;
+    animation: modal-slide-up 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes modal-slide-up {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+}
+
+@media (max-width: 480px) {
+  /* Hero: appropriate for small phones */
+  .hero--slider,
+  .hero__media {
+    min-height: 380px;
+    height: 380px;
+  }
+
+  /* Hero text: readable at small sizes */
+  .hero__title {
+    font-size: clamp(1.4rem, 1.1rem + 3vw, 2rem);
+    margin-bottom: 10px;
+  }
+
+  .hero__subtitle {
+    font-size: 0.85rem;
+  }
+
+  /* Product card note badges: show only on product detail, not cards */
+  .product-card .note-badges {
+    display: none;
+  }
+
+  /* Product card price: more prominent */
+  .product-card__footer > span {
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  /* Cart drawer: full-width on very small */
+  .cart-drawer {
+    width: 100vw;
+  }
+
+  /* Section title: adjusted */
+  .section-title {
+    letter-spacing: 0.1em;
+  }
 }
