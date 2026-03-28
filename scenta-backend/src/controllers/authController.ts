@@ -19,7 +19,7 @@ const COOKIE_OPTIONS = {
   maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days in ms
 };
 
-const signToken = (payload: { id: string; role: "customer" | "admin" }) =>
+const signToken = (payload: { id: string; role: "customer" | "admin"; name: string }) =>
   jwt.sign(payload, env.JWT_SECRET, { expiresIn: env.JWT_EXPIRES_IN as jwt.SignOptions["expiresIn"] });
 
 const setAuthCookie = (res: Response, token: string) => {
@@ -44,7 +44,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     }
     const passwordHash = await bcrypt.hash(password, 10);
     const user = await User.create({ email, passwordHash, name, role: "customer" });
-    const token = signToken({ id: user.id, role: user.role });
+    const token = signToken({ id: user.id, role: user.role, name });
     setAuthCookie(res, token);
     return sendSuccess(res, { user: { id: user.id, email, name, role: user.role } }, 201);
   } catch (error) {
@@ -63,7 +63,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     if (!ok) {
       throw new ApiError(401, "INVALID_CREDENTIALS", "Invalid email or password");
     }
-    const token = signToken({ id: user.id, role: user.role });
+    const token = signToken({ id: user.id, role: user.role, name: user.name });
     setAuthCookie(res, token);
     return sendSuccess(res, { user: { id: user.id, email, name: user.name, role: user.role } });
   } catch (error) {

@@ -26,8 +26,12 @@ export const createReview = async (req: AuthRequest, res: Response, next: NextFu
       return next(new ApiError(409, "DUPLICATE_REVIEW", "You have already reviewed this product"));
     }
 
-    const user = await User.findById(req.user?.id).lean();
-    const userName = user?.name ?? "Customer";
+    // Prefer name from JWT (fast, no DB round-trip).
+    // Fall back to a DB lookup for sessions issued before this change.
+    const userName =
+      req.user!.name ||
+      ((await User.findById(req.user!.id).select("name").lean()) as { name: string } | null)?.name ||
+      "Anonymous";
 
     const review = await Review.create({
       productId: req.params.productId,

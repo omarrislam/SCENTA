@@ -4,7 +4,7 @@ import { env } from "../config/env";
 import { ApiError } from "../utils/ApiError";
 
 export interface AuthRequest extends Request {
-  user?: { id: string; role: "customer" | "admin" };
+  user?: { id: string; role: "customer" | "admin"; name?: string };
 }
 
 const extractToken = (req: Request): string | null => {
@@ -23,7 +23,7 @@ export const requireAuth = (req: AuthRequest, _res: Response, next: NextFunction
     return next(new ApiError(401, "UNAUTHORIZED", "Missing token"));
   }
   try {
-    const payload = jwt.verify(token, env.JWT_SECRET) as { id: string; role: "customer" | "admin" };
+    const payload = jwt.verify(token, env.JWT_SECRET) as { id: string; role: "customer" | "admin"; name?: string };
     req.user = payload;
     return next();
   } catch (error) {
