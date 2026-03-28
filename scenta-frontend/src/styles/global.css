@@ -5034,3 +5034,44 @@ html {
     letter-spacing: 0.1em;
   }
 }
+
+/* ── Dark-background section (e.g. quiz with background image) ───────────── */
+
+.section-block--dark-bg {
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+}
+
+/* Semi-transparent dark overlay so text is always legible */
+.section-block--dark-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  border-radius: inherit;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* All direct children sit above the overlay */
+.section-block--dark-bg > * {
+  position: relative;
+  z-index: 1;
+}
+
+.section-block--dark-bg .section-title,
+.section-block--dark-bg p {
+  color: #fff;
+}
+
+.section-block--dark-bg .button--primary {
+  --button-bg: rgba(255, 255, 255, 0.15);
+  --button-text: #fff;
+  --button-hover-bg: rgba(255, 255, 255, 0.3);
+  --button-hover-text: #fff;
+  --button-outline: rgba(255, 255, 255, 0.65);
+  border: 1.5px solid rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(4px);
+}

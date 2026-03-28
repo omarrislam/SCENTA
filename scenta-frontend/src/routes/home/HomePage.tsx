@@ -17,7 +17,7 @@ const HomePage = () => {
   useMeta("SCENTA | Signature Fragrance");
   const { addItem } = useCart();
   const { pushToast } = useToast();
-  const { theme } = useTheme();
+  const { theme, isLoading: isThemeLoading } = useTheme();
   const { data, isLoading } = useQuery({
     queryKey: ["products", "home"],
     queryFn: () => listProducts({ limit: 12 }),
@@ -276,7 +276,7 @@ const HomePage = () => {
                       ))}
                     </div>
                   </div>
-                  <div className="hero__media" aria-hidden="true">
+                  <div className="hero__media" aria-hidden="true" style={{ opacity: isThemeLoading ? 0 : 1, transition: "opacity 0.4s ease" }}>
                     <img
                       key={slideImage}
                       className="hero__media-image"
@@ -312,7 +312,7 @@ const HomePage = () => {
                   className="section-block section-block--accent section-block--narrative section-transition"
                   data-reveal
                   style={
-                    bestSetting.backgroundImage
+                    !isThemeLoading && bestSetting.backgroundImage
                       ? { backgroundImage: `url(${resolveApiAssetUrl(bestSetting.backgroundImage) ?? bestSetting.backgroundImage})` }
                       : undefined
                   }
@@ -381,7 +381,7 @@ const HomePage = () => {
                   className="shipping-strip card section-block section-block--divider section-transition"
                   data-reveal
                   style={
-                    shippingSetting.backgroundImage
+                    !isThemeLoading && shippingSetting.backgroundImage
                       ? {
                           backgroundImage: `url(${resolveApiAssetUrl(shippingSetting.backgroundImage) ?? shippingSetting.backgroundImage})`
                         }
@@ -431,7 +431,7 @@ const HomePage = () => {
                     className="collection-strip section-block section-block--divider section-transition"
                     data-reveal
                     style={
-                      collectionsSetting.backgroundImage
+                      !isThemeLoading && collectionsSetting.backgroundImage
                         ? {
                             backgroundImage: `url(${resolveApiAssetUrl(collectionsSetting.backgroundImage) ?? collectionsSetting.backgroundImage})`
                           }
@@ -588,13 +588,14 @@ const HomePage = () => {
             );
           }
           if (section.id === "quiz") {
+            const quizBg = !isThemeLoading && quizSetting.backgroundImage;
             return (
               <section
                 key={section.id}
-                className="card section-block section-block--support section-block--divider section-transition"
+                className={`card section-block section-block--support section-block--divider section-transition${quizBg ? " section-block--dark-bg" : ""}`}
                 data-reveal
                 style={
-                  quizSetting.backgroundImage
+                  quizBg
                     ? { backgroundImage: `url(${resolveApiAssetUrl(quizSetting.backgroundImage) ?? quizSetting.backgroundImage})` }
                     : undefined
                 }
@@ -620,7 +621,7 @@ const HomePage = () => {
                 className="card section-block section-block--support section-transition"
                 data-reveal
                 style={
-                  newsletterSetting.backgroundImage
+                  !isThemeLoading && newsletterSetting.backgroundImage
                     ? {
                         backgroundImage: `url(${resolveApiAssetUrl(newsletterSetting.backgroundImage) ?? newsletterSetting.backgroundImage})`
                       }
