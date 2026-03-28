@@ -2600,11 +2600,12 @@ main {
 
 @media (max-width: 600px) {
   main {
-    padding-inline: 16px;
+    /* Let .container handle horizontal padding — avoids compounding 32px per side */
+    padding-inline: 0;
   }
 
   .section-block {
-    padding: 48px 0;
+    padding: 40px 0;
   }
 
   .section-block--hero {
@@ -2612,7 +2613,7 @@ main {
   }
 
   .home-stack {
-    gap: 40px;
+    gap: 32px;
   }
 
   .shop-layout .product-grid {
@@ -2884,6 +2885,17 @@ main {
 }
 
 @media (max-width: 600px) {
+  /* Tighter chrome on mobile — saves ~24px of vertical space total */
+  :root {
+    --announcement-height: 30px;
+    --nav-height: 56px;
+  }
+
+  .announcement {
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+  }
+
   .layout--home .navbar {
     background: linear-gradient(180deg, rgba(0, 0, 0, 0.42) 0%, rgba(0, 0, 0, 0.1) 60%, rgba(0, 0, 0, 0) 100%);
   }
@@ -4525,8 +4537,12 @@ textarea {
 }
 
 @media (max-width: 480px) {
-  /* Even tighter spacing */
+  /* Even tighter spacing — container provides the horizontal padding */
   main {
+    padding-inline: 0;
+  }
+
+  .container {
     padding-inline: 12px;
   }
 
@@ -4920,7 +4936,7 @@ html {
   /* Better main top padding accounting for both bars */
   main {
     padding-top: calc(var(--nav-height) + 4px);
-    padding-bottom: 64px;
+    padding-bottom: max(64px, env(safe-area-inset-bottom) + 48px);
   }
 
   /* Hero: taller on mobile for visual impact */
