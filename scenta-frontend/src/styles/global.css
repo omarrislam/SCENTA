@@ -145,14 +145,14 @@ body {
 }
 
 .page-fade {
-  animation: page-fade-in 320ms ease;
+  animation: page-fade-in 380ms cubic-bezier(0.16, 1, 0.3, 1);
   padding-top: var(--main-padding-top);
 }
 
 @keyframes page-fade-in {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
@@ -439,6 +439,11 @@ main {
   filter: brightness(0.92);
 }
 
+.button:active:not(:disabled) {
+  transform: scale(0.97);
+  transition: transform 80ms ease;
+}
+
 .button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
@@ -573,6 +578,21 @@ main {
   overflow-x: auto;
   padding-bottom: 8px;
   scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(17, 17, 17, 0.18) transparent;
+}
+
+.product-carousel::-webkit-scrollbar {
+  height: 2px;
+}
+
+.product-carousel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.product-carousel::-webkit-scrollbar-thumb {
+  background: rgba(17, 17, 17, 0.18);
+  border-radius: 999px;
 }
 
 .product-carousel > * {
@@ -710,12 +730,14 @@ main {
   transform: translateY(12px);
 }
 
-.section-block.reveal--in .product-grid > :nth-child(1) { transition-delay: 60ms; }
-.section-block.reveal--in .product-grid > :nth-child(2) { transition-delay: 120ms; }
-.section-block.reveal--in .product-grid > :nth-child(3) { transition-delay: 180ms; }
-.section-block.reveal--in .product-grid > :nth-child(4) { transition-delay: 240ms; }
-.section-block.reveal--in .product-grid > :nth-child(5) { transition-delay: 300ms; }
-.section-block.reveal--in .product-grid > :nth-child(6) { transition-delay: 360ms; }
+.section-block.reveal--in .product-grid > :nth-child(1)  { transition-delay: 50ms; }
+.section-block.reveal--in .product-grid > :nth-child(2)  { transition-delay: 100ms; }
+.section-block.reveal--in .product-grid > :nth-child(3)  { transition-delay: 150ms; }
+.section-block.reveal--in .product-grid > :nth-child(4)  { transition-delay: 200ms; }
+.section-block.reveal--in .product-grid > :nth-child(5)  { transition-delay: 250ms; }
+.section-block.reveal--in .product-grid > :nth-child(6)  { transition-delay: 300ms; }
+.section-block.reveal--in .product-grid > :nth-child(7)  { transition-delay: 350ms; }
+.section-block.reveal--in .product-grid > :nth-child(8)  { transition-delay: 400ms; }
 
 .collection-grid > * {
   transition: transform 240ms ease, box-shadow 240ms ease, opacity 320ms ease;
@@ -764,6 +786,21 @@ main {
   overflow-x: auto;
   padding-bottom: 8px;
   scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(17, 17, 17, 0.18) transparent;
+}
+
+.collection-carousel::-webkit-scrollbar {
+  height: 2px;
+}
+
+.collection-carousel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.collection-carousel::-webkit-scrollbar-thumb {
+  background: rgba(17, 17, 17, 0.18);
+  border-radius: 999px;
 }
 
 .collection-carousel > * {
@@ -908,14 +945,20 @@ main {
   color: var(--color-ink);
 }
 
-.tab.is-active::after {
+.tab::after {
   content: "";
   position: absolute;
-  left: 0;
-  right: 0;
+  left: 50%;
+  right: 50%;
   bottom: -6px;
   height: 1px;
   background: var(--color-accent-dark);
+  transition: left 260ms cubic-bezier(0.16, 1, 0.3, 1), right 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tab.is-active::after {
+  left: 0;
+  right: 0;
 }
 
 .section-intro {
@@ -1002,7 +1045,7 @@ main {
   z-index: 20;
   background: #ffffff;
   border-bottom: 1px solid rgba(17, 17, 17, 0.12);
-  transition: background 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+  transition: background 280ms ease, border-color 280ms ease, box-shadow 280ms ease, color 280ms ease;
 }
 
 .navbar:hover {
@@ -1524,6 +1567,11 @@ main {
   transition: opacity 240ms ease;
 }
 
+.product-card:hover {
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.09);
+  border-color: rgba(17, 17, 17, 0.22);
+}
+
 .product-card:hover .product-card__media::after {
   opacity: 0.2;
 }
@@ -1533,10 +1581,25 @@ main {
   transform: scale(1.04);
 }
 
+/* Desktop hover: reveal actions, keep visible on touch */
+@media (hover: hover) {
+  .product-card__actions {
+    opacity: 0;
+    transform: translateY(5px);
+    transition: opacity 220ms ease, transform 220ms ease;
+  }
+
+  .product-card:hover .product-card__actions,
+  .product-card:focus-within .product-card__actions {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .reveal-init {
   opacity: 0;
-  transform: translateY(12px);
-  transition: opacity 320ms ease, transform 320ms ease;
+  transform: translateY(16px);
+  transition: opacity 420ms cubic-bezier(0.16, 1, 0.3, 1), transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .reveal-init.reveal--in {
@@ -1748,6 +1811,20 @@ main {
   background: rgba(255, 255, 255, 0.85);
   cursor: pointer;
   font-size: 1rem;
+  transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+.product-gallery__nav:hover {
+  background: #ffffff;
+  border-color: rgba(17, 17, 17, 0.4);
+}
+
+.product-gallery__nav--prev:hover {
+  transform: translateY(-50%) translateX(-2px);
+}
+
+.product-gallery__nav--next:hover {
+  transform: translateY(-50%) translateX(2px);
 }
 
 .product-gallery__nav--prev {
@@ -2007,6 +2084,18 @@ main {
   color: #fff;
   background: #2f2623;
   text-align: left;
+  animation: toast-slide-in 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes toast-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .toast--success {
@@ -2795,7 +2884,7 @@ main {
   grid-template-rows: auto 1fr auto auto auto;
   gap: 0;
   transform: translateX(-104%);
-  transition: transform 260ms ease;
+  transition: transform 340ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .cart-drawer.is-open {
@@ -3708,6 +3797,12 @@ textarea {
   display: grid;
   place-items: center;
   padding: 24px;
+  animation: overlay-fade-in 200ms ease;
+}
+
+@keyframes overlay-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .quick-view-modal {
@@ -3717,6 +3812,12 @@ textarea {
   display: grid;
   grid-template-columns: 1fr 1fr;
   position: relative;
+  animation: modal-scale-in 280ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modal-scale-in {
+  from { opacity: 0; transform: scale(0.97) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 .quick-view-modal__close {

@@ -292,7 +292,7 @@ const ShopPage = () => {
               x
             </button>
             <div className="quick-view-modal__media">
-              {quickViewImage?.src ? <img src={quickViewImage.src} srcSet={quickViewImage.srcSet} alt={quickViewName} /> : null}
+              {quickViewImage?.src ? <img src={quickViewImage.src} srcSet={quickViewImage.srcSet} alt={quickViewName} loading="lazy" /> : null}
             </div>
             <div className="quick-view-modal__body">
               <h2>{quickViewName}</h2>

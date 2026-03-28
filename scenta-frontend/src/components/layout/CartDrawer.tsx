@@ -91,7 +91,7 @@ const CartDrawer = () => {
                 return (
                   <article key={item.id} className="cart-drawer__item">
                     <div className="cart-drawer__item-media">
-                      {imageSource?.src ? <img src={imageSource.src} srcSet={imageSource.srcSet} alt="" /> : null}
+                      {imageSource?.src ? <img src={imageSource.src} srcSet={imageSource.srcSet} alt="" loading="lazy" /> : null}
                     </div>
                     <div className="cart-drawer__item-body">
                       <strong>{item.product.name}</strong>
